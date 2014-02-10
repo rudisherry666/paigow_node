@@ -1,8 +1,7 @@
-var PGDot = require('./pgdot');
-
 /*
 *
-* @class PGDot
+* @class PGTile
+*
 *     This file defines the PGTile jS class.
 *
 *     PGTiles contains one or more dots on each half, and they can be red or white.
@@ -30,6 +29,8 @@ var PGDot = require('./pgdot');
 *     (n) mixed six dots on bottom: white 1, 15, 18; red 12, 17, 20
 * 
 */
+
+var PGDot = require('./pgdot');
 
 /*
 * @attribute sequence
