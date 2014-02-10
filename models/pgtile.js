@@ -65,7 +65,6 @@ var sequences = {
 * deck of tiles to the sequences that define the number, location
 * and color of dots.  The set of sequences for each tile are:
 *
-*     gee joon: ch, bj
 *     teen: gn
 *     day: ah
 *     high eight: bi
@@ -81,9 +80,9 @@ var sequences = {
 *     mixed eight: dl, cm
 *     mixed seven: bk, cl
 *     mixed five: bh, ck
+*     gee joon: ch, bj
 */
 var charSequencMap = [
-    'ch', 'bj',     // two gee joon tiles
     'gn', 'gn',     // teen
     'ah', 'ah',     // day
     'bi', 'bi',     // high eight
@@ -98,7 +97,8 @@ var charSequencMap = [
     'bl', 'dm',     // mixed nine
     'dl', 'cm',     // mixed eight
     'bk', 'cl',     // mixed seven
-    'bh', 'ck'     // mixed five
+    'bh', 'ck',     // mixed five
+    'ch', 'bj'      // two gee joon tiles
 ];
 
 /*
@@ -109,7 +109,7 @@ var charSequencMap = [
 *
 */
 function PGTile(index) {
-    if (index < PGTile.prototype.GEE_JOON_1 || index > PGTile.prototype.MIXED_FIVE_2) throw "PGTile: bad constructor param " + index;
+    if (index < PGTile.prototype.TEEN_1 || index > PGTile.prototype.GEE_JOON_2) throw "PGTile: bad constructor param " + index;
     this._index = index;
 }
 
@@ -133,7 +133,36 @@ PGTile.prototype.json = function() {
         top: jsonOfHalf('top'),
         bottom: jsonOfHalf('bottom')
     };
-}
+};
+
+/*
+* @method handChar
+*
+* Return the char relative to the hand table ranking
+*
+*/
+PGTile.prototype.handChar = function() {
+    return String.fromCharCode(97 + Math.floor((this._index)/2));
+};
+
+/*
+* @method compare
+*
+* Returns 1 if it beats the param, 0 if it's equal, -1 if it's lower.
+*
+* @param tile the tile to compare to
+*/
+PGTile.prototype.compare = function(tile) {
+    if (!tile) throw "PGTile.compare given null tile to compare"
+    var myRank = this.rank();
+    var hisRank = hand.rank();
+    if (myRank > hisRank)
+        return 1;
+    else if (myRank < hisRank)
+        return -1;
+    else
+        return 0;
+};
 
 /*
 * @method dotSequenceOf
@@ -165,7 +194,7 @@ PGTile.prototype._dotSequenceOf = function(color, half) {
     // console.log("tileColorSequence: " + tileColorSequence);
 
     return tileColorSequence;
-}
+};
 
 /*
 * @method _dotsOfSequence
@@ -179,7 +208,7 @@ PGTile.prototype._dotsOfSequence = function(sequence, color) {
         dots.push(new PGDot(sequence[si], color));
     }
     return dots;
-}
+};
 
 /*
 * @method dotsOfHalf
@@ -190,66 +219,46 @@ PGTile.prototype._dotsOfSequence = function(sequence, color) {
 PGTile.prototype._dotsOfHalf = function(half) {
     return [].concat(this._dotsOfSequence(this._dotSequenceOf('red', half), 'red'),
                      this._dotsOfSequence(this._dotSequenceOf('white', half), 'white'));
-}
+};
 
 /*
 * @attribute tilenames
 *
-* For convenience, the tile names for the indexes when creating them.  These are in the prototype but I don't know of a better way.
+* For convenience, the tile chars for the indexes when creating them.  These are in the prototype but I don't know of a better way.
 *
 */
-PGTile.prototype.GEE_JOON_1 = 0;
-PGTile.prototype.GEE_JOON_2 = 1;
-PGTile.prototype.TEEN_1 = 2;
-PGTile.prototype.TEEN_2 = 3;
-PGTile.prototype.DAY_1 = 4;
-PGTile.prototype.DAY_2 = 5;
-PGTile.prototype.HIGH_EIGHT_1 = 6;
-PGTile.prototype.HIGH_EIGHT_2 = 7;
-PGTile.prototype.HARMONY_FOUR_1 = 8;
-PGTile.prototype.HARMONY_FOUR = 9;
-PGTile.prototype.HIGH_TEN_1 = 10;
-PGTile.prototype.HIGH_TEN_2 = 11;
-PGTile.prototype.LONG_SIX_1 = 12;
-PGTile.prototype.LONG_SIX_2 = 13;
-PGTile.prototype.LOW_FOUR_1 = 14;
-PGTile.prototype.LOW_FOUR = 15;
-PGTile.prototype.ELEVEN_1 = 16;
-PGTile.prototype.ELEVEN_2 = 17;
-PGTile.prototype.LOW_TEN_1 = 18;
-PGTile.prototype.LOW_TEN = 19;
-PGTile.prototype.SEVEN_1 = 20;
-PGTile.prototype.SEVEN_2 = 21;
-PGTile.prototype.LOW_SIX_1 = 22;
-PGTile.prototype.LOW_SIX_2 = 23;
-PGTile.prototype.MIXED_NINE_1 = 24;
-PGTile.prototype.MIXED_NINE_2 = 25;
-PGTile.prototype.MIXED_EIGHT_1 = 26;
-PGTile.prototype.MIXED_EIGHT_2 = 27;
-PGTile.prototype.MIXED_SEVEN_1 = 28;
-PGTile.prototype.MIXED_SEVEN_2 = 29;
-PGTile.prototype.MIXED_FIVE_1 = 30;
-PGTile.prototype.MIXED_FIVE_2 = 31;
-
-
-var charSequencMap = [
-    'ch', 'bj',     // two gee joon tiles
-    'gn', 'gn',     // teen
-    'ah', 'ah',     // day
-    'bi', 'bi',     // high eight
-    'ak', 'ak',     // harmony four
-    'el', 'el',     // high ten
-    'dk', 'dk',     // long six
-    'cj', 'cj',     // low four
-    'fl', 'fl',     // eleven
-    'bm', 'bm',     // low ten
-    'am', 'am',     // high seven
-    'al', 'al',     // low six
-    'bl', 'dm',     // mixed nine
-    'dl', 'cm',     // mixed eight
-    'bk', 'cl',     // mixed seven
-    'bh', 'ck'     // mixed five
-];
+PGTile.prototype.TEEN_1 = 0;
+PGTile.prototype.TEEN_2 = 1;
+PGTile.prototype.DAY_1 = 2;
+PGTile.prototype.DAY_2 = 3;
+PGTile.prototype.HIGH_EIGHT_1 = 4;
+PGTile.prototype.HIGH_EIGHT_2 = 5;
+PGTile.prototype.HARMONY_FOUR_1 = 6;
+PGTile.prototype.HARMONY_FOUR = 7;
+PGTile.prototype.HIGH_TEN_1 = 8;
+PGTile.prototype.HIGH_TEN_2 = 9;
+PGTile.prototype.LONG_SIX_1 = 10;
+PGTile.prototype.LONG_SIX_2 = 11;
+PGTile.prototype.LOW_FOUR_1 = 12;
+PGTile.prototype.LOW_FOUR_2 = 13;
+PGTile.prototype.ELEVEN_1 = 14;
+PGTile.prototype.ELEVEN_2 = 15;
+PGTile.prototype.LOW_TEN_1 = 16;
+PGTile.prototype.LOW_TEN_2 = 17;
+PGTile.prototype.SEVEN_1 = 18;
+PGTile.prototype.SEVEN_2 = 19;
+PGTile.prototype.LOW_SIX_1 = 20;
+PGTile.prototype.LOW_SIX_2 = 21;
+PGTile.prototype.MIXED_NINE_1 = 22;
+PGTile.prototype.MIXED_NINE_2 = 23;
+PGTile.prototype.MIXED_EIGHT_1 = 24;
+PGTile.prototype.MIXED_EIGHT_2 = 25;
+PGTile.prototype.MIXED_SEVEN_1 = 26;
+PGTile.prototype.MIXED_SEVEN_2 = 27;
+PGTile.prototype.MIXED_FIVE_1 = 28;
+PGTile.prototype.MIXED_FIVE_2 = 29;
+PGTile.prototype.GEE_JOON_1 = 30;
+PGTile.prototype.GEE_JOON_2 = 31;
 
 
 module.exports = PGTile;
