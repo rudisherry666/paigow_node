@@ -155,7 +155,7 @@ PGTile.prototype.handChar = function() {
 PGTile.prototype.compare = function(tile) {
     if (!tile) throw "PGTile.compare given null tile to compare"
     var myRank = this.rank();
-    var hisRank = hand.rank();
+    var hisRank = tile.rank();
     if (myRank > hisRank)
         return 1;
     else if (myRank < hisRank)
@@ -163,6 +163,16 @@ PGTile.prototype.compare = function(tile) {
     else
         return 0;
 };
+
+/*
+* @method rank
+*
+* returns the rank of this hand, the higher the better.
+*/
+PGTile.prototype.rank = function() {
+    // TODO
+    return 1;
+}
 
 /*
 * @method dotSequenceOf
