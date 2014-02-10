@@ -16,7 +16,7 @@ describe('PGTile', function() {
         });
     });
     it('should throw on bad sequence getter', function() {
-        var pgTile = new PGTile(1);
+        var pgTile = new PGTile(PGTile.prototype.ELEVEN);
         assert.throws(function() {
             var sequence = pgTile.dotSequenceOf('blue', 'top');
         });
