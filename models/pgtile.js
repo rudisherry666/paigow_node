@@ -109,7 +109,7 @@ var charSequencMap = [
 *
 */
 function PGTile(index) {
-    if (index < 0 || index >= charSequencMap.length) throw "PGTile: bad constructor param " + index;
+    if (index < PGTile.prototype.GEE_JOON_1 || index > PGTile.prototype.MIXED_FIVE_2) throw "PGTile: bad constructor param " + index;
     this._index = index;
 }
 
@@ -191,6 +191,65 @@ PGTile.prototype._dotsOfHalf = function(half) {
     return [].concat(this._dotsOfSequence(this._dotSequenceOf('red', half), 'red'),
                      this._dotsOfSequence(this._dotSequenceOf('white', half), 'white'));
 }
+
+/*
+* @attribute tilenames
+*
+* For convenience, the tile names for the indexes when creating them.  These are in the prototype but I don't know of a better way.
+*
+*/
+PGTile.prototype.GEE_JOON_1 = 0;
+PGTile.prototype.GEE_JOON_2 = 1;
+PGTile.prototype.TEEN_1 = 2;
+PGTile.prototype.TEEN_2 = 3;
+PGTile.prototype.DAY_1 = 4;
+PGTile.prototype.DAY_2 = 5;
+PGTile.prototype.HIGH_EIGHT_1 = 6;
+PGTile.prototype.HIGH_EIGHT_2 = 7;
+PGTile.prototype.HARMONY_FOUR_1 = 8;
+PGTile.prototype.HARMONY_FOUR = 9;
+PGTile.prototype.HIGH_TEN_1 = 10;
+PGTile.prototype.HIGH_TEN_2 = 11;
+PGTile.prototype.LONG_SIX_1 = 12;
+PGTile.prototype.LONG_SIX_2 = 13;
+PGTile.prototype.LOW_FOUR_1 = 14;
+PGTile.prototype.LOW_FOUR = 15;
+PGTile.prototype.ELEVEN_1 = 16;
+PGTile.prototype.ELEVEN_2 = 17;
+PGTile.prototype.LOW_TEN_1 = 18;
+PGTile.prototype.LOW_TEN = 19;
+PGTile.prototype.SEVEN_1 = 20;
+PGTile.prototype.SEVEN_2 = 21;
+PGTile.prototype.LOW_SIX_1 = 22;
+PGTile.prototype.LOW_SIX_2 = 23;
+PGTile.prototype.MIXED_NINE_1 = 24;
+PGTile.prototype.MIXED_NINE_2 = 25;
+PGTile.prototype.MIXED_EIGHT_1 = 26;
+PGTile.prototype.MIXED_EIGHT_2 = 27;
+PGTile.prototype.MIXED_SEVEN_1 = 28;
+PGTile.prototype.MIXED_SEVEN_2 = 29;
+PGTile.prototype.MIXED_FIVE_1 = 30;
+PGTile.prototype.MIXED_FIVE_2 = 31;
+
+
+var charSequencMap = [
+    'ch', 'bj',     // two gee joon tiles
+    'gn', 'gn',     // teen
+    'ah', 'ah',     // day
+    'bi', 'bi',     // high eight
+    'ak', 'ak',     // harmony four
+    'el', 'el',     // high ten
+    'dk', 'dk',     // long six
+    'cj', 'cj',     // low four
+    'fl', 'fl',     // eleven
+    'bm', 'bm',     // low ten
+    'am', 'am',     // high seven
+    'al', 'al',     // low six
+    'bl', 'dm',     // mixed nine
+    'dl', 'cm',     // mixed eight
+    'bk', 'cl',     // mixed seven
+    'bh', 'ck'     // mixed five
+];
 
 
 module.exports = PGTile;

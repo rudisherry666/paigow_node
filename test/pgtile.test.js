@@ -3,16 +3,16 @@ var assert = require('assert'),
 
 describe('PGTile', function() {
     it('should return a PGTile object', function() {
-        var pgTile = new PGTile(1);
+        var pgTile = new PGTile(PGTile.prototype.GEE_JOON_1);
         assert.notEqual(pgTile, null);
     });
     it('should throw on bad constructor params', function() {
         var pgTile;
         assert.throws(function() {
-            pgTile = new PGTile(-1);
+            pgTile = new PGTile(PGTile.prototype.GEE_JOON_1 - 1);
         });
         assert.throws(function() {
-            pgTile = new PGTile(300);
+            pgTile = new PGTile(PGTile.prototype.MIXED_FIVE_2 + 1);
         });
     });
     it('should throw on bad sequence getter', function() {
