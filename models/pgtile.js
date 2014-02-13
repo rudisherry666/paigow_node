@@ -33,6 +33,108 @@
 var PGDot = require('./pgdot');
 
 /*
+* @attribute tilenames
+*
+* For convenience, names for the tile indexes for the indexes when creating them.  These are
+* indexes into the 'tiles' array below.
+*
+*/
+PGTile.prototype.TILE_INDEX = {
+    TEEN_1:         0,
+    TEEN_2:         1,
+    DAY_1:          2,
+    DAY_2:          3,
+    HIGH_EIGHT_1:   4,
+    HIGH_EIGHT_2:   5,
+    HARMONY_FOUR_1: 6,
+    HARMONY_FOUR_2: 7,
+    HIGH_TEN_1:     8,
+    HIGH_TEN_2:     9,
+    LONG_SIX_1:     10,
+    LONG_SIX_2:     11,
+    LOW_FOUR_1:     12,
+    LOW_FOUR_2:     13,
+    ELEVEN_1:       14,
+    ELEVEN_2:       15,
+    LOW_TEN_1:      16,
+    LOW_TEN_2:      17,
+    SEVEN_1:        18,
+    SEVEN_2:        19,
+    LOW_SIX_1:      20,
+    LOW_SIX_2:      21,
+    MIXED_NINE_1:   22,
+    MIXED_NINE_2:   23,
+    MIXED_EIGHT_1:  24,
+    MIXED_EIGHT_2:  25,
+    MIXED_SEVEN_1:  26,
+    MIXED_SEVEN_2:  27,
+    MIXED_FIVE_1:   28,
+    MIXED_FIVE_2:   29,
+    GEE_JOON_1:     30,
+    GEE_JOON_2:     31
+};
+
+/*
+* These define the tiles, given the index.  The index into this array should match 
+* the name given by TILE_INDEX.
+*/
+
+PGTile.prototype.TILE_CHARS = {
+    TEEN:         'a',
+    DAY:          'b',
+    HIGH_EIGHT:   'c',
+    HARMONY_FOUR: 'd',
+    HIGH_TEN:     'e',
+    LONG_SIX:     'f',
+    LOW_FOUR:     'g',
+    ELEVEN:       'h',
+    LOW_TEN:      'i',
+    SEVEN:        'j',
+    LOW_SIX:      'k',
+    MIXED_NINE:   'l',
+    MIXED_EIGHT:  'm',
+    MIXED_SEVEN:  'n',
+    MIXED_FIVE:   'o',
+    GEE_JOON:     'p'
+};
+
+var tiles = [
+    { tileChar:PGTile.prototype.TILE_CHARS.TEEN,            dotCharSeq:'GN', tileRank:15, pairRank:14 },
+    { tileChar:PGTile.prototype.TILE_CHARS.TEEN,            dotCharSeq:'GN', tileRank:15, pairRank:14 },
+    { tileChar:PGTile.prototype.TILE_CHARS.DAY,             dotCharSeq:'AH', tileRank:14, pairRank:13 },
+    { tileChar:PGTile.prototype.TILE_CHARS.DAY,             dotCharSeq:'AH', tileRank:14, pairRank:13 },
+    { tileChar:PGTile.prototype.TILE_CHARS.HIGH_EIGHT,      dotCharSeq:'BI', tileRank:13, pairRank:12 },
+    { tileChar:PGTile.prototype.TILE_CHARS.HIGH_EIGHT,      dotCharSeq:'BI', tileRank:13, pairRank:12 },
+    { tileChar:PGTile.prototype.TILE_CHARS.HARMONY_FOUR,    dotCharSeq:'AK', tileRank:12, pairRank:11 },
+    { tileChar:PGTile.prototype.TILE_CHARS.HARMONY_FOUR,    dotCharSeq:'AK', tileRank:12, pairRank:11 },
+    { tileChar:PGTile.prototype.TILE_CHARS.HIGH_TEN,        dotCharSeq:'EL', tileRank:11, pairRank:10 },
+    { tileChar:PGTile.prototype.TILE_CHARS.HIGH_TEN,        dotCharSeq:'EL', tileRank:11, pairRank:10 },
+    { tileChar:PGTile.prototype.TILE_CHARS.LONG_SIX,        dotCharSeq:'BK', tileRank:10, pairRank: 9 },
+    { tileChar:PGTile.prototype.TILE_CHARS.LONG_SIX,        dotCharSeq:'BK', tileRank:10, pairRank: 9 },
+    { tileChar:PGTile.prototype.TILE_CHARS.LOW_FOUR,        dotCharSeq:'CJ', tileRank: 9, pairRank: 8 },
+    { tileChar:PGTile.prototype.TILE_CHARS.LOW_FOUR,        dotCharSeq:'CJ', tileRank: 9, pairRank: 8 },
+    { tileChar:PGTile.prototype.TILE_CHARS.ELEVEN,          dotCharSeq:'FL', tileRank: 8, pairRank: 7 },
+    { tileChar:PGTile.prototype.TILE_CHARS.ELEVEN,          dotCharSeq:'FL', tileRank: 8, pairRank: 7 },
+    { tileChar:PGTile.prototype.TILE_CHARS.LOW_TEN,         dotCharSeq:'BM', tileRank: 7, pairRank: 6 },
+    { tileChar:PGTile.prototype.TILE_CHARS.LOW_TEN,         dotCharSeq:'BM', tileRank: 7, pairRank: 6 },
+    { tileChar:PGTile.prototype.TILE_CHARS.SEVEN,           dotCharSeq:'AM', tileRank: 6, pairRank: 5 },
+    { tileChar:PGTile.prototype.TILE_CHARS.SEVEN,           dotCharSeq:'AM', tileRank: 6, pairRank: 5 },
+    { tileChar:PGTile.prototype.TILE_CHARS.LOW_SIX,         dotCharSeq:'AL', tileRank: 5, pairRank: 4 },
+    { tileChar:PGTile.prototype.TILE_CHARS.LOW_SIX,         dotCharSeq:'AL', tileRank: 5, pairRank: 4 },
+    { tileChar:PGTile.prototype.TILE_CHARS.MIXED_NINE,      dotCharSeq:'BL', tileRank: 4, pairRank: 3 },
+    { tileChar:PGTile.prototype.TILE_CHARS.MIXED_NINE,      dotCharSeq:'DM', tileRank: 4, pairRank: 3 },
+    { tileChar:PGTile.prototype.TILE_CHARS.MIXED_EIGHT,     dotCharSeq:'DL', tileRank: 3, pairRank: 2 },
+    { tileChar:PGTile.prototype.TILE_CHARS.MIXED_EIGHT,     dotCharSeq:'CM', tileRank: 3, pairRank: 2 },
+    { tileChar:PGTile.prototype.TILE_CHARS.MIXED_SEVEN,     dotCharSeq:'BK', tileRank: 2, pairRank: 1 },
+    { tileChar:PGTile.prototype.TILE_CHARS.MIXED_SEVEN,     dotCharSeq:'CL', tileRank: 2, pairRank: 1 },
+    { tileChar:PGTile.prototype.TILE_CHARS.MIXED_FIVE,      dotCharSeq:'BH', tileRank: 1, pairRank: 0 },
+    { tileChar:PGTile.prototype.TILE_CHARS.MIXED_FIVE,      dotCharSeq:'CK', tileRank: 1, pairRank: 0 },
+    { tileChar:PGTile.prototype.TILE_CHARS.GEE_JOON,        dotCharSeq:'CH', tileRank: 0, pairRank:15 },
+    { tileChar:PGTile.prototype.TILE_CHARS.GEE_JOON,        dotCharSeq:'BJ', tileRank: 0, pairRank:15 }
+];
+
+
+/*
 * @attribute sequence
 *
 * Used for display purposes when generating HTML.
@@ -40,8 +142,29 @@ var PGDot = require('./pgdot');
 * each of the dotSequences. Each letter implies a set of red
 * dot locations (by number) and a set of white dot locations
 * (by number), in two lists.
+*
+* These are the charcodes that map from an index into the entire
+* deck of tiles to the dotSequences that define the number, location
+* and color of dots.  The set of dotSequences for each tile are:
+*
+*     teen: GN
+*     day: AH
+*     high eight: BI
+*     harmony four: AK
+*     high ten: EL
+*     long six: DK
+*     low four: CJ
+*     eleven: FL
+*     low ten: BM
+*     high seven: AM
+*     low six: AL
+*     mixed nine: BL, DM
+*     mixed eight: DL, CM
+*     mixed seven: BK, CL
+*     mixed five: BH, CK
+*     gee joon: CH, BJ
 */
-var dotSequences = {
+var dotCharSeqs = {
     'A': { 'red': [2], 'white': [] },
     'B': { 'red': [1,3,7,8], 'white': [] },
     'C': { 'red': [], 'white': [1,3] },
@@ -57,49 +180,6 @@ var dotSequences = {
     'M': { 'red': [], 'white': [11,12,15,17,18,20] },
     'N': { 'red': [12,17,20], 'white': [11,15,18] },
 };
-
-/* @attribute dotSequenceMap
-*
-* Used for display purposes when generating HTML.
-* These are the charcodes that map from an index into the entire
-* deck of tiles to the dotSequences that define the number, location
-* and color of dots.  The set of dotSequences for each tile are:
-*
-*     teen: gn
-*     day: ah
-*     high eight: bi
-*     harmony four: ak
-*     high ten: el
-*     long six: dk
-*     low four: cj
-*     eleven: fl
-*     low ten: bm
-*     high seven: am
-*     low six: al
-*     mixed nine: bl, dm
-*     mixed eight: dl, cm
-*     mixed seven: bk, cl
-*     mixed five: bh, ck
-*     gee joon: ch, bj
-*/
-var dotSequenceMap = [
-    'GN', 'GN',     // teen
-    'AH', 'AH',     // day
-    'BI', 'BI',     // high eight
-    'AK', 'AK',     // harmony four
-    'EL', 'EL',     // high ten
-    'DK', 'DK',     // long six
-    'CJ', 'CJ',     // low four
-    'FL', 'FL',     // eleven
-    'BM', 'BM',     // low ten
-    'AM', 'AM',     // high seven
-    'AL', 'AL',     // low six
-    'BL', 'DM',     // mixed nine
-    'DL', 'CM',     // mixed eight
-    'BK', 'CL',     // mixed seven
-    'BH', 'CK',     // mixed five
-    'CH', 'BJ'      // two gee joon tiles
-];
 
 /*
 * @constructor
@@ -142,7 +222,8 @@ PGTile.prototype.json = function() {
 *
 */
 PGTile.prototype.handChar = function() {
-    return String.fromCharCode(97 + Math.floor((this._index)/2));
+    var tileObj = tiles[this._index];
+    return tileObj.tileChar;
 };
 
 /*
@@ -187,7 +268,7 @@ PGTile.prototype._dotSequenceOf = function(color, half) {
     if (color !== 'red' && color !== 'white') throw "PGTile.dotSequenceOf: bad color " + color;
     if (half !== 'top' && half !== 'bottom')  throw "PGTile.dotSequenceOf: bad half " + half;
 
-    var charSeq = dotSequenceMap[this._index];
+    var charSeq = tiles[this._index].dotCharSeq;
     if (!charSeq) throw "PGTile.dotSequenceOf: bad tile index " + this._index;
     // console.log("charSeq: " + charSeq);
 
@@ -195,7 +276,7 @@ PGTile.prototype._dotSequenceOf = function(color, half) {
     if (!char) throw "PGTile.dotSequenceOf: bad charSeq " + charSeq;
     // console.log("char: " + char);
 
-    var tileSequences = dotSequences[char];
+    var tileSequences = dotCharSeqs[char];
     if (!tileSequences) throw "PGTile.dotSequenceOf: bad char " + char;
     // console.log("tileSequences: " + tileSequences);
 
@@ -231,71 +312,5 @@ PGTile.prototype._dotsOfHalf = function(half) {
                      this._dotsOfSequence(this._dotSequenceOf('white', half), 'white'));
 };
 
-/*
-* @attribute tilenames
-*
-* For convenience, the tile indexes for the indexes when creating them.  These are in the prototype but I don't know of a better way.
-*
-*/
-PGTile.prototype.TILE_INDEX = {
-    TEEN_1:         0,
-    TEEN_2:         1,
-    DAY_1:          2,
-    DAY_2:          3,
-    HIGH_EIGHT_1:   4,
-    HIGH_EIGHT_2:   5,
-    HARMONY_FOUR_1: 6,
-    HARMONY_FOUR_2: 7,
-    HIGH_TEN_1:     8,
-    HIGH_TEN_2:     9,
-    LONG_SIX_1:     10,
-    LONG_SIX_2:     11,
-    LOW_FOUR_1:     12,
-    LOW_FOUR_2:     13,
-    ELEVEN_1:       14,
-    ELEVEN_2:       15,
-    LOW_TEN_1:      16,
-    LOW_TEN_2:      17,
-    SEVEN_1:        18,
-    SEVEN_2:        19,
-    LOW_SIX_1:      20,
-    LOW_SIX_2:      21,
-    MIXED_NINE_1:   22,
-    MIXED_NINE_2:   23,
-    MIXED_EIGHT_1:  24,
-    MIXED_EIGHT_2:  25,
-    MIXED_SEVEN_1:  26,
-    MIXED_SEVEN_2:  27,
-    MIXED_FIVE_1:   28,
-    MIXED_FIVE_2:   29,
-    GEE_JOON_1:     30,
-    GEE_JOON_2:     31
-};
-
-/*
-* @attribute tileCHARS
-*
-* For convenience, the tile chars for the indexes when looking at hands
-*
-*/
-
-PGTile.prototype.TILE_CHARS = {
-    TEEN:         'a',
-    DAY:          'b',
-    HIGH_EIGHT:   'c',
-    HARMONY_FOUR: 'd',
-    HIGH_TEN:     'e',
-    LONG_SIX:     'f',
-    LOW_FOUR:     'g',
-    ELEVEN:       'h',
-    LOW_TEN:      'i',
-    SEVEN:        'j',
-    LOW_SIX:      'k',
-    MIXED_NINE:   'l',
-    MIXED_EIGHT:  'm',
-    MIXED_SEVEN:  'n',
-    MIXED_FIVE:   'o',
-    GEE_JOON:     'p'
-};
 
 module.exports = PGTile;
