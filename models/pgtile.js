@@ -222,8 +222,7 @@ PGTile.prototype.json = function() {
 *
 */
 PGTile.prototype.handChar = function() {
-    var tileObj = tiles[this._index];
-    return tileObj.tileChar;
+    return tiles[this._index].tileChar;
 };
 
 /*
@@ -235,8 +234,8 @@ PGTile.prototype.handChar = function() {
 */
 PGTile.prototype.compare = function(tile) {
     if (!tile) throw "PGTile.compare given null tile to compare";
-    var myRank = this.rank();
-    var hisRank = tile.rank();
+    var myRank = this.tileRank();
+    var hisRank = tile.tileRank();
     if (myRank > hisRank)
         return 1;
     else if (myRank < hisRank)
@@ -246,13 +245,21 @@ PGTile.prototype.compare = function(tile) {
 };
 
 /*
-* @method rank
+* @method tileRank
 *
-* returns the rank of this hand, the higher the better.
+* returns the rank of this tile, the higher the better.
 */
-PGTile.prototype.rank = function() {
-    // TODO
-    return 1;
+PGTile.prototype.tileRank = function() {
+    return tiles[this._index].tileRank;
+};
+
+/*
+* @method pairRank
+*
+* returns the rank of a pair of this tile, the higher the better.
+*/
+PGTile.prototype.pairRank = function() {
+    return tiles[this._index].pairRank;
 };
 
 /*
