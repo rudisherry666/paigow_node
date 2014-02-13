@@ -3,7 +3,7 @@ var assert = require('assert'),
 
 describe('PGTile', function() {
     it('should return a PGTile object', function() {
-        var pgTile = new PGTile(PGTile.prototype.GEE_JOON_1);
+        var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.GEE_JOON_1);
         assert.notEqual(pgTile, null);
     });
     it('should throw on bad constructor params', function() {
@@ -28,20 +28,20 @@ describe('PGTile', function() {
         });
     });
     it('should return a good json object', function() {
-        var pgTile = new PGTile(PGTile.prototype.TEEN_2); // teen
+        var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.TEEN_2); // teen
         var tileJSON = pgTile.json();
         assert.equal(tileJSON.top.length, 6);
         assert.equal(tileJSON.bottom.length, 6);
     });
     it ('should return the correct char', function() {
-        var pgTile = new PGTile(PGTile.prototype.MIXED_SEVEN_1);
+        var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.MIXED_SEVEN_1);
         assert.equal(pgTile.handChar(), 'n');
     });
     it('should return the correct number of dots', function() {
-        var pgTile = new PGTile(PGTile.prototype.LOW_TEN_1); // teen
+        var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.LOW_TEN_1); // teen
         assert.equal(pgTile._dotsOfHalf('top').length, 4);
         assert.equal(pgTile._dotsOfHalf('bottom').length, 6);
-        pgTile = new PGTile(PGTile.prototype.DAY_1); // day
+        pgTile = new PGTile(PGTile.prototype.TILE_INDEX.DAY_1); // day
         assert.equal(pgTile._dotsOfHalf('bottom').length, 1);
     });
 });

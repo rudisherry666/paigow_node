@@ -3,10 +3,10 @@ var assert = require('assert'),
     PGHand = require('../models/pghand');
 
 describe('PGHand', function() {
-    var tileEleven = new PGTile(PGTile.prototype.ELEVEN_1),
-        tileEight = new PGTile(PGTile.prototype.MIXED_EIGHT_1),
-        tileDay = new PGTile(PGTile.prototype.DAY_2),
-        tileFour = new PGTile(PGTile.prototype.HARMONY_FOUR_1);
+    var tileEleven = new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1),
+        tileEight = new PGTile(PGTile.prototype.TILE_INDEX.MIXED_EIGHT_1),
+        tileDay = new PGTile(PGTile.prototype.TILE_INDEX.DAY_2),
+        tileFour = new PGTile(PGTile.prototype.TILE_INDEX.HARMONY_FOUR_1);
     it('should return a PGHand object', function() {
         var pgHand = new PGHand(tileEleven, tileEight);
         assert.notEqual(pgHand, null);
