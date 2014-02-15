@@ -12,6 +12,7 @@ var app = express();
 app.configure(function(){
     app.set('port', process.env.PORT || 8088);
     app.set('views', __dirname + '/views');
+    app.use(express.static(__dirname + '/static'));
     // app.engine('html', require('ejs').renderFile);
     app.use(express.favicon());
     app.use(express.logger('dev'));
@@ -29,6 +30,12 @@ app.configure('development', function(){
 app.get('/', function(req, res){
     res.render('index.ejs', {
         title: 'Home'
+    });
+});
+
+app.get('/tile', function(req, res){
+    res.render('pgtile.ejs', {
+        title: 'Tile'
     });
 });
 

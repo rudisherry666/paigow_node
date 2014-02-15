@@ -12,27 +12,27 @@
     some sort of percentage.
 */
 var locations = [
-    [  0,  0 ],   // placeholder: dots start at one
-    [  4,  6 ],
-    [  4, 17 ],
-    [  4, 28 ],
-    [ 24,  6 ],
-    [ 24, 17 ],
-    [ 24, 28 ],
-    [ 34,  6 ],
-    [ 34, 28 ],
-    [ 44,  6 ],
-    [ 44, 28 ],
-    [ 64,  6 ],
-    [ 64, 28 ],
-    [ 74,  6 ],
-    [ 74, 28 ],
-    [ 84,  6 ],
-    [ 84, 17 ],
-    [ 84, 28 ],
-    [104,  6 ],
-    [104, 17 ],
-    [104, 28 ],
+  [  0,  0 ],   //  0 placeholder: dots start at one
+  [  4,  6 ],   //  1 top left
+  [  4, 17 ],   //  2 top middle
+  [  4, 28 ],   //  3 top right
+  [ 24,  6 ],   //  4 upper-middle left
+  [ 24, 17 ],   //  5 upper-middle middle
+  [ 24, 28 ],   //  6 upper-middle right
+  [ 34,  6 ],   //  7 
+  [ 34, 28 ],   //  8
+  [ 44,  6 ],   //  9
+  [ 44, 28 ],   // 10 middle left
+  [ 64,  6 ],   // 11 middle right
+  [ 64, 28 ],   // 12
+  [ 74,  6 ],   // 13 
+  [ 74, 28 ],   // 14
+  [ 84,  6 ],   // 15 lower-middle left
+  [ 84, 17 ],   // 16 lower-middle middle
+  [ 84, 28 ],   // 17 lower-middle right
+  [104,  6 ],   // 18 bottom left
+  [104, 17 ],   // 19 bottom middle
+  [104, 28 ],   // 20 bottom right
 ];
 
 /*
