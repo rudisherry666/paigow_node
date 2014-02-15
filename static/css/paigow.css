@@ -62,6 +62,8 @@
   display: block;
 }
 
+/* ----------- HIGH-EIGHT ----------- */
+
 .pgtile-high-eight .pgdot-1,
 .pgtile-high-eight .pgdot-3,
 .pgtile-high-eight .pgdot-7,
@@ -103,6 +105,259 @@
 .pgtile-high-ten .pgdot-16,
 .pgtile-high-ten .pgdot-18,
 .pgtile-high-ten .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- HIGH-SIX ----------- */
+
+.pgtile-high-six .pgdot-1,
+.pgtile-high-six .pgdot-5,
+.pgtile-high-six .pgdot-10,
+.pgtile-high-six .pgdot-11,
+.pgtile-high-six .pgdot-16,
+.pgtile-high-six .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- HIGH-FOUR ----------- */
+
+.pgtile-high-four .pgdot-1,
+.pgtile-high-four .pgdot-3,
+.pgtile-high-four .pgdot-18,
+.pgtile-high-four .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- ELEVEN ----------- */
+
+.pgtile-eleven .pgdot-1,
+.pgtile-eleven .pgdot-3,
+.pgtile-eleven .pgdot-5,
+.pgtile-eleven .pgdot-9,
+.pgtile-eleven .pgdot-10,
+.pgtile-eleven .pgdot-11,
+.pgtile-eleven .pgdot-12,
+.pgtile-eleven .pgdot-15,
+.pgtile-eleven .pgdot-17,
+.pgtile-eleven .pgdot-18,
+.pgtile-eleven .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- LOW-TEN ----------- */
+
+.pgtile-low-ten .pgdot-1,
+.pgtile-low-ten .pgdot-3,
+.pgtile-low-ten .pgdot-7,
+.pgtile-low-ten .pgdot-8
+{
+  background: Firebrick;
+  display: block;
+}
+
+.pgtile-low-ten .pgdot-11,
+.pgtile-low-ten .pgdot-12,
+.pgtile-low-ten .pgdot-15,
+.pgtile-low-ten .pgdot-17,
+.pgtile-low-ten .pgdot-18,
+.pgtile-low-ten .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- HIGH-SEVEN ----------- */
+
+.pgtile-high-seven .pgdot-2
+{
+  background: Firebrick;
+  display: block;
+}
+
+.pgtile-high-seven .pgdot-11,
+.pgtile-high-seven .pgdot-12,
+.pgtile-high-seven .pgdot-15,
+.pgtile-high-seven .pgdot-17,
+.pgtile-high-seven .pgdot-18,
+.pgtile-high-seven .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- LOW-SIX ----------- */
+
+.pgtile-low-six .pgdot-2
+{
+  background: Firebrick;
+  display: block;
+}
+
+.pgtile-low-six .pgdot-11,
+.pgtile-low-six .pgdot-12,
+.pgtile-low-six .pgdot-16,
+.pgtile-low-six .pgdot-18,
+.pgtile-low-six .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- MIXED-NINE ----------- */
+
+.pgtile-mixed-nine-1 .pgdot-1,
+.pgtile-mixed-nine-1 .pgdot-5,
+.pgtile-mixed-nine-1 .pgdot-10,
+.pgtile-mixed-nine-1 .pgdot-11,
+.pgtile-mixed-nine-1 .pgdot-12,
+.pgtile-mixed-nine-1 .pgdot-15,
+.pgtile-mixed-nine-1 .pgdot-17,
+.pgtile-mixed-nine-1 .pgdot-18,
+.pgtile-mixed-nine-1 .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+.pgtile-mixed-nine-2 .pgdot-1,
+.pgtile-mixed-nine-2 .pgdot-3,
+.pgtile-mixed-nine-2 .pgdot-7,
+.pgtile-mixed-nine-2 .pgdot-8
+{
+  background: Firebrick;
+  display: block;
+}
+
+.pgtile-mixed-nine-2 .pgdot-11,
+.pgtile-mixed-nine-2 .pgdot-12,
+.pgtile-mixed-nine-2 .pgdot-16,
+.pgtile-mixed-nine-2 .pgdot-18,
+.pgtile-mixed-nine-2 .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- MIXED-EIGHT ----------- */
+
+.pgtile-mixed-eight-1 .pgdot-1,
+.pgtile-mixed-eight-1 .pgdot-3,
+.pgtile-mixed-eight-1 .pgdot-11,
+.pgtile-mixed-eight-1 .pgdot-12,
+.pgtile-mixed-eight-1 .pgdot-15,
+.pgtile-mixed-eight-1 .pgdot-17,
+.pgtile-mixed-eight-1 .pgdot-18,
+.pgtile-mixed-eight-1 .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+.pgtile-mixed-eight-2 .pgdot-1,
+.pgtile-mixed-eight-2 .pgdot-5,
+.pgtile-mixed-eight-2 .pgdot-10,
+.pgtile-mixed-eight-2 .pgdot-11,
+.pgtile-mixed-eight-2 .pgdot-12,
+.pgtile-mixed-eight-2 .pgdot-16,
+.pgtile-mixed-eight-2 .pgdot-18,
+.pgtile-mixed-eight-2 .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+/* ----------- MIXED-SEVEN ----------- */
+
+.pgtile-mixed-seven-1 .pgdot-1,
+.pgtile-mixed-seven-1 .pgdot-3,
+.pgtile-mixed-seven-1 .pgdot-11,
+.pgtile-mixed-seven-1 .pgdot-12,
+.pgtile-mixed-seven-1 .pgdot-16,
+.pgtile-mixed-seven-1 .pgdot-18,
+.pgtile-mixed-seven-1 .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+.pgtile-mixed-seven-2 .pgdot-1,
+.pgtile-mixed-seven-2 .pgdot-5,
+.pgtile-mixed-seven-2 .pgdot-10
+{
+  background: White;
+  display: block;
+}
+
+.pgtile-mixed-seven-2 .pgdot-13,
+.pgtile-mixed-seven-2 .pgdot-14,
+.pgtile-mixed-seven-2 .pgdot-18,
+.pgtile-mixed-seven-2 .pgdot-20
+{
+  background: Firebrick;
+  display: block;
+}
+
+/* ----------- MIXED-FIVE ----------- */
+
+.pgtile-mixed-five-1 .pgdot-1,
+.pgtile-mixed-five-1 .pgdot-3,
+.pgtile-mixed-five-1 .pgdot-11,
+.pgtile-mixed-five-1 .pgdot-16,
+.pgtile-mixed-five-1 .pgdot-20
+{
+  background: White;
+  display: block;
+}
+
+.pgtile-mixed-five-2 .pgdot-2
+{
+  background: Firebrick;
+  display: block;
+}
+
+.pgtile-mixed-five-2 .pgdot-13,
+.pgtile-mixed-five-2 .pgdot-14,
+.pgtile-mixed-five-2 .pgdot-18,
+.pgtile-mixed-five-2 .pgdot-20
+{
+  background: Firebrick;
+  display: block;
+}
+
+/* ----------- GEE-JOON ----------- */
+
+.pgtile-gee-joon-1 .pgdot-1,
+.pgtile-gee-joon-1 .pgdot-3
+{
+  background: White;
+  display: block;
+}
+
+.pgtile-gee-joon-1 .pgdot-13,
+.pgtile-gee-joon-1 .pgdot-14,
+.pgtile-gee-joon-1 .pgdot-18,
+.pgtile-gee-joon-1 .pgdot-20
+{
+  background: Firebrick;
+  display: block;
+}
+
+.pgtile-gee-joon-2 .pgdot-2
+{
+  background: Firebrick;
+  display: block;
+}
+
+.pgtile-gee-joon-2 .pgdot-18,
+.pgtile-gee-joon-2 .pgdot-20
 {
   background: White;
   display: block;
