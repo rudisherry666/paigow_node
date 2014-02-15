@@ -1,3 +1,4 @@
 *.zip
 express_example-master
 node_modules
+.DS_Store
