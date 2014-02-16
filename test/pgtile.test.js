@@ -30,21 +30,13 @@ describe('PGTile', function() {
     it('should return a good json object', function() {
         var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.TEEN_2); // teen
         var tileJSON = pgTile.json();
-        assert.equal(tileJSON.top.length, 6);
-        assert.equal(tileJSON.bottom.length, 6);
+        assert(Boolean(tileJSON));
     });
     it ('should return the correct char', function() {
         var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.MIXED_SEVEN_1);
         assert.equal(pgTile.handChar(), PGTile.prototype.TILE_CHARS.MIXED_SEVEN);
         pgTile = new PGTile(PGTile.prototype.TILE_INDEX.GEE_JOON_2);
         assert.equal(pgTile.handChar(), PGTile.prototype.TILE_CHARS.GEE_JOON);
-    });
-    it('should return the correct number of dots', function() {
-        var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.LOW_TEN_1); // teen
-        assert.equal(pgTile._dotsOfHalf('top').length, 4);
-        assert.equal(pgTile._dotsOfHalf('bottom').length, 6);
-        pgTile = new PGTile(PGTile.prototype.TILE_INDEX.DAY_1); // day
-        assert.equal(pgTile._dotsOfHalf('bottom').length, 1);
     });
     it('should have a ranking', function() {
         var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.HIGH_TEN_2);

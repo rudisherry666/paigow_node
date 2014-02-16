@@ -34,7 +34,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/tile', function(req, res){
-    res.render('pgtile.ejs', {
+    res.render('pgtiles.ejs', {
         title: 'Tile'
     });
 });

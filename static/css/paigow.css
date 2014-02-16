@@ -112,12 +112,12 @@
 
 /* ----------- HIGH-SIX ----------- */
 
-.pgtile-high-six .pgdot-1,
-.pgtile-high-six .pgdot-5,
-.pgtile-high-six .pgdot-10,
-.pgtile-high-six .pgdot-11,
-.pgtile-high-six .pgdot-16,
-.pgtile-high-six .pgdot-20
+.pgtile-long-six .pgdot-1,
+.pgtile-long-six .pgdot-5,
+.pgtile-long-six .pgdot-10,
+.pgtile-long-six .pgdot-11,
+.pgtile-long-six .pgdot-16,
+.pgtile-long-six .pgdot-20
 {
   background: White;
   display: block;
@@ -154,58 +154,58 @@
 
 /* ----------- LOW-TEN ----------- */
 
-.pgtile-low-ten .pgdot-1,
-.pgtile-low-ten .pgdot-3,
-.pgtile-low-ten .pgdot-7,
-.pgtile-low-ten .pgdot-8
+.pgtile-ten .pgdot-1,
+.pgtile-ten .pgdot-3,
+.pgtile-ten .pgdot-7,
+.pgtile-ten .pgdot-8
 {
   background: Firebrick;
   display: block;
 }
 
-.pgtile-low-ten .pgdot-11,
-.pgtile-low-ten .pgdot-12,
-.pgtile-low-ten .pgdot-15,
-.pgtile-low-ten .pgdot-17,
-.pgtile-low-ten .pgdot-18,
-.pgtile-low-ten .pgdot-20
+.pgtile-ten .pgdot-11,
+.pgtile-ten .pgdot-12,
+.pgtile-ten .pgdot-15,
+.pgtile-ten .pgdot-17,
+.pgtile-ten .pgdot-18,
+.pgtile-ten .pgdot-20
 {
   background: White;
   display: block;
 }
 
-/* ----------- HIGH-SEVEN ----------- */
+/* ----------- SEVEN ----------- */
 
-.pgtile-high-seven .pgdot-2
+.pgtile-seven .pgdot-2
 {
   background: Firebrick;
   display: block;
 }
 
-.pgtile-high-seven .pgdot-11,
-.pgtile-high-seven .pgdot-12,
-.pgtile-high-seven .pgdot-15,
-.pgtile-high-seven .pgdot-17,
-.pgtile-high-seven .pgdot-18,
-.pgtile-high-seven .pgdot-20
+.pgtile-seven .pgdot-11,
+.pgtile-seven .pgdot-12,
+.pgtile-seven .pgdot-15,
+.pgtile-seven .pgdot-17,
+.pgtile-seven .pgdot-18,
+.pgtile-seven .pgdot-20
 {
   background: White;
   display: block;
 }
 
-/* ----------- LOW-SIX ----------- */
+/* ----------- SIX ----------- */
 
-.pgtile-low-six .pgdot-2
+.pgtile-six .pgdot-2
 {
   background: Firebrick;
   display: block;
 }
 
-.pgtile-low-six .pgdot-11,
-.pgtile-low-six .pgdot-12,
-.pgtile-low-six .pgdot-16,
-.pgtile-low-six .pgdot-18,
-.pgtile-low-six .pgdot-20
+.pgtile-six .pgdot-11,
+.pgtile-six .pgdot-12,
+.pgtile-six .pgdot-16,
+.pgtile-six .pgdot-18,
+.pgtile-six .pgdot-20
 {
   background: White;
   display: block;
