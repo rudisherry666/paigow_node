@@ -48,6 +48,17 @@ app.get('/tile', function(req, res){
     });
 });
 
+app.get('/hand', function(req, res){
+    var tiles = [
+        new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
+        new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1)
+    ];
+    res.render('pghand.ejs', {
+        title: 'Hand',
+        tiles: tiles
+    });
+});
+
 http.createServer(app).listen(app.get('port'), function(){
     console.log("Express server listening on port " + app.get('port'));
 });
