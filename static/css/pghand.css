@@ -1,0 +1,16 @@
+.pghand {
+    width: 140px;
+    padding-top: 10px;
+    padding-bottom: 3px;
+    background-color: LimeGreen;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.pghand .pghand-tiles {
+    width: auto;
+}
+
+.pghand .pghand-name {
+    width: auto;
+}

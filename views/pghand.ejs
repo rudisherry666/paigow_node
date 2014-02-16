@@ -1,6 +1,9 @@
-<div class="pghand-tiles">
-    <% hand.tiles().forEach(function(tile) { %>
-        <% include pgtile %>
-    <% }) %>
+<link href="/css/pghand.css" rel="stylesheet">
+<div class="pghand">
+    <div class="pghand-tiles">
+        <% hand.tiles().forEach(function(tile) { %>
+            <% include pgtile %>
+        <% }) %>
+    </div>
+    <div class="pghand-name"><%= hand.name() %><div>
 </div>
-<div class="pghand-name"><%= hand.name() %><div>
