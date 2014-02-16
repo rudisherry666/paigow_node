@@ -6,7 +6,8 @@
 var express = require('express'),
     http = require('http'),
     path = require('path'),
-    PGTile = require('./models/pgtile');
+    PGTile = require('./models/pgtile'),
+    PGHand = require('./models/pghand');
 
 var app = express();
 
@@ -49,13 +50,13 @@ app.get('/tile', function(req, res){
 });
 
 app.get('/hand', function(req, res){
-    var tiles = [
+    var hand = new PGHand([
         new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
         new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1)
-    ];
+    ]);
     res.render('pghand.ejs', {
         title: 'Hand',
-        tiles: tiles
+        hand: hand
     });
 });
 
