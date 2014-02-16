@@ -16,145 +16,147 @@ var PGTile = require('./pgtile');
 * This array defines all the rankings of the hands.  Each tile has a char code
 * associated with it, so two chars define the hand; although the order does not
 * matter, this table assumes alphabetical order for the tiles (which is, not
-* coincidentally, the ranking of the tiles).
+* coincidentally, the ranking of the tiles).  Note there are duplicates, which
+* indicate the two different hands are ties (only the higher-ranking tile is
+* used to determine ranking when there is a hand-value tie).
 */
-var _rankings = {
-    'hl': 0,    // eleven / mixed nine
-    'gk': 0,    // low four / low six
-    'fg': 0,    // long six / low four
-    'ei': 0,    // high ten / low ten
-    'df': 0,    // harmony four / long six
-    'dk': 0,    // harmony four / low six
-    'ko': 5,    // low six / mixed five
-    'hi': 6,    // eleven / low ten
-    'gj': 7,    // low four / high seven
-    'gn': 7,    // low four / mixed seven
-    'fo': 8,    // long six / mixed five
-    'eh': 9,    // high ten / eleven
-    'dj': 10,    // harmony four / high seven
-    'dn': 10,    // harmony four / mixed seven
-    'no': 11,    // mixed seven / mixed five
-    'jo': 12,    // high seven / mixed five
-    'gm': 13,    // low four / mixed eight
-    'fk': 14,    // long six / low six
-    'dm': 15,    // harmony four / mixed eight
-    'cd': 16,    // high eight / harmony four
-    'cg': 16,    // high eight / low four
-    'be': 17,    // day / high ten
-    'bi': 17,    // day / low ten
-    'ae': 18,    // teen / high ten
-    'ai': 18,    // teen / low ten
-    'np': 19,    // mixed seven / gee joon
-    'mo': 20,    // mixed eight / mixed five
-    'kn': 21,    // low six / mixed seven
-    'jp': 22,    // high seven / gee joon
-    'jk': 22,    // high seven / low six
-    'gl': 23,    // low four / mixed nine
-    'fj': 24,    // long six / high seven
-    'fn': 24,    // long six / mixed seven
-    'dl': 25,    // harmony four / mixed nine   # magic number for low hands
-    'co': 26,    // high eight / mixed five
-    'bh': 27,    // day / eleven
-    'ah': 28,    // teen / eleven
-    'mp': 29,    // mixed eight / gee joon
-    'lo': 30,    // mixed nine / mixed five
-    'km': 31,    // low six / mixed eight
-    'jn': 32,    // high seven / mixed seven
-    'gi': 33,    // low four / low ten
-    'fm': 34,    // long six / mixed eight
-    'eg': 35,    // high ten / low four
-    'de': 36,    // harmony four / high ten
-    'di': 36,    // harmony four / low ten
-    'cp': 37,    // high eight / gee joon
-    'cf': 37,    // high eight / long six
-    'ck': 37,    // high eight / low six
-    'ab': 38,    // teen / day
-    'mn': 39,    // mixed eight / mixed seven
-    'lp': 40,    // mixed nine / gee joon
-    'kl': 41,    // low six / mixed nine
-    'jm': 42,    // high seven / mixed eight
-    'io': 43,    // low ten / mixed five
-    'gh': 44,    // low four / eleven
-    'fl': 45,    // long six / mixed nine
-    'eo': 46,    // high ten / mixed five
-    'dh': 47,    // harmony four / eleven
-    'cj': 48,    // high eight / high seven
-    'cn': 48,    // high eight / mixed seven
-    'ln': 49,    // mixed nine / mixed seven
-    'jl': 50,    // high seven / mixed nine
-    'ip': 51,    // low ten / gee joon
-    'ik': 51,    // low ten / low six
-    'ho': 52,    // eleven / mixed five
-    'fi': 53,    // long six / low ten
-    'ep': 54,    // high ten / gee joon
-    'ef': 54,    // high ten / long six
-    'ek': 54,    // high ten / low six
-    'cm': 55,    // high eight / mixed eight
-    'bd': 56,    // day / harmony four
-    'bg': 56,    // day / low four
-    'ad': 57,    // teen / harmony four
-    'ag': 57,    // teen / low four
-    'lm': 58,    // mixed nine / mixed eight
-    'ij': 59,    // low ten / high seven
-    'in': 59,    // low ten / mixed seven
-    'hp': 60,    // eleven / gee joon
-    'hk': 60,    // eleven / low six
-    'gp': 61,    // low four / gee joon
-    'fh': 62,    // long six / eleven
-    'ej': 63,    // high ten / high seven
-    'en': 63,    // high ten / mixed seven
-    'dp': 64,    // harmony four / gee joon
-    'cl': 65,    // high eight / mixed nine
-    'bo': 66,    // day / mixed five
-    'ao': 67,    // teen / mixed five
-    'op': 68,    // mixed five / gee joon
-    'im': 69,    // low ten / mixed eight
-    'hj': 70,    // eleven / high seven
-    'hn': 70,    // eleven / mixed seven
-    'em': 71,    // high ten / mixed eight
-    'dg': 72,    // harmony four / low four
-    'ce': 73,    // high eight / high ten
-    'ci': 73,    // high eight / low ten
-    'bp': 74,    // day / gee joon
-    'bf': 74,    // day / long six
-    'bk': 74,    // day / low six
-    'ap': 75,    // teen / gee joon
-    'af': 75,    // teen / long six
-    'ak': 75,    // teen / low six
-    'kp': 76,    // low six / gee joon
-    'il': 77,    // low ten / mixed nine
-    'hm': 78,    // eleven / mixed eight
-    'go': 79,    // low four / mixed five
-    'fp': 80,    // long six / gee joon
-    'el': 81,    // high ten / mixed nine
-    'do': 82,    // harmony four / mixed five
-    'ch': 83,    // high eight / eleven
-    'bj': 84,    // day / high seven
-    'bn': 84,    // day / mixed seven
-    'aj': 85,    // teen / high seven
-    'an': 85,    // teen / mixed seven
-    'bc': 86,    // day / high eight
-    'bm': 86,    // day / mixed eight
-    'ac': 87,    // teen / high eight
-    'am': 87,    // teen / mixed eight
-    'bl': 88,    // day / mixed nine
-    'al': 89,    // teen / mixed nine
-    'oo': 90,    // mixed five / mixed five
-    'nn': 91,    // mixed seven / mixed seven
-    'mm': 92,    // mixed eight / mixed eight
-    'll': 93,    // mixed nine / mixed nine
-    'kk': 94,    // low six / low six
-    'jj': 95,    // high seven / high seven
-    'ii': 96,    // low ten / low ten
-    'hh': 97,    // eleven / eleven
-    'gg': 98,    // low four / low four
-    'ff': 99,    // long six / long six
-    'ee': 100,    // high ten / high ten
-    'dd': 101,    // harmony four / harmony four
-    'cc': 102,    // high eight / high eight
-    'bb': 103,    // day / day
-    'aa': 104,    // teen / teen
-    'pp': 105,    // gee joon / gee joon
+var HANDS = {
+/*  eleven        / mixed nine    */   'hl': { rank:   0, value:  0, name: "0" },
+/*  low four      / low six       */   'gk': { rank:   1, value:  0, name: "0" },
+/*  long six      / low four      */   'fg': { rank:   2, value:  0, name: "0" },
+/*  high ten      / low ten       */   'ei': { rank:   3, value:  0, name: "0" },
+/*  harmony four  / long six      */   'df': { rank:   4, value:  0, name: "0" },
+/*  harmony four  / low six       */   'dk': { rank:   4, value:  0, name: "0" },
+/*  low six       / mixed five    */   'ko': { rank:   5, value:  1, name: "1" },
+/*  eleven        / low ten       */   'hi': { rank:   6, value:  1, name: "1" },
+/*  low four      / high seven    */   'gj': { rank:   7, value:  1, name: "1" },
+/*  low four      / mixed seven   */   'gn': { rank:   7, value:  1, name: "1" },
+/*  long six      / mixed five    */   'fo': { rank:   8, value:  1, name: "1" },
+/*  high ten      / eleven        */   'eh': { rank:   9, value:  1, name: "1" },
+/*  harmony four  / high seven    */   'dj': { rank:  10, value:  1, name: "1" },
+/*  harmony four  / mixed seven   */   'dn': { rank:  10, value:  1, name: "1" },
+/*  mixed seven   / mixed five    */   'no': { rank:  11, value:  2, name: "2" },
+/*  high seven    / mixed five    */   'jo': { rank:  12, value:  2, name: "2" },
+/*  low four      / mixed eight   */   'gm': { rank:  13, value:  2, name: "2" },
+/*  long six      / low six       */   'fk': { rank:  14, value:  2, name: "2" },
+/*  harmony four  / mixed eight   */   'dm': { rank:  15, value:  2, name: "2" },
+/*  high eight    / harmony four  */   'cd': { rank:  16, value:  2, name: "2" },
+/*  high eight    / low four      */   'cg': { rank:  16, value:  2, name: "2" },
+/*  day           / high ten      */   'be': { rank:  17, value:  2, name: "2" },
+/*  day           / low ten       */   'bi': { rank:  17, value:  2, name: "2" },
+/*  teen          / high ten      */   'ae': { rank:  18, value:  2, name: "2" },
+/*  teen          / low ten       */   'ai': { rank:  18, value:  2, name: "2" },
+/*  mixed seven   / gee joon      */   'np': { rank:  19, value:  3, name: "3" },
+/*  mixed eight   / mixed five    */   'mo': { rank:  20, value:  3, name: "3" },
+/*  low six       / mixed seven   */   'kn': { rank:  21, value:  3, name: "3" },
+/*  high seven    / gee joon      */   'jp': { rank:  22, value:  3, name: "3" },
+/*  high seven    / low six       */   'jk': { rank:  22, value:  3, name: "3" },
+/*  low four      / mixed nine    */   'gl': { rank:  23, value:  3, name: "3" },
+/*  long six      / high seven    */   'fj': { rank:  24, value:  3, name: "3" },
+/*  long six      / mixed seven   */   'fn': { rank:  24, value:  3, name: "3" },
+/*  harmony four  / mixed nine    */   'dl': { rank:  25, value:  3, name: "3" },
+/*  high eight    / mixed five    */   'co': { rank:  26, value:  3, name: "3" },
+/*  day           / eleven        */   'bh': { rank:  27, value:  3, name: "3" },
+/*  teen          / eleven        */   'ah': { rank:  28, value:  3, name: "3" },
+/*  mixed eight   / gee joon      */   'mp': { rank:  29, value:  4, name: "4" },
+/*  mixed nine    / mixed five    */   'lo': { rank:  30, value:  4, name: "4" },
+/*  low six       / mixed eight   */   'km': { rank:  31, value:  4, name: "4" },
+/*  high seven    / mixed seven   */   'jn': { rank:  32, value:  4, name: "4" },
+/*  low four      / low ten       */   'gi': { rank:  33, value:  4, name: "4" },
+/*  long six      / mixed eight   */   'fm': { rank:  34, value:  4, name: "4" },
+/*  high ten      / low four      */   'eg': { rank:  35, value:  4, name: "4" },
+/*  harmony four  / high ten      */   'de': { rank:  36, value:  4, name: "4" },
+/*  harmony four  / low ten       */   'di': { rank:  36, value:  4, name: "4" },
+/*  high eight    / gee joon      */   'cp': { rank:  37, value:  4, name: "4" },
+/*  high eight    / long six      */   'cf': { rank:  37, value:  4, name: "4" },
+/*  high eight    / low six       */   'ck': { rank:  37, value:  4, name: "4" },
+/*  teen          / day           */   'ab': { rank:  38, value:  4, name: "4" },
+/*  mixed eight   / mixed seven   */   'mn': { rank:  39, value:  5, name: "5" },
+/*  mixed nine    / gee joon      */   'lp': { rank:  40, value:  5, name: "5" },
+/*  low six       / mixed nine    */   'kl': { rank:  41, value:  5, name: "5" },
+/*  high seven    / mixed eight   */   'jm': { rank:  42, value:  5, name: "5" },
+/*  low ten       / mixed five    */   'io': { rank:  43, value:  5, name: "5" },
+/*  low four      / eleven        */   'gh': { rank:  44, value:  5, name: "5" },
+/*  long six      / mixed nine    */   'fl': { rank:  45, value:  5, name: "5" },
+/*  high ten      / mixed five    */   'eo': { rank:  46, value:  5, name: "5" },
+/*  harmony four  / eleven        */   'dh': { rank:  47, value:  5, name: "5" },
+/*  high eight    / high seven    */   'cj': { rank:  48, value:  5, name: "5" },
+/*  high eight    / mixed seven   */   'cn': { rank:  48, value:  5, name: "5" },
+/*  mixed nine    / mixed seven   */   'ln': { rank:  49, value:  6, name: "6" },
+/*  high seven    / mixed nine    */   'jl': { rank:  50, value:  6, name: "6" },
+/*  low ten       / gee joon      */   'ip': { rank:  51, value:  6, name: "6" },
+/*  low ten       / low six       */   'ik': { rank:  51, value:  6, name: "6" },
+/*  eleven        / mixed five    */   'ho': { rank:  52, value:  6, name: "6" },
+/*  long six      / low ten       */   'fi': { rank:  53, value:  6, name: "6" },
+/*  high ten      / gee joon      */   'ep': { rank:  54, value:  6, name: "6" },
+/*  high ten      / long six      */   'ef': { rank:  54, value:  6, name: "6" },
+/*  high ten      / low six       */   'ek': { rank:  54, value:  6, name: "6" },
+/*  high eight    / mixed eight   */   'cm': { rank:  55, value:  6, name: "6" },
+/*  day           / harmony four  */   'bd': { rank:  56, value:  6, name: "6" },
+/*  day           / low four      */   'bg': { rank:  56, value:  6, name: "6" },
+/*  teen          / harmony four  */   'ad': { rank:  57, value:  6, name: "6" },
+/*  teen          / low four      */   'ag': { rank:  57, value:  6, name: "6" },
+/*  mixed nine    / mixed eight   */   'lm': { rank:  58, value:  7, name: "7" },
+/*  low ten       / high seven    */   'ij': { rank:  59, value:  7, name: "7" },
+/*  low ten       / mixed seven   */   'in': { rank:  59, value:  7, name: "7" },
+/*  eleven        / gee joon      */   'hp': { rank:  60, value:  7, name: "7" },
+/*  eleven        / low six       */   'hk': { rank:  60, value:  7, name: "7" },
+/*  low four      / gee joon      */   'gp': { rank:  61, value:  7, name: "7" },
+/*  long six      / eleven        */   'fh': { rank:  62, value:  7, name: "7" },
+/*  high ten      / high seven    */   'ej': { rank:  63, value:  7, name: "7" },
+/*  high ten      / mixed seven   */   'en': { rank:  63, value:  7, name: "7" },
+/*  harmony four  / gee joon      */   'dp': { rank:  64, value:  7, name: "7" },
+/*  high eight    / mixed nine    */   'cl': { rank:  65, value:  7, name: "7" },
+/*  day           / mixed five    */   'bo': { rank:  66, value:  7, name: "7" },
+/*  teen          / mixed five    */   'ao': { rank:  67, value:  7, name: "7" },
+/*  mixed five    / gee joon      */   'op': { rank:  68, value:  8, name: "8" },
+/*  low ten       / mixed eight   */   'im': { rank:  69, value:  8, name: "8" },
+/*  eleven        / high seven    */   'hj': { rank:  70, value:  8, name: "8" },
+/*  eleven        / mixed seven   */   'hn': { rank:  70, value:  8, name: "8" },
+/*  high ten      / mixed eight   */   'em': { rank:  71, value:  8, name: "8" },
+/*  harmony four  / low four      */   'dg': { rank:  72, value:  8, name: "8" },
+/*  high eight    / high ten      */   'ce': { rank:  73, value:  8, name: "8" },
+/*  high eight    / low ten       */   'ci': { rank:  73, value:  8, name: "8" },
+/*  day           / gee joon      */   'bp': { rank:  74, value:  8, name: "8" },
+/*  day           / long six      */   'bf': { rank:  74, value:  8, name: "8" },
+/*  day           / low six       */   'bk': { rank:  74, value:  8, name: "8" },
+/*  teen          / gee joon      */   'ap': { rank:  75, value:  8, name: "8" },
+/*  teen          / long six      */   'af': { rank:  75, value:  8, name: "8" },
+/*  teen          / low six       */   'ak': { rank:  75, value:  8, name: "8" },
+/*  low six       / gee joon      */   'kp': { rank:  76, value:  9, name: "9" },
+/*  low ten       / mixed nine    */   'il': { rank:  77, value:  9, name: "9" },
+/*  eleven        / mixed eight   */   'hm': { rank:  78, value:  9, name: "9" },
+/*  low four      / mixed five    */   'go': { rank:  79, value:  9, name: "9" },
+/*  long six      / gee joon      */   'fp': { rank:  80, value:  9, name: "9" },
+/*  high ten      / mixed nine    */   'el': { rank:  81, value:  9, name: "9" },
+/*  harmony four  / mixed five    */   'do': { rank:  82, value:  9, name: "9" },
+/*  high eight    / eleven        */   'ch': { rank:  83, value:  9, name: "9" },
+/*  day           / high seven    */   'bj': { rank:  84, value:  9, name: "high nine" },
+/*  day           / mixed seven   */   'bn': { rank:  84, value:  9, name: "high nine" },
+/*  teen          / high seven    */   'aj': { rank:  85, value:  9, name: "high nine" },
+/*  teen          / mixed seven   */   'an': { rank:  85, value:  9, name: "high nine" },
+/*  day           / high eight    */   'bc': { rank:  86, value: 10, name: "gong" },
+/*  day           / mixed eight   */   'bm': { rank:  86, value: 10, name: "gong" },
+/*  teen          / high eight    */   'ac': { rank:  87, value: 10, name: "gong" },
+/*  teen          / mixed eight   */   'am': { rank:  87, value: 10, name: "gong" },
+/*  day           / mixed nine    */   'bl': { rank:  88, value: 11, name: "wong" },
+/*  teen          / mixed nine    */   'al': { rank:  89, value: 11, name: "wong" },
+/*  mixed five    / mixed five    */   'oo': { rank:  90, value: 12, name: "bo" },
+/*  mixed seven   / mixed seven   */   'nn': { rank:  91, value: 13, name: "bo" },
+/*  mixed eight   / mixed eight   */   'mm': { rank:  92, value: 14, name: "bo" },
+/*  mixed nine    / mixed nine    */   'll': { rank:  93, value: 15, name: "bo" },
+/*  low six       / low six       */   'kk': { rank:  94, value: 16, name: "bo" },
+/*  high seven    / high seven    */   'jj': { rank:  95, value: 17, name: "bo" },
+/*  low ten       / low ten       */   'ii': { rank:  96, value: 18, name: "bo" },
+/*  eleven        / eleven        */   'hh': { rank:  97, value: 19, name: "bo" },
+/*  low four      / low four      */   'gg': { rank:  98, value: 20, name: "bo" },
+/*  long six      / long six      */   'ff': { rank:  99, value: 21, name: "bo" },
+/*  high ten      / high ten      */   'ee': { rank: 100, value: 22, name: "bo" },
+/*  harmony four  / harmony four  */   'dd': { rank: 101, value: 23, name: "bo" },
+/*  high eight    / high eight    */   'cc': { rank: 102, value: 24, name: "bo" },
+/*  day           / day           */   'bb': { rank: 103, value: 25, name: "bo" },
+/*  teen          / teen          */   'aa': { rank: 104, value: 26, name: "bo" },
+/*  gee joon      / gee joon      */   'pp': { rank: 105, value: 27, name: "gee joon" }
 };
 
 /*
@@ -175,8 +177,8 @@ function PGHand(tile1, tile2) {
         break;
 
         default:
-            this._tile1 = tile1;
-            this._tile2 = tile2;
+            this._tile2 = tile1;
+            this._tile1 = tile2;
         break;
     }
 
@@ -185,15 +187,42 @@ function PGHand(tile1, tile2) {
         throw "PGHand constructor got bad chars " + this._chars;
 }
 
+PGHand.prototype._obj = function() {
+    var chars = this._tile1.handChar() + this._tile2.handChar();
+    return HANDS[chars];
+};
+
 /*
-* @method ranking
+* @method rank
 *
 * Return the ranking of this hand, higher is better.
 *
 */
 PGHand.prototype.rank = function() {
-    var chars = this._tile1.handChar() + this._tile2.handChar();
-    return _rankings[chars];
+    return this._obj().rank;
+};
+
+/*
+* @method value
+*
+* Return the value of this hand, which is the sum of the values
+* for everything 9 or less, but higher numbers for gong, wong
+* and bo's.  Used when evening the numbers, not that useful if
+* high-nine or better.
+*
+*/
+PGHand.prototype.value = function() {
+    return this._obj().value;
+};
+
+/*
+* @method name
+*
+* Return the name of this hand for UI purposes.
+*
+*/
+PGHand.prototype.name = function() {
+    return this._obj().name;
 };
 
 /*

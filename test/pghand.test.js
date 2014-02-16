@@ -23,8 +23,13 @@ describe('PGHand', function() {
             pgHand = new PGHand(TileFour, { _index: 1});
         });
     });
-    it('should have a ranking', function() {
+    it('should have a rank and value', function() {
         var pgHand = new PGHand(tileFour, tileEight);
         assert(pgHand.rank() >= 0);
+        assert.equal(pgHand.value(), 2);
+        assert.equal(pgHand.name(), "2");
+        pgHand = new PGHand(tileEight, tileDay);
+        assert(pgHand.rank() >= 0);
+        assert.equal(pgHand.name(), "gong");
     });
 });
