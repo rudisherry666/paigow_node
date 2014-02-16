@@ -29,7 +29,7 @@ function PGDeal(tiles, tile2, tile3, tile4) {
     }
 
     // Sort the array.
-    function compareTiles(tileA, tileB) { return tileA.compare(tileB); }
+    function compareTiles(tileA, tileB) { return tileB.compare(tileA); }
     tiles.sort(compareTiles);
 
     this._tiles = tiles;
