@@ -5,7 +5,8 @@
 
 var express = require('express'),
     http = require('http'),
-    path = require('path');
+    path = require('path'),
+    PGTile = require('./models/pgtile');
 
 var app = express();
 
@@ -33,9 +34,18 @@ app.get('/', function(req, res){
     });
 });
 
-app.get('/tile', function(req, res){
+app.get('/tiles', function(req, res){
     res.render('pgtiles.ejs', {
-        title: 'Tile'
+        title: 'All Tiles'
+    });
+});
+
+app.get('/tile', function(req, res){
+    var tile = new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1);
+    res.render('pgtile.ejs', {
+        title: 'Tile',
+        tile: tile,
+        tileClass: tile._obj.divClass
     });
 });
 

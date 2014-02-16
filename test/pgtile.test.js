@@ -32,15 +32,33 @@ describe('PGTile', function() {
         var tileJSON = pgTile.json();
         assert(Boolean(tileJSON));
     });
-    it ('should return the correct char', function() {
+    it ('should return the correct name', function() {
         var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.MIXED_SEVEN_1);
-        assert.equal(pgTile.handChar(), PGTile.prototype.TILE_CHARS.MIXED_SEVEN);
+        assert.equal(pgTile.name(), "mixed seven");
         pgTile = new PGTile(PGTile.prototype.TILE_INDEX.GEE_JOON_2);
-        assert.equal(pgTile.handChar(), PGTile.prototype.TILE_CHARS.GEE_JOON);
+        assert.equal(pgTile.name(), "gee joon");
     });
     it('should have a ranking', function() {
         var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.HIGH_TEN_2);
         assert(pgTile.tileRank() >= 0);
         assert(pgTile.pairRank() >= 0);
+    });
+    it('should return a deck with 32 tiles', function() {
+        var deck = PGTile.prototype.deck();
+        assert.equal(typeof deck, "object");
+        assert.equal(deck.length, 32);
+    });
+    it('should return a deck with exactly two of several tile types', function() {
+        var deck = PGTile.prototype.deck();
+        var numTeens = 0, numMixedFives = 0;
+        for (var di = 0; di < deck.length; di++) {
+            var pgTile = deck[di];
+            switch (pgTile.name()) {
+                case "teen": numTeens++; break;
+                case "mixed five": numMixedFives++; break;
+            }
+        }
+        assert.equal(numTeens, 2);
+        assert.equal(numMixedFives, 2);
     });
 });
