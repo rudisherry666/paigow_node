@@ -10,6 +10,8 @@ describe('PGHand', function() {
     it('should return a PGHand object', function() {
         var pgHand = new PGHand(tileEleven, tileEight);
         assert.notEqual(pgHand, null);
+        pgHand = new PGHand([tileEleven, tileEight]);
+        assert.notEqual(pgHand, null);
     });
     it('should throw on bad constructor params', function() {
         var pgHand;
@@ -18,6 +20,9 @@ describe('PGHand', function() {
         });
         assert.throws(function() {
             pgHand = new PGHand('Hello world');
+        });
+        assert.throws(function() {
+            pgHand = new PGHand([tileEleven]);
         });
         assert.throws(function() {
             pgHand = new PGHand(TileFour, { _index: 1});

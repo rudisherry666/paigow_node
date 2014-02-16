@@ -166,6 +166,11 @@ var HANDS = {
 *
 */
 function PGHand(tile1, tile2) {
+    if (tile1 instanceof Array) {
+        if (tile1.length !== 2) throw "PGHand constructor given array of length " + tile1.length;
+        tile2 = tile1[1];
+        tile1 = tile1[0];
+    }
     if (!tile1 || !tile2) throw "PGHand constructor not given two tiles";
 
     // Make it so tile1 is the higher tile
