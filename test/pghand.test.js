@@ -28,6 +28,14 @@ describe('PGHand', function() {
             pgHand = new PGHand(TileFour, { _index: 1});
         });
     });
+    it('should return a tiles array', function() {
+        var pgHand = new PGHand(tileFour, tileDay);
+        var tiles = pgHand.tiles();
+        assert(tiles instanceof Array);
+        assert(tiles.length === 2);
+        assert.equal(tiles[0], tileDay);
+        assert.equal(tiles[1], tileFour);
+    });
     it('should have a rank and value', function() {
         var pgHand = new PGHand(tileFour, tileEight);
         assert(pgHand.rank() >= 0);

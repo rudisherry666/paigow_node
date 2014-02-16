@@ -231,6 +231,16 @@ PGHand.prototype.name = function() {
 };
 
 /*
+* @method tiles
+*
+* Return the array of tiles of this hand.
+*
+*/
+PGHand.prototype.tiles = function() {
+    return [ this._tile1, this._tile2 ];
+};
+
+/*
 * @method compare
 *
 * Returns the canonical comparison: -1 if it's less than the param, 0 if equal, 1 if greater.
