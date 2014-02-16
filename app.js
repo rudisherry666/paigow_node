@@ -44,8 +44,7 @@ app.get('/tile', function(req, res){
     var tile = new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1);
     res.render('pgtile.ejs', {
         title: 'Tile',
-        tile: tile,
-        tileClass: tile._obj.divClass
+        tile: tile
     });
 });
 
