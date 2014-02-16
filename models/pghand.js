@@ -11,14 +11,14 @@
 var PGTile = require('./pgtile');
 
 /*
-* @attribute rankings
+* @attribute HANDS
 *
-* This array defines all the rankings of the hands.  Each tile has a char code
+* This array defines all the atributes of all hands.  Each tile has a char code
 * associated with it, so two chars define the hand; although the order does not
 * matter, this table assumes alphabetical order for the tiles (which is, not
-* coincidentally, the ranking of the tiles).  Note there are duplicates, which
-* indicate the two different hands are ties (only the higher-ranking tile is
-* used to determine ranking when there is a hand-value tie).
+* coincidentally, the ranking of the tiles).  Note there are duplicates in the
+* ranking values, which indicate the two different hands are ties (only the
+* higher-ranking tile is used to determine ranking when there is a hand-value tie).
 */
 var HANDS = {
 /*  eleven        / mixed nine    */   'hl': { rank:   0, value:  0, name: "0" },
