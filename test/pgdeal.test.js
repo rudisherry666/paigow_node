@@ -25,4 +25,13 @@ describe('PGDeal', function() {
             pgDeal = new PGDeal();
         });
     });
+    it('should have two hands in the right order', function() {
+        var pgDeal = new PGDeal([tileEleven, tileEight, tileDay, tileFour]);
+        var hands = pgDeal.hands();
+        assert(hands instanceof Array);
+        assert(hands.length === 2);
+        var handTiles = hands[0].tiles();
+        assert(handTiles[0].name() === tileEleven.name());
+        assert(handTiles[1].name() === tileEight.name());
+    });
 });
