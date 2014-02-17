@@ -26,6 +26,6 @@ requirejs.config({
     }
 });
 
-define(['bootstrap', 'backbone'], function(bs, bb) {
-
+define(['pgapp'], function(PGApp) {
+    var dummyApp = new PGApp();
 });

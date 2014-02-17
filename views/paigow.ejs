@@ -31,6 +31,17 @@
                         <li><a href="#about">About</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
+                    <ul class="nav pull-right navbar-nav">
+                        <li id="fat-menu" class="dropdown">
+                            <a href="#" id="user-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown">
+                                <div id="pglayer-name-nav" style="display:inline-block;"></div>
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="user-dropdown">
+                                <li><a tabindex="-1" href="{{ logout_url }}">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div><!--/.nav-collapse -->
             </div>
         </div>
