@@ -7,7 +7,8 @@ var express = require('express'),
     http = require('http'),
     path = require('path'),
     PGTile = require('./models/pgtile'),
-    PGHand = require('./models/pghand');
+    PGHand = require('./models/pghand'),
+    PGDeal = require('./models/pgdeal');
 
 var app = express();
 
@@ -57,6 +58,19 @@ app.get('/hand', function(req, res) {
     res.render('pghand.ejs', {
         title: 'Hand',
         hand: hand
+    });
+});
+
+app.get('/deal', function(req, res) {
+    var deal = new PGDeal([
+        new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
+        new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1),
+        new PGTile(PGTile.prototype.TILE_INDEX.DAY_2),
+        new PGTile(PGTile.prototype.TILE_INDEX.HARMONY_FOUR_1)
+    ]);
+    res.render('pgdeal.ejs', {
+        title: 'Hand',
+        deal: deal
     });
 });
 
