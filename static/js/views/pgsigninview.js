@@ -47,9 +47,9 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         _onSignin: function(e) {
             this._hideError();
 
-            var email = $("#pgsignin-signin-email").val();
-            if (!email) {
-                return this._onError("Email address is required!");
+            var name = $("#pgsignin-signin-name").val();
+            if (!name) {
+                return this._onError("Username is required!");
             }
             var password = $("#pgsignin-signin-password").val();
             if (!password) {
@@ -61,9 +61,9 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         _onRegister: function(e) {
             this._hideError();
 
-            var email = $("#pgsignin-register-email").val();
-            if (!email) {
-                return this._onError("Email address is required!");
+            var name = $("#pgsignin-register-name").val();
+            if (!name) {
+                return this._onError("Username is required!");
             }
             var password = $("#pgsignin-register-password").val();
             if (!password) {
@@ -76,7 +76,6 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
             if (passwordVerify != password) {
                 return this._onError("Passwords don't match!");
             }
-            console.log("register!");
         },
 
         _onError: function(err) {
