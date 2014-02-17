@@ -1,0 +1,9 @@
+.pgdeal {
+    padding-top: 10px;
+    padding-bottom: 3px;
+    background-color: LimeGreen;
+    border-radius: 5px;
+    text-align: center;
+    display: inline-block;
+}
+
