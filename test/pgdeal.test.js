@@ -12,7 +12,6 @@ describe('PGDeal', function() {
         assert.notEqual(pgDeal, null);
         pgDeal = new PGDeal(tileEleven, tileEight, tileDay, tileFour);
         assert.notEqual(pgDeal, null);
-        console.log(JSON.stringify(pgDeal));
     });
     it('should throw on bad constructor params', function() {
         var pgDeal;
