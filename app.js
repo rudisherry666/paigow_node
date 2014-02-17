@@ -31,8 +31,15 @@ app.configure('development', function() {
 });
 
 app.get('/', function(req, res) {
-    res.render('index.ejs', {
-        title: 'Home'
+    var deal = new PGDeal([
+        new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
+        new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1),
+        new PGTile(PGTile.prototype.TILE_INDEX.DAY_2),
+        new PGTile(PGTile.prototype.TILE_INDEX.HARMONY_FOUR_1)
+    ]);
+    res.render('paigow.ejs', {
+        title: 'Home',
+        deal: deal
     });
 });
 
