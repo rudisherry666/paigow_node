@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'entypo';
+  src: url("/fonts/entypo.eot");
+  src: url("/fonts/entypo.eot#iefix") format("embedded-opentype"), url("/fonts/entypo.woff") format("woff"), url("/fonts/entypo.ttf") format("truetype"), url("/fonts/entypo.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.pgicon {
+  font-family: "entypo";
+  color: DodgerBlue;
+  font-size: 80px;
+  vertical-align: middle;
+  margin-top: -5px;
+  width: 1em;
+  line-height: 0em;
+}
