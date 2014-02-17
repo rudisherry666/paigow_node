@@ -11,7 +11,7 @@ var express = require('express'),
 
 var app = express();
 
-app.configure(function(){
+app.configure(function() {
     app.set('port', process.env.PORT || 8088);
     app.set('views', __dirname + '/views');
     app.use(express.static(__dirname + '/static'));
@@ -25,23 +25,23 @@ app.configure(function(){
     app.use(express.static(path.join(__dirname, 'public')));
 });
 
-app.configure('development', function(){
+app.configure('development', function() {
     app.use(express.errorHandler());
 });
 
-app.get('/', function(req, res){
+app.get('/', function(req, res) {
     res.render('index.ejs', {
         title: 'Home'
     });
 });
 
-app.get('/tiles', function(req, res){
+app.get('/tiles', function(req, res) {
     res.render('pgtiles.ejs', {
         title: 'All Tiles'
     });
 });
 
-app.get('/tile', function(req, res){
+app.get('/tile', function(req, res) {
     var tile = new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1);
     res.render('pgtile.ejs', {
         title: 'Tile',
@@ -49,7 +49,7 @@ app.get('/tile', function(req, res){
     });
 });
 
-app.get('/hand', function(req, res){
+app.get('/hand', function(req, res) {
     var hand = new PGHand([
         new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
         new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1)
@@ -60,7 +60,7 @@ app.get('/hand', function(req, res){
     });
 });
 
-http.createServer(app).listen(app.get('port'), function(){
+http.createServer(app).listen(app.get('port'), function() {
     console.log("Express server listening on port " + app.get('port'));
 });
 
