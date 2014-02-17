@@ -5,7 +5,14 @@
 *
 */
 
-define(['models/pgplayermodel', 'views/pgplayernameview'], function(PGPlayerModel, PGPlayerNameView) {
+define([
+    'models/pgplayermodel',
+    'views/pgplayernameview',
+    'views/pgsigninview'
+], function(
+    PGPlayerModel,
+    PGPlayerNameView,
+    PGSigninView) {
 
     function PGApp() {
         // Create a player model that will communicate with the server about
@@ -15,10 +22,14 @@ define(['models/pgplayermodel', 'views/pgplayernameview'], function(PGPlayerMode
         // Create the views that show the player's name or other attributes in
         // various parts of the UI.
         var navPGPlayerNameView = new PGPlayerNameView({
-            model: pgPlayerModel,
+            pgPlayerModel: pgPlayerModel,
             $el: $("#pglayer-name-nav")
         });
         navPGPlayerNameView.render();
+
+        var signinView = new PGSigninView({
+            pgPlayerModel: pgPlayerModel,
+        });
     }
 
     return PGApp;
