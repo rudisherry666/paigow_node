@@ -24,3 +24,7 @@
     margin-bottom: 15px;
     padding: 7px 9px;
 }
+.pgsignin-error {
+    visibility: hidden;
+    margin: 4px 0 8px;
+}

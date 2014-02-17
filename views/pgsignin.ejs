@@ -4,10 +4,11 @@
     <h2 class="form-signin-heading">Please sign in</h2>
     <div class="tabbable"> <!-- Only required for left/right tabs -->
         <ul id="pgsignin-tabs" class="nav nav-tabs">
-            <li class="active"><a href="#login" data-toggle="tab">Log in</a></li>
+            <li class="active"><a href="#login" data-toggle="tab">Sign in</a></li>
             <li><a href="#register" data-toggle="tab">Register</a></li>
         </ul>
         <div class="tab-content">
+            <div class="pgsignin-error"><span id="pgsignin-error-message" style="color:red"><strong>&nbsp;</strong></span></div>
             <div class="tab-pane active" id="login">
                 <input id="pgsignin-signin-email" type="text" class="input-block-level" placeholder="Email address">
                 <input id="pgsignin-signin-password" type="password" class="input-block-level" placeholder="Password">

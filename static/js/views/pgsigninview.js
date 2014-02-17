@@ -18,6 +18,7 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         events: {
             'click #pgsignin-signin': "_onSignin",
             'click #pgsignin-register': "_onRegister",
+            'click .nav-tabs li a': function(e) { this._hideError(); }
         },
 
         // If there is no signin, then show the view.
@@ -44,34 +45,47 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         },
 
         _onSignin: function(e) {
+            this._hideError();
+
             var email = $("#pgsignin-signin-email").val();
             if (!email) {
-
+                return this._onError("Email address is required!");
             }
             var password = $("#pgsignin-signin-password").val();
             if (!password) {
-
+                return this._onError("Password is required!");
             }
             console.log("signin!");
         },
 
         _onRegister: function(e) {
+            this._hideError();
+
             var email = $("#pgsignin-register-email").val();
             if (!email) {
-
+                return this._onError("Email address is required!");
             }
             var password = $("#pgsignin-register-password").val();
             if (!password) {
-                
+                return this._onError("Password is required!");
             }
             var passwordVerify = $("#pgsignin-register-password-verify").val();
             if (!passwordVerify) {
-                
+                return this._onError("Password verification is required!");
             }
             if (passwordVerify != password) {
-                
+                return this._onError("Passwords don't match!");
             }
             console.log("register!");
+        },
+
+        _onError: function(err) {
+            $("#pgsignin-error-message").text(err);
+            $("#pgsignin-error-message").css("visibility", "visible");
+        },
+
+        _hideError: function() {
+            $("#pgsignin-error-message").css('visibility', "hidden");            
         }
 
     });
