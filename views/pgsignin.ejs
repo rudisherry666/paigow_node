@@ -3,27 +3,27 @@
 <div class="form-signin">
     <h2 class="form-signin-heading">Please sign in</h2>
     <div class="tabbable"> <!-- Only required for left/right tabs -->
-        <ul class="nav nav-tabs">
+        <ul id="pgsignin-tabs" class="nav nav-tabs">
             <li class="active"><a href="#login" data-toggle="tab">Log in</a></li>
             <li><a href="#register" data-toggle="tab">Register</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="login">
-                <input type="text" class="input-block-level" placeholder="Email address">
-                <input type="password" class="input-block-level" placeholder="Password">
+                <input id="pgsignin-signin-email" type="text" class="input-block-level" placeholder="Email address">
+                <input id="pgsignin-signin-password" type="password" class="input-block-level" placeholder="Password">
                 <label class="checkbox">
-                    <input type="checkbox" value="remember-me"> Remember me
+                    <input id="pgsignin-signin-rememberme" type="checkbox" value="remember-me"> Remember me
                 </label>
-                <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+                <button id="pgsignin-signin" class="btn btn-large btn-primary">Sign in</button>
             </div>
             <div class="tab-pane" id="register">
-                <input type="text" class="input-block-level" placeholder="Email address">
-                <input type="password" class="input-block-level" placeholder="Password">
-                <input type="password" class="input-block-level" placeholder="Retype Password">
+                <input id="pgsignin-register-email" type="text" class="input-block-level" placeholder="Email address">
+                <input id="pgsignin-register-password" type="password" class="input-block-level" placeholder="Choose a password">
+                <input id="pgsignin-register-password-verify" type="password" class="input-block-level" placeholder="Verify Password">
                 <label class="checkbox">
-                    <input type="checkbox" value="remember-me"> Remember me
+                    <input id="pgsignin-register-rememberme" type="checkbox" value="remember-me"> Remember me
                 </label>
-                <button class="btn btn-large btn-primary" type="submit">Register</button>
+                <button id="pgsignin-register" class="btn btn-large btn-primary" type="submit">Register</button>
             </div>
         </div>
     </div>

@@ -28,6 +28,7 @@ define([
         navPGPlayerNameView.render();
 
         var signinView = new PGSigninView({
+            el: $(".form-signin"),
             pgPlayerModel: pgPlayerModel,
         });
     }
