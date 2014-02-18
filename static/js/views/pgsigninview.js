@@ -35,8 +35,8 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         // Listen for changes: show or hide the form depending on whether
         // or not there is a user (name === "unknown" is the trigger)
         _addModelListeners: function() {
-            this._options.pgPlayerModel.on("change:name", _.bind(function() {
-                this._isShowing = (this._options.pgPlayerModel.get('name') === "unknown");
+            this._options.pgPlayerModel.on("change:username", _.bind(function() {
+                this._isShowing = (this._options.pgPlayerModel.get('username') === "unknown");
                 if (this._isShowing)
                     $(".form-signin").fadeIn(500);
                 else
@@ -61,8 +61,8 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         _onRegister: function(e) {
             this._hideError();
 
-            var name = $("#pgsignin-register-name").val();
-            if (!name) {
+            var username = $("#pgsignin-register-name").val();
+            if (!username) {
                 return this._onError("Username is required!");
             }
             var password = $("#pgsignin-register-password").val();
@@ -76,6 +76,11 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
             if (passwordVerify != password) {
                 return this._onError("Passwords don't match!");
             }
+            this._options.pgPlayerModel.set({
+                username: username,
+                password: password
+            });
+            this._options.pgPlayerModel.save();
         },
 
         _onError: function(err) {

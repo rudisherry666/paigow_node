@@ -21,17 +21,17 @@ define(['backbone'], function(Backbone) {
         render: function() {
             if (!this._nameSpan) {
                 this._nameSpan = $('<span></span>');
-                this._nameSpan.html(this._options.pgPlayerModel.get('name'));
+                this._nameSpan.html(this._options.pgPlayerModel.get('username'));
                 this._options.$el.append(this._nameSpan);
             }
         },
 
         // Listen for changes
         _addModelListeners: function() {
-            this._options.pgPlayerModel.on("change:name", _.bind(function() {
+            this._options.pgPlayerModel.on("change:username", _.bind(function() {
                 console.log("PGPlayerView: name changed!");
                 if (this._nameSpan)
-                    this._nameSpan.html(this._options.pgPlayerModel.get('name'));
+                    this._nameSpan.html(this._options.pgPlayerModel.get('username'));
             }, this));
         }
 

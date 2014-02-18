@@ -17,8 +17,8 @@ define(['backbone'], function(Backbone) {
         },
 
         defaults: {
-            'name': 'unknown',
-            'email': 'unknown'
+            'username': 'unknown',
+            'password': 'unknown'
         },
 
         urlRoot: '/player'
