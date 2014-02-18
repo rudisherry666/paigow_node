@@ -38,17 +38,30 @@ app.get('/', function(req, res) {
     ]);
     res.render('paigow.ejs', {
         title: 'Home',
-        deal: deal,
-        username: req.session.username
+        deal: deal
     });
 });
 
+// Get of player: return the player that's in the session.
+app.get('/player', function(req, res) {
+    var username = req.session.username || "unknown";
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ username: username }));
+});
+
+// Post of player means they're creating a player.
+app.post('/player', function(req, res) {
+    console.log(req.body);
+});
+
+// Test all the tiles.
 app.get('/tiles', function(req, res) {
     res.render('pgtiles.ejs', {
         title: 'All Tiles'
     });
 });
 
+// Test getting one tile.
 app.get('/tile', function(req, res) {
     var tile = new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1);
     res.render('pgtile.ejs', {
@@ -57,6 +70,7 @@ app.get('/tile', function(req, res) {
     });
 });
 
+// Test a hand.
 app.get('/hand', function(req, res) {
     var hand = new PGHand([
         new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
@@ -68,6 +82,7 @@ app.get('/hand', function(req, res) {
     });
 });
 
+// Test a deal.
 app.get('/deal', function(req, res) {
     var deal = new PGDeal([
         new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
@@ -81,6 +96,7 @@ app.get('/deal', function(req, res) {
     });
 });
 
+// Start the server!
 http.createServer(app).listen(app.get('port'), function() {
     console.log("Express server listening on port " + app.get('port'));
 });

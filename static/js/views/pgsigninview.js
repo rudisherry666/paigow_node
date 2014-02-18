@@ -23,25 +23,27 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
 
         // If there is no signin, then show the view.
         render: function() {
-            if (this._options.pgPlayerModel.get('name') === "unknown" && !this._isShowing) {
-                this._isShowing = true;
-                $(".form-signin").fadeIn(500);
+            if (!this._everRendered) {
+                this._everRendered = true;
 
                 // Initialize the tabs
                 $("#pgsignin-tabs").tabs();
             }
+            this._showOrHide();
         },
 
         // Listen for changes: show or hide the form depending on whether
         // or not there is a user (name === "unknown" is the trigger)
         _addModelListeners: function() {
-            this._options.pgPlayerModel.on("change:username", _.bind(function() {
-                this._isShowing = (this._options.pgPlayerModel.get('username') === "unknown");
-                if (this._isShowing)
-                    $(".form-signin").fadeIn(500);
-                else
-                    $(".form-signin").fadeOut(500);
-            }, this));
+            this._options.pgPlayerModel.on("change:username", _.bind(this._showOrHide, this));
+        },
+
+        _showOrHide: function() {
+            this._isShowing = (this._options.pgPlayerModel.get('username') === "unknown");
+            if (this._isShowing) {
+                $(".form-signin").fadeIn(500);
+            } else
+                $(".form-signin").fadeOut(500);
         },
 
         _onSignin: function(e) {
