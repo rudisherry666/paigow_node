@@ -12,23 +12,22 @@ var express = require('express'),
 
 var app = express();
 
-app.configure(function() {
-    app.set('port', process.env.PORT || 8088);
-    app.set('views', __dirname + '/views');
-    app.use(express.static(__dirname + '/static'));
-    // app.engine('html', require('ejs').renderFile);
-    app.use(express.favicon());
-    app.use(express.logger('dev'));
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
-    app.use(app.router);
-    // app.use(require('stylus').middleware(__dirname + '/public'));
-    app.use(express.static(path.join(__dirname, 'public')));
-});
+app.set('port', process.env.PORT || 8088);
+app.set('views', __dirname + '/views');
+app.use(express.static(__dirname + '/static'));
+app.use(express.favicon());
+app.use(express.logger('dev'));
+app.use(express.bodyParser());
+app.use(express.methodOverride());
+app.use(express.cookieParser());
+app.use(express.session({secret: process.env.PG_SECRET}));
+app.use(app.router);
 
-app.configure('development', function() {
-    app.use(express.errorHandler());
-});
+// app.use(require('stylus').middleware(__dirname + '/public'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(express.errorHandler());
 
 app.get('/', function(req, res) {
     var deal = new PGDeal([
@@ -39,7 +38,8 @@ app.get('/', function(req, res) {
     ]);
     res.render('paigow.ejs', {
         title: 'Home',
-        deal: deal
+        deal: deal,
+        username: req.session.username
     });
 });
 
