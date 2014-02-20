@@ -9,8 +9,10 @@
     "node": "0.10.x"
   },
   "dependencies": {
+    "q": "1.0.0",
     "express": "3.1.0",
-    "ejs": "0.8.5"
+    "ejs": "0.8.5",
+    "password-hash": "1.2.1"
   },
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"

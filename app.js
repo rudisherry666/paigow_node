@@ -1,17 +1,15 @@
-
-/**
-* Module dependencies.
-*/
-
+// Module dependencies
 var express = require('express'),
     http = require('http'),
     path = require('path'),
     PGTile = require('./models/pgtile'),
     PGHand = require('./models/pghand'),
-    PGDeal = require('./models/pgdeal');
+    PGDeal = require('./models/pgdeal'),
+    PGDBPlayer = require('./models/db/pgdbplayer'),
+    PGRoutePlayer = require('./routes/pgrouteplayer');
 
+// Set up the express application
 var app = express();
-
 app.set('port', process.env.PORT || 8088);
 app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/static'));
@@ -22,12 +20,13 @@ app.use(express.methodOverride());
 app.use(express.cookieParser());
 app.use(express.session({secret: process.env.PG_SECRET}));
 app.use(app.router);
-
 // app.use(require('stylus').middleware(__dirname + '/public'));
-
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(express.errorHandler());
+
+// Initialize the player stuff.
+var pgdbPlayer = new PGDBPlayer();
+var pgRoutePlayer = new PGRoutePlayer(app, pgdbPlayer);
 
 app.get('/', function(req, res) {
     var deal = new PGDeal([
@@ -43,15 +42,30 @@ app.get('/', function(req, res) {
 });
 
 // Get of player: return the player that's in the session.
-app.get('/player', function(req, res) {
-    var username = req.session.username || "unknown";
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ username: username }));
-});
+// app.get('/player', function(req, res) {
+//     res.setHeader('Content-Type', 'application/json');
+//     if (req.session.username)
+//         res.end(JSON.stringify({ username: req.session.username }));
+//     else {
+//         console.log("calling get...");
+//         PGPlayer.getSessionPlayer(req)
+//             .then(function(player) {
+//                 console.log("          ...success: " + player.username);
+//                 req.session.username = player.username;
+//                 res.end(JSON.stringify({ username: req.session.username }));
+//             })
+//             .fail(function(err) {
+//                 console.log("          ...failure: " + err);
+//                 req.session.username = "unknown";
+//                 res.end(JSON.stringify({ username: req.session.username }));
+//             });
+//     }
+// });
 
-// Post of player means they're creating a player.
+// Post of player means they're creating a player or signing in.
 app.post('/player', function(req, res) {
-    console.log(req.body);
+    var player = req.body;
+    PGPlayer.setSessionPlayer(req.body);
 });
 
 // Test all the tiles.
