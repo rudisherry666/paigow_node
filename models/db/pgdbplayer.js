@@ -33,9 +33,12 @@ util.inherits(PGDBPlayer, PGDB);
 
 PGDBPlayer.prototype.init = function() {
     var defer = Q.defer();
+    var self = this;
+
+    // Original username is unknown.
+    this._username = "unknown";
 
     // Find out if we have a table, by describing it.
-    var self = this;
     self._DB.describeTable({ TableName: self._tableName}, function(err, data) {
         if (err) {
             if (err.code && err.code === 'ResourceNotFoundException') {
@@ -68,7 +71,7 @@ PGDBPlayer.prototype.init = function() {
             }
         } else {
             // We have a table!
-            console.log("PGDBPlayer found existing player table, status is " + data.Table.TableStatus);
+            // console.log("PGDBPlayer found existing player table, status is " + data.Table.TableStatus);
             defer.resolve();
 
             // See if we have a user of this name
@@ -205,97 +208,8 @@ PGDBPlayer.prototype.registerNewUser = function(postedUsername, postedPassword) 
     return defer;
 };
 
-PGDBPlayer.prototype.getCurrentUsername = function() {
+PGDBPlayer.prototype.currentUsername = function() {
     return this._username;
 };
-
-
-
-// // var PGPlayerModels = Backbone.DynamoDB.Collection.extend({
-// //     model: PGPlayerModel,
-// //     url: '/players'
-// // });
-
-// module.exports = {
-//     // Get the player that's in the session: make sure it matches something
-//     // in the database.
-//     getSessionPlayer: function(req) {
-//         console.log("Getting player");
-//         var defer = q.defer();
-//         if (!req.session.username || req.session.username === "unknown") {
-//             console.log("No player, rejected");
-//             defer.reject();
-//         } else {
-//             console.log("Using player username: " + req.session.username);
-//             var pgPlayerModel = new PGPlayerModel({username: req.session.username});
-//             pgPlayerModel.fetch({
-//                 dynamodb: {
-//                     ConsistentRead: true
-//                 },
-//                 success: function(pgPlayer, response) {
-//                     defer.resolve(pgPlayer);
-//                 },
-//                 error: function(pgPlayer, response) {
-//                     // response = {code: 'NotFound'} if the user was not found
-//                     console.log("Cannot fetch 1: " + response.code);
-//                     defer.reject(response.code);
-//                 }
-//             });
-//         }
-//         return defer.promise;
-//     },
-
-//     // User has sent username and password: does it match?
-//     matchSessionPlayer: function(postedPlayer) {
-//         console.log("Checking player: " + JSON.stringify(postedPlayer));
-//         var defer = q.defer();
-//         if (    !postedPlayer ||
-//                 !postedPlayer.username ||
-//                 postedPlayer.username === "unknown" ||
-//                 !postedPlayer.password)
-//             defer.reject();
-//         else {
-//             var pgPlayerModel = new PGPlayerModel({username: player.username});
-//             pgPlayerModel.fetch({
-//                 dynamodb: {
-//                     ConsistentRead: true
-//                 },
-//                 success: function(pgPlayer, response) {
-//                     if (PasswordHash.verify(postedPlayer.password, pgPlayer.hashedPassword))
-//                         defer.resolve(pgPlayer);
-//                     else
-//                         defer.reject("password does not match");
-//                 },
-//                 error: function(pgPlayer, response) {
-//                     // response = {code: 'NotFound'} if the user was not found
-//                     console.log("Cannot fetch 2: " + response.code);
-//                     defer.reject(response.code);
-//                 }
-//             });
-//         }
-//         return defer.promise;
-//     },
-
-//     setSessionPlayer: function(newPGPlayer) {
-//         var pgPlayer = {
-//             username: newPGPlayer.username,
-//             hashedPassword: PasswordHash.generate(newPGPlayer.password)
-//         };
-//         console.log("Saving player: " + JSON.stringify(pgPlayer));
-//         var defer = q.defer();
-//         var pgPlayerModel = new PGPlayerModel(pgPlayer);
-//         pgPlayerModel.save({}, {
-//             success: function(pgPlayer, response) {
-//                 // req.session.username = pgPlayer.username;
-//                 defer.resolve(pgPlayer);
-//             },
-//             error: function(pgPlayer, response) {
-//                 console.log("Cannot save: " + JSON.stringify(response));
-//                 defer.reject(response.code);
-//             }
-//         });
-//         return defer.promise;
-//     }
-// };
 
 module.exports = PGDBPlayer;
