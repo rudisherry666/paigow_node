@@ -60,7 +60,7 @@ PGDBPlayer.prototype.init = function() {
                         console.log('FATAL Players table createTable: ' + err);
                         defer.reject();
                     } else {
-                        console.log("PGDBPlayer created player table, status is " + data.TableDescription.TableStatus);
+                        // console.log("PGDBPlayer created player table, status is " + data.TableDescription.TableStatus);
                         defer.resolve();
                     }
                 });
@@ -82,12 +82,13 @@ PGDBPlayer.prototype.init = function() {
 };
 
 PGDBPlayer.prototype.fetchUsername = function(username) {
+    var self = this;
     var defer = Q.defer();
 
         // Do we have a username?  If not, we don't need to look.
-    if (!username || username === "unknown")
-        defer.reject("unknown");
-    else {
+    if (!username || username === "unknown") {
+        defer.reject("unknown!");
+    } else {
         // We have a username: the only time we're initialized with a username that is
         // not unknown is when it's rememberd in the session cookie -- we don't need
         // to check against the password, we only need to remember it.
@@ -103,14 +104,11 @@ PGDBPlayer.prototype.fetchUsername = function(username) {
             }
         }, function(err, data) {
             if (err) {
-                if (err.code && err.code === 'ResourceNotFoundException') {
-                    // Can't find the user: could have been deleted.
-                    console.log("PGDBPlayer cannot find " + username);
-                    defer.reject("not-found");
-                } else {
-                    console.log('FATAL Players trying to find user: ' + username);
-                    defer.reject("bad-err " + err);
-                }
+                console.log('FATAL Players trying to find user: ' + username);
+                defer.reject("bad-err " + err);
+            } else if (data.Count === 0) {
+                // Can't find the user
+                defer.reject("not-found");
             } else {
                 // Success!  This is the user, remember it.
                 defer.resolve(data);
@@ -118,7 +116,7 @@ PGDBPlayer.prototype.fetchUsername = function(username) {
         });
     }
 
-    return defer;
+    return defer.promise;
 };
 
 PGDBPlayer.prototype.verifySessionUsername = function(username) {
@@ -145,7 +143,7 @@ PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, 
 
     // Fetch it and check the password.
     self.fetchUsername(username).then(function(userInDB) {
-        if (user.username === postedUsername)
+        if (userInDB.username === postedUsername)
             if (PasswordHash.verify(postedPassword, userInDB.hashedPassword)) {
                 self._username = postedUsername;
                 defer.resolve(self._username);
@@ -157,7 +155,7 @@ PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, 
             console.log("FATAL UH-OH: internal logic found user: " + JSON.stringify(userInDB) + " that didn't match username: " + postedUsername);
             defer.reject();
         }
-    }).fail(function() { defer.reject(); });
+    }/*).fail(*/,function() { defer.reject(); });
 
     return defer.promise;
 };
@@ -178,34 +176,65 @@ PGDBPlayer.prototype.registerNewUser = function(postedUsername, postedPassword) 
     var self = this;
     var defer = Q.defer();
 
-    // Can't have duplicates.
-    // TODO: use 'Exists' in the 'Expected' property to avoid duplicates
-    self.fetchUsername(postedUsername).then( function() { defer.reject("name-exists"); }).fail(function(err) {
-        if (err === "not-found") {
-            // Good, we didn't find it, we can add it.
-            self._DB.putItem({
-                TableName: self._tableName,
-                Item: {
-                    username: { 'S': postedUserName },
-                    hashedPassword: { 'S': PasswordHash.generate(postedPassword) }
-                }
-            }, function(err, data) {
-                if (err) {
-                    console.log("FATAL error trying to add username " + postedUsername + ": " + err);
-                    defer.reject("save-error " + err);
+    try {
+        // Can't have duplicates.
+        // TODO: use 'Exists' in the 'Expected' property to avoid duplicates
+        self.fetchUsername(postedUsername).then(
+            function() { defer.reject("name-exists"); },
+            function(err) {
+                if (err === "not-found") {
+                    // Good, we didn't find it, we can add it.
+                    try {
+                        self._DB.putItem({
+                            TableName: self._tableName,
+                            Item: {
+                                username: { 'S': postedUsername },
+                                hashedPassword: { 'S': PasswordHash.generate(postedPassword) }
+                            }
+                        }, function(err, data) {
+                            if (err) {
+                                console.log("FATAL error trying to add username " + postedUsername + ": " + err);
+                                defer.reject("save-error " + err);
+                            } else {
+                                // Success!
+                                defer.resolve(postedUsername);
+                            }
+                        });
+                    } catch(exc2) {
+                        console.log("DB.putItem threw exc " + exc2);
+                    }
                 } else {
-                    // Success!
-                    defer.resolve(postedUsername);
+                    // Uh-oh, some other kind of error, bad news.
+                    console.log("FATAL error trying to fetch username " + postedUsername + ": " + err);
+                    defer.reject("fetch-error " + err);
                 }
-            });
-        } else {
-            // Uh-oh, some other kind of error, bad news.
-            console.log("FATAL error trying to fetch username " + postedUsername + ": " + err);
-            defer.reject("fetch-error " + err);
-        }
-    });
+            }
+        );
+    } catch(exc) {
+        console.log("registerNewUser threw: " + exc);
+    }
 
-    return defer;
+    return defer.promise;
+};
+
+PGDBPlayer.prototype.deleteUser = function(username) {
+    var self = this;
+    var defer = Q.defer();
+
+    try {
+        self._DB.deleteItem({
+            TableName: self._tableName,
+            Key: {
+                username: { 'S': username },
+            }
+        }, function(err, data) {
+            defer.resolve();
+        });
+    } catch(exc) {
+        console.log("PGDBPlayer.deleteUser threw: " + exc);
+    }
+
+    return defer.promise;
 };
 
 PGDBPlayer.prototype.currentUsername = function() {
