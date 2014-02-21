@@ -17,7 +17,7 @@ var DB;
 if (!process.env.AWS_ACCESS_KEY_ID)
     console.log("ERROR cannot start dynamoDB: environment variables are not set up!");
 else
-    DB = new AWS.DynamoDB({ endpoint: new AWS.Endpoint('http://localhost:8000') });
+    DB = new AWS.DynamoDB({ endpoint: new AWS.Endpoint(process.env.AWS_ENDPOINT) });
 
 /*
 * @constructor PGDB
