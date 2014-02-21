@@ -14,9 +14,8 @@ function PGRoutePlayer(expressApp, pgdbPlayer) {
     var self = this;
 
     // Establish the endpoints.
-    self._expressApp.get('/player', self._getSessionPlayer);
-    self._expressApp.post('/player/register', self._registerPlayer);
-    self._expressApp.post('/player/signin', self._signinPlayer);
+    self._expressApp.get('/player', function(req, res) { self._getSessionPlayer(req, res); });
+    self._expressApp.post('/player', function(req, res) { self._registerOrSigninPlayer(req, res); });
 
     self._pgdbPlayer = pgdbPlayer;
 }
@@ -27,7 +26,7 @@ PGRoutePlayer.prototype._getSessionPlayer = function(req, res) {
     var self = this;
     console.log("PGRoutePlayer _getSessionPlayer");
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ username: req.session.username }));
+    res.end(JSON.stringify({ username: req.session['username'] }));
 };
 
 /*
@@ -37,30 +36,41 @@ PGRoutePlayer.prototype._getSessionPlayer = function(req, res) {
 * @method _registerPlayer
 *
 */
-PGRoutePlayer.prototype._registerPlayer = function(req, res) {
+PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
     var self = this;
-    console.log("PGRoutePlayer _registerPlayer");
 
     res.setHeader('Content-Type', 'application/json');
-    self._pgdbPlayer.registerNewUser(req.username, req.password).then(function() {
-        req.session.username = username;
-        res.end(JSON.stringify({ username: req.session.username }));
-    }).fail(function(err) {
-        res.end(JSON.stringify({ err: err }));
-    });
-};
 
-PGRoutePlayer.prototype._signinPlayer = function(req, res) {
-    var self = this;
-    console.log("PGRoutePlayer _signinPlayer");
+    console.log(JSON.stringify(req.body));
 
-    res.setHeader('Content-Type', 'application/json');
-    self._pgdbPlayer.verifyPostedUsernameAndPassword(req.username, req.password).then(function() {
-        req.session.username = username;
-        res.end(JSON.stringify({ username: req.session.username }));
-    }).fail(function(err) {
-        res.end(JSON.stringify({ err: err }));
-    });
+    // We know the difference by the existence of 'passwordVerify'; the client checked
+    // that it matches, but we get a POST in either way so we need something to differentiate
+    if (req.body.passwordVerify) {
+        try {
+            console.log("PGRoutePlayer _register");
+            // This is a register
+            self._pgdbPlayer.registerNewUser(req.body.username, req.body.password).then(
+                function() {
+                    req.session['username'] = req.body.username;
+                    res.end(JSON.stringify({ username: req.session['username'] }));
+                },
+                function(err) {
+                    console.log('err setting username: ' + err);
+                    res.end(JSON.stringify({ err: err }));
+                });
+        } catch (err) {
+            console.log("Caught err " + err);
+        }
+    } else {
+        console.log("PGRoutePlayer _signin");
+        self._pgdbPlayer.verifyPostedUsernameAndPassword(req.username, req.password).then(function() {
+            req.session['username'] = username;
+            res.end(JSON.stringify({ username: req.session['username'] }));
+        }).fail(function(err) {
+            res.end(JSON.stringify({ err: err }));
+        });
+    }
+
 };
 
 module.exports = PGRoutePlayer;

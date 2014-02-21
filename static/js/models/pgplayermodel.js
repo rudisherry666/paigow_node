@@ -13,7 +13,11 @@ define(['backbone'], function(Backbone) {
 
         // Startup
         initialize: function() {
+            // Assume the worst: we don't know.
             this.set(this.defaults);
+
+            // Fetch: maybe it will change.
+            this.fetch();
         },
 
         defaults: {

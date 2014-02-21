@@ -80,7 +80,8 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
             }
             this._options.pgPlayerModel.set({
                 username: username,
-                password: password
+                password: password,
+                passwordVerify: passwordVerify
             });
             this._options.pgPlayerModel.save();
         },

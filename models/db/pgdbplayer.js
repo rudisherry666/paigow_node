@@ -176,11 +176,16 @@ PGDBPlayer.prototype.registerNewUser = function(postedUsername, postedPassword) 
     var self = this;
     var defer = Q.defer();
 
+    console.log("PGDBPlayer.registerNewUser(" + postedUsername + ")");
+
     try {
         // Can't have duplicates.
         // TODO: use 'Exists' in the 'Expected' property to avoid duplicates
         self.fetchUsername(postedUsername).then(
-            function() { defer.reject("name-exists"); },
+            function() {
+                console.log("PGDBPlayer.registerNewUser rejected: name exists");
+                defer.reject("name-exists");
+            },
             function(err) {
                 if (err === "not-found") {
                     // Good, we didn't find it, we can add it.
