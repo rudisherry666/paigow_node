@@ -14,7 +14,7 @@ var AWS = require('aws-sdk');
 
 // One global DB, subclasses use it.
 var DB;
-if (!process.env.AWS_ACCESS_KEY_ID)
+if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !process.env.AWS_REGION || !process.env.AWS_ENDPOINT)
     console.log("ERROR cannot start dynamoDB: environment variables are not set up!");
 else
     DB = new AWS.DynamoDB({ endpoint: new AWS.Endpoint(process.env.AWS_ENDPOINT) });
