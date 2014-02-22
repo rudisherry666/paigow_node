@@ -41,27 +41,6 @@ app.get('/', function(req, res) {
     });
 });
 
-// Get of player: return the player that's in the session.
-// app.get('/player', function(req, res) {
-//     res.setHeader('Content-Type', 'application/json');
-//     if (req.session.username)
-//         res.end(JSON.stringify({ username: req.session.username }));
-//     else {
-//         console.log("calling get...");
-//         PGPlayer.getSessionPlayer(req)
-//             .then(function(player) {
-//                 console.log("          ...success: " + player.username);
-//                 req.session.username = player.username;
-//                 res.end(JSON.stringify({ username: req.session.username }));
-//             })
-//             .fail(function(err) {
-//                 console.log("          ...failure: " + err);
-//                 req.session.username = "unknown";
-//                 res.end(JSON.stringify({ username: req.session.username }));
-//             });
-//     }
-// });
-
 // Post of player means they're creating a player or signing in.
 app.post('/player', function(req, res) {
     var player = req.body;
