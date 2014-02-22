@@ -43,27 +43,21 @@ describe('PGDBPlayer', function() {
         var testPassword = 'xyz';
         pgdbPlayer.deleteUser(testUsername)
             .done(  function() {
-                console.log("recognize deleted, done");
                 pgdbPlayer.registerNewUser(testUsername, testPassword)
                     .then(  function(username) {
-                                console.log("recognize deleted, register success");
                                 assert.equal(username, testUsername);
                                 pgdbPlayer.verifyPostedUsernameAndPassword(testUsername, testPassword)
                                     .then(  function(userData) {
-                                                console.log("recognize deleted, verified success");
                                                 assert.equal(userData.username, testUsername);
                                             },
                                             function(err){
-                                                console.log("recognize deleted, verified fail");
                                                 assert(false);
                                             })
                                     .done(  function() {
-                                                console.log("recognize deleted, verified done");
                                                 done();
                                             });
                             },
                             function(err) {
-                                console.log("recognize deleted, register fail");
                                 assert(false);
                                 done();
                             });
