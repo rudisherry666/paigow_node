@@ -19,28 +19,66 @@ describe('PGDBPlayer', function() {
             .done(  function() { done(); });
     });
     it('should reject fetching username known not to exist', function (done) {
-        pgdbPlayer.fetchUsername("unkxnownxxx")
+        var testUsername = 'test-user-unknown';
+        var testPassword = 'xyz';
+        pgdbPlayer.fetchUsername(testUsername)
             .then(  function() { assert.fail("allowed", "rejected"); },
                     function() { /* otherwise rejection gets thrown */ })
             .done(  function() { done(); });
     });
     it ('should allow registering a username', function(done) {
-        pgdbPlayer.deleteUser("test_user")
+        var testUsername = 'test-user-register';
+        var testPassword = 'xyz';
+        pgdbPlayer.deleteUser(testUsername)
             .then(  function() {
-                pgdbPlayer.registerNewUser("test_user", "xyz")
-                    .then(  function(username) { assert.equal(username, "test_user"); },
+                pgdbPlayer.registerNewUser(testUsername, testPassword)
+                    .then(  function(username) { assert.equal(username, testUsername); },
                             function(err)      { assert(false); })
                     .done(  function() { done(); });
             }
         );
     });
+    it ('should recognize an existing username', function(done) {
+        var testUsername = 'test-user-existing';
+        var testPassword = 'xyz';
+        pgdbPlayer.deleteUser(testUsername)
+            .done(  function() {
+                console.log("recognize deleted, done");
+                pgdbPlayer.registerNewUser(testUsername, testPassword)
+                    .then(  function(username) {
+                                console.log("recognize deleted, register success");
+                                assert.equal(username, testUsername);
+                                pgdbPlayer.verifyPostedUsernameAndPassword(testUsername, testPassword)
+                                    .then(  function(userData) {
+                                                console.log("recognize deleted, verified success");
+                                                assert.equal(userData.username, testUsername);
+                                            },
+                                            function(err){
+                                                console.log("recognize deleted, verified fail");
+                                                assert(false);
+                                            })
+                                    .done(  function() {
+                                                console.log("recognize deleted, verified done");
+                                                done();
+                                            });
+                            },
+                            function(err) {
+                                console.log("recognize deleted, register fail");
+                                assert(false);
+                                done();
+                            });
+            }
+        );
+    });
     it ('should reject re-registering a username', function(done) {
-        pgdbPlayer.deleteUser("test_user")
+        var testUsername = 'test-user-reregister';
+        var testPassword = 'xyz';
+        pgdbPlayer.deleteUser(testUsername)
             .then(  function() {
-                pgdbPlayer.registerNewUser("test_user", "xyz").then(
+                pgdbPlayer.registerNewUser(testUsername, testPassword).then(
                     function(username) {
-                        assert.equal(username, "test_user");
-                        pgdbPlayer.registerNewUser("test_user", "xyz")
+                        assert.equal(username, testUsername);
+                        pgdbPlayer.registerNewUser(testUsername, testPassword)
                             .then(  function(username) { assert.fail("allowed", "rejected"); },
                                     function(err)      { /* otherwise rejection gets thrown */ })
                             .done(  function() { done(); });

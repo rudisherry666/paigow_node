@@ -85,35 +85,61 @@ PGDBPlayer.prototype.fetchUsername = function(username) {
     var self = this;
     var defer = Q.defer();
 
+    console.log("PGDBPlayer:fetchUsername('" + username + "')");
+    try {
         // Do we have a username?  If not, we don't need to look.
-    if (!username || username === "unknown") {
-        defer.reject("unknown!");
-    } else {
-        // We have a username: the only time we're initialized with a username that is
-        // not unknown is when it's rememberd in the session cookie -- we don't need
-        // to check against the password, we only need to remember it.
-        self._DB.query({
-            TableName: self._tableName,
-            ConsistentRead: true,
-            Select: "ALL_ATTRIBUTES",
-            KeyConditions: {
-                'username' : {
-                    AttributeValueList: [{'S': username}],
-                    ComparisonOperator: 'EQ'
+        if (!username || username === "unknown") {
+            console.log("PGDBPlayer:fetchUsername('" + username + "') unknown: rejected");
+            defer.reject("unknown!");
+        } else {
+            // We have a username: the only time we're initialized with a username that is
+            // not unknown is when it's rememberd in the session cookie -- we don't need
+            // to check against the password, we only need to remember it.
+            self._DB.query({
+                TableName: self._tableName,
+                ConsistentRead: true,
+                Select: "ALL_ATTRIBUTES",
+                KeyConditions: {
+                    'username' : {
+                        AttributeValueList: [{'S': username}],
+                        ComparisonOperator: 'EQ'
+                    }
                 }
-            }
-        }, function(err, data) {
-            if (err) {
-                console.log('FATAL Players trying to find user: ' + username);
-                defer.reject("bad-err " + err);
-            } else if (data.Count === 0) {
-                // Can't find the user
-                defer.reject("not-found");
-            } else {
-                // Success!  This is the user, remember it.
-                defer.resolve(data);
-            }
-        });
+            }, function(err, data) {
+                console.log("PGDBPlayer:fetchUsername('" + username + "') returned from DB.query");
+                if (err) {
+                    console.log("PGDBPlayer:fetchUsername('" + username + "') FATAL error: " + err);
+                    defer.reject("bad-err " + err);
+                } else if (data.Count === 0) {
+                    // Can't find the user
+                    console.log("PGDBPlayer:fetchUsername('" + username + "') not-found");
+                    defer.reject("not-found");
+                } else if (data.Count > 1) {
+                    // Can't find the user
+                    console.log("PGDBPlayer:fetchUsername('" + username + "') FATAL: returned " + data.Count + " users!");
+                    defer.reject("too-many-found");
+                } else if (!data.Items || !(data.Items instanceof Array) || (data.Items.length !== 1)) {
+                    console.log("PGDBPlayer:fetchUsername('" + username + "') FATAL: Items don't match count!");
+                    defer.reject("aws-sdk-corrupted");
+                } else {
+                    var item = data.Items[0];
+                    if (!item.username || (typeof item.username !== "object") || !item.hashedPassword || (typeof item.hashedPassword !== "object")) {
+                        console.log("PGDBPlayer:fetchUsername('" + username + "') FATAL: no username or password in returned item!");
+                        defer.reject("item-corrupted");
+                    } else if (!item.username.S || !item.hashedPassword.S) {
+                        console.log("PGDBPlayer:fetchUsername('" + username + "') FATAL: empty username or password in returned item!");
+                        defer.reject("empty-username");
+                    } else {
+                        // Success!  This is the user, remember it.
+                        console.log("PGDBPlayer:fetchUsername('" + username + "') success");
+                        defer.resolve({username: item.username.S, hashedPassword: item.hashedPassword.S});
+                    }
+                }
+            });
+        }
+    } catch(exc) {
+        console.log("PGDBPlayer:fetchUsername('" + username + "') caught exception: " + exc);
+        defer.reject(exc);
     }
 
     return defer.promise;
@@ -142,20 +168,29 @@ PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, 
     delete self._username;
 
     // Fetch it and check the password.
-    self.fetchUsername(username).then(function(userInDB) {
-        if (userInDB.username === postedUsername)
-            if (PasswordHash.verify(postedPassword, userInDB.hashedPassword)) {
-                self._username = postedUsername;
-                defer.resolve(self._username);
+    self.fetchUsername(postedUsername).then(
+        function(userInDB) {
+            console.log("PGDBPlayer:verifyPostedUsernameAndPassword('" + postedUsername + "') returned from fetchUsername");
+            console.log("PGDBPlayer:verifyPostedUsernameAndPassword('" + postedUsername + "') fetchUserName returned: " + JSON.stringify(userInDB));
+            if (userInDB.username === postedUsername) {
+                console.log("PGDBPlayer:verifyPostedUsernameAndPassword('" + postedUsername + "') matching name");
+                if (PasswordHash.verify(postedPassword, userInDB.hashedPassword)) {
+                    console.log("PGDBPlayer:verifyPostedUsernameAndPassword('" + postedUsername + "') password match success");
+                    self._username = postedUsername;
+                    defer.resolve({username: postedUsername, password: postedPassword});
+                } else {
+                    console.log("PGDBPlayer:verifyPostedUsernameAndPassword('" + postedUsername + "') password mismatch");
+                    defer.reject();
+                }
             } else {
-                console.log("Bad password entered for username " + postedUsername);
+                console.log("PGDBPlayer:verifyPostedUsernameAndPassword('" + postedUsername + "') FATAL username mismatch");
                 defer.reject();
             }
-        else {
-            console.log("FATAL UH-OH: internal logic found user: " + JSON.stringify(userInDB) + " that didn't match username: " + postedUsername);
+        },
+        function(err) {
+            console.log("PGDBPlayer:verifyPostedUsernameAndPassword('" + postedUsername + "') fetchUsername err: " + err);
             defer.reject();
-        }
-    }/*).fail(*/,function() { defer.reject(); });
+        });
 
     return defer.promise;
 };
@@ -176,7 +211,7 @@ PGDBPlayer.prototype.registerNewUser = function(postedUsername, postedPassword) 
     var self = this;
     var defer = Q.defer();
 
-    console.log("PGDBPlayer.registerNewUser(" + postedUsername + ")");
+    console.log("PGDBPlayer.registerNewUser('" + postedUsername + "')");
 
     try {
         // Can't have duplicates.
