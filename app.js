@@ -41,12 +41,6 @@ app.get('/', function(req, res) {
     });
 });
 
-// Post of player means they're creating a player or signing in.
-app.post('/player', function(req, res) {
-    var player = req.body;
-    PGPlayer.setSessionPlayer(req.body);
-});
-
 // Test all the tiles.
 app.get('/tiles', function(req, res) {
     res.render('pgtiles.ejs', {
