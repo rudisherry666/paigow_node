@@ -48,8 +48,6 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
 
     res.setHeader('Content-Type', 'application/json');
 
-    console.log(JSON.stringify(req.body));
-
     // We know the difference between signing in and registering by the state
     if (req.body.state === 'registering') {
         try {
@@ -69,8 +67,8 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
         }
     } else {
         console.log("PGRoutePlayer _signin");
-        self._pgdbPlayer.verifyPostedUsernameAndPassword(req.username, req.password).then(function() {
-            req.session['username'] = username;
+        self._pgdbPlayer.verifyPostedUsernameAndPassword(req.body.username, req.body.password).then(function() {
+            req.session['username'] = req.body.username;
             res.end(JSON.stringify({ username: req.session['username'] }));
         }).fail(function(err) {
             res.end(JSON.stringify({ err: err }));
