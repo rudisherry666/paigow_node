@@ -18,11 +18,18 @@ define(['backbone'], function(Backbone) {
 
             // Fetch: maybe it will change.
             this.fetch();
+
+            // When we've changed an we've synced,
+            // then we're static again.
+            this.on('sync', function() {
+                this.set('state', 'static');
+            });
         },
 
         defaults: {
             'username': 'unknown',
-            'password': 'unknown'
+            'password': 'unknown',
+            'state': 'static'
         },
 
         urlRoot: '/player'

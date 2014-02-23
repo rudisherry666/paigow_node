@@ -35,32 +35,49 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         // Listen for changes: show or hide the form depending on whether
         // or not there is a user (name === "unknown" is the trigger)
         _addModelListeners: function() {
-            this._options.pgPlayerModel.on("change:username", _.bind(this._showOrHide, this));
+            this._options.pgPlayerModel.on("change:state", _.bind(this._showOrHide, this));
         },
 
         _showOrHide: function() {
-            this._isShowing = (this._options.pgPlayerModel.get('username') === "unknown");
-            if (this._isShowing) {
-                $(".form-signin").fadeIn(500);
-            } else
-                $(".form-signin").fadeOut(500);
+            if (this._options.pgPlayerModel.get('state') === 'static') {
+                this._hideError();
+                this._isShowing = (this._options.pgPlayerModel.get('username') === "unknown");
+                if (this._isShowing) {
+                    $(".form-signin").fadeIn(500);
+                } else
+                    $(".form-signin").fadeOut(500);
+            } else {
+                this._onError((this._options.pgPlayerModel.get('state') === 'signing-in') ? "Signing in..." : "Registering...");
+            }
         },
 
         _onSignin: function(e) {
+            if (this._options.pgPlayerModel.get('state') === 'working')
+                return;
+
             this._hideError();
 
-            var name = $("#pgsignin-signin-name").val();
-            if (!name) {
+            var username = $("#pgsignin-signin-name").val();
+            if (!username) {
                 return this._onError("Username is required!");
             }
             var password = $("#pgsignin-signin-password").val();
             if (!password) {
                 return this._onError("Password is required!");
             }
-            console.log("signin!");
+
+            this._options.pgPlayerModel.set({
+                state: 'signing-in',
+                username: username,
+                password: password
+            });
+            this._options.pgPlayerModel.save();
         },
 
         _onRegister: function(e) {
+            if (this._options.pgPlayerModel.get('state') === 'working')
+                return;
+
             this._hideError();
 
             var username = $("#pgsignin-register-name").val();
@@ -79,9 +96,9 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
                 return this._onError("Passwords don't match!");
             }
             this._options.pgPlayerModel.set({
+                state: 'registering',
                 username: username,
-                password: password,
-                passwordVerify: passwordVerify
+                password: password
             });
             this._options.pgPlayerModel.save();
         },
@@ -92,7 +109,7 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         },
 
         _hideError: function() {
-            $("#pgsignin-error-message").css('visibility', "hidden");            
+            $("#pgsignin-error-message").css('visibility', "hidden");
         }
 
     });
