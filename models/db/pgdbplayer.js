@@ -20,10 +20,9 @@ var Q = require('q'),
 */
 
 function PGDBPlayer() {
-    PGDB.call(this);
+    PGDB.call(this, 'Players');
     var self = this;
 
-    self._tableName = self.fullTableName('Players');
     self.init();
 }
 

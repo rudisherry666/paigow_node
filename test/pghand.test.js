@@ -1,6 +1,9 @@
-var assert = require('assert'),
+var before = require('./before.test'),
+    assert = require('assert'),
     PGTile = require('../models/pgtile'),
     PGHand = require('../models/pghand');
+
+console.log("test: PGHand");
 
 describe('PGHand', function() {
     var tileEleven = new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1),

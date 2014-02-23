@@ -1,5 +1,8 @@
-var assert = require('assert'),
+var before = require('./before.test'),
+    assert = require('assert'),
     PGTile = require('../models/pgtile.js');
+
+console.log("test: PGTile");
 
 describe('PGTile', function() {
     it('should return a PGTile object', function() {

@@ -1,8 +1,12 @@
-var assert = require('assert'),
+var before = require('./before.test'),
+    assert = require('assert'),
     PGTile = require('../models/pgtile'),
     PGDeal = require('../models/pgdeal');
 
+console.log("test: PGDeal");
+
 describe('PGDeal', function() {
+
     var tileEleven = new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1),
         tileEight = new PGTile(PGTile.prototype.TILE_INDEX.MIXED_EIGHT_1),
         tileDay = new PGTile(PGTile.prototype.TILE_INDEX.DAY_2),

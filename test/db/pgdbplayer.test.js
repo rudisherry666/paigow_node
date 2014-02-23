@@ -1,12 +1,14 @@
-var PGDBPlayer = require('../../models/db/pgdbplayer'),
+var Before = require('../before.test'),
+    PGDBPlayer = require('../../models/db/pgdbplayer'),
     assert = require('assert');
 
+console.log("test: db.PGDBPlayer");
 
 describe('PGDBPlayer', function() {
-
     var pgdbPlayer;
-    before(function () {
+    before(function(done) {
         pgdbPlayer = new PGDBPlayer();
+        done();
     });
 
     it('should have a DB', function () {

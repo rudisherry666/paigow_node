@@ -28,12 +28,14 @@ var gDBPrefix = "";
 * @constructor PGDB
 *
 */
-function PGDB() {
+function PGDB(tableName) {
+    if (!tableName) throw new Error("PBDB: no table name!");
     this._DB = gDB;
+    this._tableName = tableName;
 }
 
 /*
-* Return the gDB used (more for testing than anything else)
+* Return the gDB used (more for testing than anything else).  Global function.
 *
 * @method gDB
 *
@@ -62,17 +64,17 @@ PGDB.prototype.setPrefix = function(prefix) {
 *
 */
 PGDB.prototype.fullTableName = function(tableName) {
-    return gDBPrefix + tableName;
+    return gDBPrefix + this._tableName;
 };
 
 /*
-* Drop all the tables, with the current prefix.
+* Drop all the tables, with the current prefix.  Global function.
 *
 * @method clearAll
 *
 */
 PGDB.prototype.clearAll = function() {
-    if (!this._DB) throw new Error("PGDB.clearAll without DB!");
+    if (!gDB) throw new Error("PGDB.clearAll without DB!");
 
     var self = this;
 
@@ -82,17 +84,18 @@ PGDB.prototype.clearAll = function() {
 
     // This function keeps resetting until a table is really gone.
     function checkForTableReallyGone(tableName, defer) {
-        self._DB.describeTable({ TableName: self._tableName}, function(err, data) {
+        gDB.describeTable({ TableName: self.fullTableName()}, function(err, data) {
             if (err && err.code && err.code === 'ResourceNotFoundException') {
-                console.log("PGDB.clearAll.checkForTableReallyGone('" + tableName + "'): it's gone!");
+                // console.log("PGDB.clearAll.checkForTableReallyGone('" + tableName + "'): it's gone!");
                 // It's gone!  Don't re-register to get called again.
+                defer.resolve();
             } else if (err) {
                 // Uh-oh, an error trying, that's bad.
                 console.log("PGDB.clearAll.checkForTableReallyGone('" + tableName + "'): FATAL: " + err);
                 defer.reject(err);
             } else {
                 // Not gone, try again later.
-                console.log("PGDB.clearAll.checkForTableReallyGone('" + tableName + "'): not gone yet!");
+                // console.log("PGDB.clearAll.checkForTableReallyGone('" + tableName + "'): not gone yet!");
                 setTimeout(function() { checkForTableReallyGone(tableName, defer); }, 100);
             }
         });
@@ -102,8 +105,8 @@ PGDB.prototype.clearAll = function() {
     function deleteTable(tableName) {
         var defer = Q.defer();
         defers.push(defer);
-        console.log("PGDB.clearAll.deleteTable('" + tableName + "')");
-        self._DB.deleteTable({TableName:tableName}, function(err, data) {
+        // console.log("PGDB.clearAll.deleteTable('" + tableName + "')");
+        gDB.deleteTable({TableName:tableName}, function(err, data) {
             if (err) {
                 // May already be gone; that's OK.
                 if (err.code && err.code === 'ResourceNotFoundException') {
@@ -122,7 +125,7 @@ PGDB.prototype.clearAll = function() {
         });
     }
 
-    this._DB.listTables(function(err, data) {
+    gDB.listTables(function(err, data) {
         if (err) throw new Error("PBDB.clearAll listTables threw: " + err);
         if (!data || !data.TableNames) throw new Error("PBDB.clearAll listTables found no tables!");
 
@@ -136,7 +139,6 @@ PGDB.prototype.clearAll = function() {
         }
     });
 
-    console.log("PGDB.clearAll(): found " + defers.length + " tables.");
     return Q.all(defers);
 };
 

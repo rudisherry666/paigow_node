@@ -3,6 +3,7 @@ var before = require('../before.test'),
     assert = require('assert'),
     http = require('http');
 
+console.log("test: routes.PGRoutePlayer");
 
 describe('GET /player', function(){
 
