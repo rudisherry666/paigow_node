@@ -68,6 +68,59 @@ PGDB.prototype.fullTableName = function(tableName) {
 };
 
 /*
+* Initialize the table
+*
+* @method init
+*
+* @param keyAttributeName {string}: assumed to be string and HASH
+*/
+PGDB.prototype.init = function(keyAttributeName) {
+    var self = this;
+    var defer = Q.defer();
+
+    // Create the AttributeName from the input Attributes.
+
+    // Find out if we have a table, by describing it.  If we don't, create it
+    self._DB.describeTable({ TableName: self.fullTableName()}, function(err, data) {
+        if (!err) {
+            // Table exists, we're good.
+            defer.resolve();
+        } else if (!err.code || err.code !== 'ResourceNotFoundException') {
+            // Hmm, error other than no-table: that's really bad.
+            console.log('FATAL describeTable for ' + self.fullTableName() + ' err: ' + err);
+            defer.reject();
+        } else {
+            // It can't find the table: that means we haven't created it yet.  Do so.
+            self._DB.createTable({
+                TableName: self.fullTableName(),
+                AttributeDefinitions: [
+                    { AttributeName: keyAttributeName, AttributeType: "S" }
+                ],
+                KeySchema: [
+                    { AttributeName: keyAttributeName, KeyType: "HASH" }
+                ],
+                ProvisionedThroughput: {
+                    ReadCapacityUnits: 1,
+                    WriteCapacityUnits: 1
+                }
+            }, function(err, data) {
+                if (err) {
+                    // Uh-oh, can't create the table: that's bad
+                    console.log('FATAL createTable for ' + self.fullTableName() + ' err: ' + err);
+                    defer.reject();
+                } else {
+                    // console.log("PGDBPlayer created player table, status is " + data.TableDescription.TableStatus);
+                    defer.resolve();
+                }
+            });
+        }
+    });
+
+    // Nothing happens until this promise is done.
+    this._initPromise = defer.promise;
+};
+
+/*
 * Drop all the tables, with the current prefix.  Global function.
 *
 * @method clearAll
