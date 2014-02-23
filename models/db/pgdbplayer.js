@@ -38,12 +38,12 @@ PGDBPlayer.prototype.init = function() {
     this._username = "unknown";
 
     // Find out if we have a table, by describing it.
-    self._DB.describeTable({ TableName: self._tableName}, function(err, data) {
+    self._DB.describeTable({ TableName: self.fullTableName() }, function(err, data) {
         if (err) {
             if (err.code && err.code === 'ResourceNotFoundException') {
                 // We don't have the table: create it.
                 self._DB.createTable({
-                    TableName: self._tableName,
+                    TableName: self.fullTableName(),
                     AttributeDefinitions: [
                         { AttributeName: 'username', AttributeType: "S" }
                     ],
@@ -95,7 +95,7 @@ PGDBPlayer.prototype.fetchUsername = function(username) {
             // not unknown is when it's rememberd in the session cookie -- we don't need
             // to check against the password, we only need to remember it.
             self._DB.query({
-                TableName: self._tableName,
+                TableName: self.fullTableName(),
                 ConsistentRead: true,
                 Select: "ALL_ATTRIBUTES",
                 KeyConditions: {
@@ -225,7 +225,7 @@ PGDBPlayer.prototype.registerNewUser = function(postedUsername, postedPassword) 
                     // Good, we didn't find it, we can add it.
                     try {
                         self._DB.putItem({
-                            TableName: self._tableName,
+                            TableName: self.fullTableName(),
                             Item: {
                                 username: { 'S': postedUsername },
                                 hashedPassword: { 'S': PasswordHash.generate(postedPassword) }
@@ -262,7 +262,7 @@ PGDBPlayer.prototype.deleteUser = function(username) {
 
     try {
         self._DB.deleteItem({
-            TableName: self._tableName,
+            TableName: self.fullTableName(),
             Key: {
                 username: { 'S': username },
             }
