@@ -22,10 +22,17 @@ function PGRoutePlayer(expressApp, pgdbPlayer) {
 
 util.inherits(PGRoutePlayer, PGRouteBase);
 
+/*
+* @method GET /player
+* 
+* Get the current player in the session, or "unknown" if there isn't one.
+*
+*/
 PGRoutePlayer.prototype._getSessionPlayer = function(req, res) {
     var self = this;
-    console.log("PGRoutePlayer _getSessionPlayer");
     res.setHeader('Content-Type', 'application/json');
+    if (!req.session['username'])
+        req.session['username'] = self._pgdbPlayer.currentUsername();
     res.end(JSON.stringify({ username: req.session['username'] }));
 };
 
@@ -43,9 +50,8 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
 
     console.log(JSON.stringify(req.body));
 
-    // We know the difference by the existence of 'passwordVerify'; the client checked
-    // that it matches, but we get a POST in either way so we need something to differentiate
-    if (req.body.passwordVerify) {
+    // We know the difference between signing in and registering by the state
+    if (req.body.state === 'registering') {
         try {
             console.log("PGRoutePlayer _register");
             // This is a register

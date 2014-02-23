@@ -1,6 +1,5 @@
-var app = require('../app'),
-  assert = require('assert'),
-  http = require('http');
+var assert = require('assert'),
+    http = require('http');
 
 
 describe('GET /', function(){

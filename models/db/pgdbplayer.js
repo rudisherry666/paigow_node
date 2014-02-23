@@ -23,7 +23,7 @@ function PGDBPlayer() {
     PGDB.call(this);
     var self = this;
 
-    self._tableName = 'Players';
+    self._tableName = self.fullTableName('Players');
     self.init();
 }
 

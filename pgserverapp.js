@@ -33,7 +33,7 @@ function PGServerApp() {
 }
 
 PGServerApp.prototype.init = function() {
-    
+
     // Initialize the player stuff.
     var pgdbPlayer = new PGDBPlayer();
     var pgRoutePlayer = new PGRoutePlayer(this._expressApp, pgdbPlayer);
@@ -100,10 +100,16 @@ PGServerApp.prototype.init = function() {
 PGServerApp.prototype.run = function() {
     var self = this;
     // Start the server!
-    http.createServer(self._expressApp).listen(self._expressApp.get('port'), function() {
+    this._server = http.createServer(self._expressApp).listen(self._expressApp.get('port'), function() {
         console.log("Express server listening on port " + self._expressApp.get('port'));
     });
 };
+
+PGServerApp.prototype.stop = function() {
+    if (this._server)
+        this._server.close();
+};
+
 
 
 module.exports = PGServerApp;

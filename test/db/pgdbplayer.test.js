@@ -4,7 +4,10 @@ var PGDBPlayer = require('../../models/db/pgdbplayer'),
 
 describe('PGDBPlayer', function() {
 
-    var pgdbPlayer = new PGDBPlayer();
+    var pgdbPlayer;
+    before(function () {
+        pgdbPlayer = new PGDBPlayer();
+    });
 
     it('should have a DB', function () {
         assert(Boolean(pgdbPlayer.DB()));
