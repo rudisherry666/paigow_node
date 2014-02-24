@@ -41,6 +41,12 @@ describe('PGDB', function() {
             }
         );
     });
+    it('should be able to delete a table that doesn\'t exist', function(done) {
+        awsWrapper1.tableDelete('test-table-never-created').then(
+            function() {},
+            function(err) { assert.fail(err); }
+        ).done(function() { done(); });
+    });
     it('should list tables it has created', function(done) {
         var tableName = 'test-table-created';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
@@ -74,10 +80,10 @@ describe('PGDB', function() {
         );
     });
     it('should not leave any tables with a certain prefix', function(done) {
-        var tableName = 'test2-table-created';
+        var tableName = 'test-table-create-prefix';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
             function() {
-                var regex = /^test2.*$/;
+                var regex = /^test.*$/;
                 awsWrapper1.tableDeleteMany(regex).then(
                     function() {
                         awsWrapper1.tableList().then(
