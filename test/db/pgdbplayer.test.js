@@ -41,9 +41,9 @@ describe('PGDBPlayer', function() {
         pgdbPlayer.deleteUser(testUsername)
             .then(  function() {
                 pgdbPlayer.registerNewUser(testUsername, testPassword)
-                    .then(  function(username) { assert.equal(username, testUsername); },
-                            function(err)      { assert(false); })
-                    .done(  function() { done(); });
+                    .then(  function(data) { assert.equal(data.username, testUsername); },
+                            function(err)  { assert(false); })
+                    .done(  function()     { done(); });
             }
         );
     });
