@@ -4,7 +4,7 @@ var AWSWrapper = require('../models/db/awswrapper'),
     PGDB = require('../models/db/pgdb'),
     PGServerApp = require('../pgserverapp');
 
-var pgServerApp;
+var pgServerApp, awsWrapper;
 
 before(function(done) {
 
@@ -14,8 +14,8 @@ before(function(done) {
     // Clear all the tables (which will use the prefix above) so we have a
     // clean database when we're done.  This returns a promise when they're
     // all really gone, and that's when we call 'done()' to start the tests.
-    var awsWrapper = new AWSWrapper();
-    awsWrapper.tableDeleteMany(/^test-$/).done(function() {
+    awsWrapper = new AWSWrapper();
+    awsWrapper.tableDeleteMany(/^test-.*$/).done(function() {
         pgServerApp = new PGServerApp();
         pgServerApp.init();
         pgServerApp.run();
@@ -23,6 +23,14 @@ before(function(done) {
     });
 });
 
-after(function() {
+after(function(done) {
+    // Stop the server
     if (pgServerApp) pgServerApp.stop();
+
+    // Clean up all the tables with this prefix.
+    awsWrapper.tableDeleteMany(/^test-.*$/).then(
+        function() {},
+        function() {}
+    ).done(function() { done(); });
+
 });

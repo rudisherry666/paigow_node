@@ -1,4 +1,5 @@
-var AWSWrapper = require('../../models/db/awswrapper'),
+var Before = require('../before.test'),
+    AWSWrapper = require('../../models/db/awswrapper'),
     assert = require('assert');
 
 console.log("test: db.AWSWrapper");
@@ -10,13 +11,6 @@ describe('AWSWrapper', function() {
         awsWrapper1 = new AWSWrapper('test1');
         awsWrapper2 = new AWSWrapper('test2');
         done();
-    });
-
-    after(function(done) {
-        awsWrapper1.tableDeleteMany(/^test.*$/).then(
-            function() {},
-            function() {}
-        ).done(function() { done(); });
     });
 
     it('should use the same DB', function () {
