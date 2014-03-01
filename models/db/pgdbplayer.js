@@ -72,7 +72,8 @@ PGDBPlayer.prototype.verifySessionUsername = function(username) {
 
 PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, postedPassword) {
     var self = this;
-    self._log.debug("verifyPostedUsernameAndPassword(" + username + ")");
+    var prefix = "verifyPostedUsernameAndPassword('" + postedUsername + "') ";
+    self._log.debug(prefix + "called");
 
     var defer = Q.defer();
 
@@ -83,26 +84,34 @@ PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, 
 
             // Fetch it and check the password.
             self.fetchUsername(postedUsername).then(
-                function(userInDB) {
-                    self._log.debug("verifyPostedUsernameAndPassword('" + postedUsername + "') returned from fetchUsername");
-                    self._log.debug("verifyPostedUsernameAndPassword('" + postedUsername + "') fetchUserName returned: " + JSON.stringify(userInDB));
-                    if (userInDB.username === postedUsername) {
-                        self._log.debug("verifyPostedUsernameAndPassword('" + postedUsername + "') matching name");
-                        if (PasswordHash.verify(postedPassword, userInDB.hashedPassword)) {
-                            self._log.debug("verifyPostedUsernameAndPassword('" + postedUsername + "') password match success");
-                            self._username = postedUsername;
-                            defer.resolve({username: postedUsername, password: postedPassword});
-                        } else {
-                            self._log.error("verifyPostedUsernameAndPassword('" + postedUsername + "') password mismatch");
-                            defer.reject();
-                        }
+                function(data) {
+                    self._log.debug(prefix + "fetchUserName returned: " + JSON.stringify(data));
+                    if (!(data instanceof Array)) {
+                        self._log.fatal(prefix + "non-array returned");
+                        defer.reject("non-array");
+                    } else if (data.length !== 1) {
+                        self._log.fatal(prefix + "bad number of items returned");
+                        defer.reject("bad-array-length");
                     } else {
-                        self._log.fatal("verifyPostedUsernameAndPassword('" + postedUsername + "') FATAL username mismatch");
-                        defer.reject();
+                        var user = data[0];
+                        if (user.username !== postedUsername) {
+                            self._log.fatal(prefix + "username mismatch");
+                            defer.reject("bad-username");
+                        } else {
+                            self._log.debug(prefix + "matching name");
+                            if (PasswordHash.verify(postedPassword, user.hashedPassword)) {
+                                self._log.debug(prefix + "password match success");
+                                self._username = postedUsername;
+                                defer.resolve({username: postedUsername, password: postedPassword});
+                            } else {
+                                self._log.error(prefix + "password mismatch");
+                                defer.reject();
+                            }
+                        }
                     }
                 },
                 function(err) {
-                    self._log.error("verifyPostedUsernameAndPassword('" + postedUsername + "') fetchUsername err: " + err);
+                    self._log.error(prefix + "fetchUsername err: " + err);
                     defer.reject();
                 });
         },

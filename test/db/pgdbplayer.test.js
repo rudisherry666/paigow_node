@@ -11,7 +11,10 @@ describe('PGDBPlayer', function() {
     var pgdbPlayer;
     before(function(done) {
         pgdbPlayer = new PGDBPlayer();
-        done();
+        pgdbPlayer.created().then(
+            function(data) { done(); },
+            function(err)  { assert.fail(err); done(); }
+        );
     });
 
     it('should return unknown username', function () {
@@ -42,7 +45,7 @@ describe('PGDBPlayer', function() {
             .then(  function() {
                 pgdbPlayer.registerNewUser(testUsername, testPassword)
                     .then(  function(data) { assert.equal(data.username, testUsername); },
-                            function(err)  { assert(false); })
+                            function(err)  { assert.fail(err); })
                     .done(  function()     { done(); });
             }
         );
@@ -51,26 +54,17 @@ describe('PGDBPlayer', function() {
         playerLog.debug('should recognize an existing username');
         var testUsername = 'test-user-existing';
         var testPassword = 'xyz';
-        pgdbPlayer.deleteUser(testUsername)
-            .done(  function() {
-                pgdbPlayer.registerNewUser(testUsername, testPassword)
-                    .then(  function(username) {
-                                assert.equal(username, testUsername);
-                                pgdbPlayer.verifyPostedUsernameAndPassword(testUsername, testPassword)
-                                    .then(  function(userData) {
-                                                assert.equal(userData.username, testUsername);
-                                            },
-                                            function(err){
-                                                assert(false);
-                                            })
-                                    .done(  function() {
-                                                done();
-                                            });
-                            },
-                            function(err) {
-                                assert(false);
-                                done();
-                            });
+        pgdbPlayer.deleteUser(testUsername).done(
+            function() {
+                pgdbPlayer.registerNewUser(testUsername, testPassword).then(
+                  function(data) {
+                    assert.equal(data.username, testUsername);
+                    pgdbPlayer.verifyPostedUsernameAndPassword(testUsername, testPassword)
+                        .then(  function(data) { assert.equal(data.username, testUsername); },
+                                function(err)  { assert.fail(err); })
+                        .done(  function()     { done(); });
+                },
+                function(err) { assert.fail(err); done(); });
             }
         );
     });
@@ -78,20 +72,24 @@ describe('PGDBPlayer', function() {
         playerLog.debug('should reject re-registering a username');
         var testUsername = 'test-user-reregister';
         var testPassword = 'xyz';
-        pgdbPlayer.deleteUser(testUsername)
-            .then(  function() {
+        pgdbPlayer.deleteUser(testUsername).then(
+            function(data) {
                 pgdbPlayer.registerNewUser(testUsername, testPassword).then(
-                    function(username) {
-                        assert.equal(username, testUsername);
+                    function(data) {
+                        assert.equal(data.username, testUsername);
                         pgdbPlayer.registerNewUser(testUsername, testPassword)
-                            .then(  function(username) { assert.fail("allowed", "rejected"); },
-                                    function(err)      { /* otherwise rejection gets thrown */ })
+                            .then(  function(data) { assert.fail("allowed", "rejected"); },
+                                    function(err)  { /* otherwise rejection gets thrown */ })
                             .done(  function() { done(); });
                     },
                     function(err) {
-                        assert.fail("rejected", "allowed");
+                        assert.fail(err);
                         done();
                     });
+            },
+            function(err) {
+                assert.fail(err);
+                done();
             }
         );
     });
