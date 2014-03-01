@@ -117,7 +117,7 @@ PGDB.prototype.delete = function(keyValue) {
 */
 PGDB.prototype.add = function(item) {
     var self = this;
-    self._log.debug("delete");
+    self._log.debug("add");
 
     var options = {
         item: item,
