@@ -23,7 +23,7 @@ function PGLog(moduleName, level) {
 
 PGLog.prototype._log = function(str, level) {
     if (_levelMap[level] >= this._level)
-        console.log('[' + "             ".slice(0, 10-this._moduleName.length) + this._moduleName + '] ' + str);
+        console.log('[' + "               ".slice(0, 15-this._moduleName.length) + this._moduleName + '] ' + str);
 };
 
 PGLog.prototype.fatal   = function(str) { this._log("[FATAL  ] " + str, "fatal"  ); };
