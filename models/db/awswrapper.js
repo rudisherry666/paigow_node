@@ -7,7 +7,8 @@
 
 
 // Get the SDK and make sure it's set to the right thing.
-var Q = require('q'),
+var PGLog = require('../../utils/pglog'),
+    Q = require('q'),
     AWS = require('aws-sdk');
 
 // Don't need to do this.
@@ -29,6 +30,7 @@ var gDBPrefix = "";
 *
 */
 function AWSWrapper() {
+    this._log = new PGLog("AWS", "debug");
     this._DB = awsDB;
 }
 
@@ -52,9 +54,11 @@ AWSWrapper.prototype.DB = function() {
 */
 AWSWrapper.prototype.tableStatus = function(tableName) {
     var self = this;
-    var defer = Q.defer();
+    self._log.debug("tableStatus('" + tableName + "')");
 
     if (!awsDB) throw new Error("AWSWrapper.tableStatus: no DB!");
+
+    var defer = Q.defer();
 
     self._DB.describeTable({TableName: tableName}, function(err, data) {
         if (!err) {
@@ -93,13 +97,13 @@ AWSWrapper.prototype.tableStatus = function(tableName) {
 */
 AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
     var self = this;
-    var defer = Q.defer();
-
-    // console.log("AWSWrapper.tableCreate('" + tableName + "')");
+    self._log.debug("tableCreate(" + tableName + ", " + keyAttributeName + " )");
 
     if (!awsDB) throw new Error("AWSWrapper.tableCreate: no DB!");
     if (!tableName || (typeof tableName !== "string")) throw new Error("AWSWrapper.tableCreate: bad tableName!");
     if (!keyAttributeName || (typeof keyAttributeName !== "string")) throw new Error("AWSWrapper.tableCreate: bad keyAttributeName!");
+
+    var defer = Q.defer();
 
     // If the table already exists, we're done.
     var existsPromise = self.tableStatus(tableName);
@@ -153,9 +157,12 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
 */
 AWSWrapper.prototype.tableDelete = function(tableName) {
     var self = this;
-    var defer = Q.defer();
+    self._log.debug("tableDelete(" + tableName + " )");
 
     if (!awsDB) throw new Error("AWSWrapper.tableDelete: no DB!");
+    if (!tableName || (typeof tableName !== "string")) throw new Error("AWSWrapper.tableDelete: bad tableName!");
+
+    var defer = Q.defer();
 
     awsDB.deleteTable({TableName:tableName}, function(err, data) {
         if (err) {
@@ -184,13 +191,14 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
 *
 */
 AWSWrapper.prototype.tableList = function(tableNameRegex) {
+    var self = this;
+    self._log.debug("tableList(" + tableNameRegex + ")");
 
     if (!awsDB) throw new Error("AWSWrapper.tableList without DB!");
 
     // No regex means match any table.
     tableNameRegex = tableNameRegex || /^.*$/;
 
-    var self = this;
     var defer = Q.defer();
 
     awsDB.listTables(function(err, data) {
@@ -223,13 +231,13 @@ AWSWrapper.prototype.tableList = function(tableNameRegex) {
 *
 */
 AWSWrapper.prototype.tableDeleteMany = function(tableNameRegex) {
+    var self = this;
+    self._log.debug("tableDeleteMany(" + tableNameRegex + ")");
 
     if (!awsDB) throw new Error("AWSWrapper.tableDeleteMany without DB!");
 
     // No regex means match any table.
     tableNameRegex = tableNameRegex || /^.*$/;
-
-    var self = this;
 
     // This is the array of defers created, one per table we're deleting.  They
     // each get resolved when the table really is deleted, and we return a promise
@@ -254,6 +262,243 @@ AWSWrapper.prototype.tableDeleteMany = function(tableNameRegex) {
 
     return defer.promise;
 };
+
+/*
+* Find an item, assuming key attribute, string and EQ.
+*
+* No items: rejected "not-found"
+* More than one item: rejected "too-many-found"
+* Exactly one item: might be "aws-sdk-corrupted" if doesn't look right
+* Resolved with item normalized properties.
+*
+* @method keyItemFind
+* @param tableName
+* @param options 
+*     * attributeName (assumed to be key)
+*     * [attributeValue] (assumed to be EQ); if doesn't exist, finds all
+*
+*/
+AWSWrapper.prototype.keyItemFind = function(tableName, options) {
+    var self = this;
+    self._log.debug("keyItemFind(" + tableName + " )");
+
+    if (!awsDB) throw new Error("AWSWrapper.keyItemFind without DB!");
+
+    var prefix = "AWSWrapper:keyItemFind";
+
+    // Any issues, we bail and throw.
+    function keyItemFindFatal(err) {
+        var msg = prefix + " " + err + "!";
+        self._log.fatal(msg);
+        throw new Error(msg);
+    }
+
+    var defer = Q.defer();
+
+    // Set up the error prefix in case something goes wrong.
+    if (!tableName) keyItemFindFatal("no tablename");
+    prefix += "('" + tableName + "') ";
+    // options are mandatory (that comment sounds funny)
+    if (!options) keyItemFindFatal(err + "no options");
+    if (!options.keyAttributeName) keyItemFindFatal(err + "no options.attributeName");
+
+
+    // This is the function that gets passed to the query.
+    function queryFunc(err, data) {
+        self._log.debug(prefix + "returned from DB.query");
+
+        // Any error returned from the database is fatal.
+        if (err) keyItemFindFatal(err);
+
+        // If we can't find any, we just reject.
+        if (data.Count === 0) {
+            self._log.debug(prefix + " rejected: not-found");
+            defer.reject("not-found");
+            return defer.promise;
+        }
+
+        // If we find more than one given a value, this means the database is corrupt or we
+        // managed to get two records with the same key: that's *really* bad.
+        if (data.Count > 1 && options.keyAttributeValue)
+            keyItemFindFatal("more than one record with '" + options.keyAttributeValue + "'");
+
+        // If there isn't an Items array or its size doesn't match Count, something is really wrong.
+        if (!data.Items || !(data.Items instanceof Array) || (data.Items.length !== data.Count))
+            keyItemFindFatal("Items don't match count!");
+
+        self._log.debug(prefix + "found " + data.Count + " items");
+
+        // We'll return an array with the item values, stripping the types.
+        var retVals = [];
+        for (var di = 0; di < data.Items.length; di++) {
+            var item = data.Items[di];
+
+            self._log.debug("     " + JSON.stringify(item));
+
+            // The item has to have the keyAttribute
+            var foundKeyAttribute = false;
+
+            // We return an object for this item.
+            var retVal = {};
+            for (var itemProp in keyItem) {
+                var propItem = keyItem[itemProp];
+
+                // Each property in the the item has to be an object, with a string.
+                if (typeof propItem !== "object") keyItemFindFatal("property '" + itemProp + "'is not object, it's " + typeof propItem);
+
+                // For now we assume everything is a string.
+                if (!propItem.S) keyItemFindFatal("property '" + itemProp + "' doesn't have 'S' property");
+
+                // Add this property to the return.
+                retVal[itemProp] = propItem.S;
+            }
+
+            // The item has to have the keyAttribute.
+            if (!retVal[options.keyAttributeName])
+                keyItemFindFatal("no keyAttribute '" + options.keyAttributeName + "'in one of the returned items");
+
+            retVals.push(retVal);
+        }
+
+        // Done.
+        defer.resolve(retVals);
+    }
+
+    // Set up the query's basic params.
+    var queryOptions = {
+        TableName: tableName,
+        ConsistentRead: true,
+        Select: "ALL_ATTRIBUTES",
+    };
+
+    // Create the key attributes and value, if they exist.  If the value doesn't,
+    // then we're searching for all the values in the table, and we don't have
+    // a keyCondition.
+    var keyConditions = {};
+    keyConditions[options.keyAttributeName] = {
+        AttributeValueList: [{'S': options.attributeValue || "*"}],
+        ComparisonOperator: 'EQ'
+    };
+    queryOptions.KeyConditions = keyConditions;
+
+    self._DB.query(queryOptions, queryFunc);
+
+    return defer.promise;
+};
+
+/*
+* Delete an item, assuming key attribute, string and EQ.
+*
+* No items: resolved "did-not-exist"
+* Item deleted successfully: resolved "deleted"
+*
+* @method keyItemDeleted
+* @param tableName
+* @param options 
+*     * attributeName (assumed to be key)
+*     * [attributeValue] (assumed to be EQ); if doesn't exist, deletes all
+*
+*/
+
+AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
+    var self = this;
+    self._log.debug("keyItemDelete(" + tableName + " )");
+
+    if (!awsDB) throw new Error("AWSWrapper.keyItemDelete without DB!");
+
+    var prefix = "AWSWrapper:keyItemDelete";
+
+    // Any issues, we bail and throw.
+    function keyItemDeleteFatal(err) {
+        var msg = prefix + " " + err + "!";
+        self._log.fatal(msg);
+        throw new Error(msg);
+    }
+
+    var defer = Q.defer();
+
+    // Set up the error prefix in case something goes wrong.
+    if (!tableName) keyItemDeleteFatal("no tablename");
+    prefix += "('" + tableName + "') ";
+    if (!options) keyItemDeleteFatal(err + "no options");
+    if (!options.keyAttributeName) keyItemDeleteFatal(err + "no options.attributeName");
+
+    // This is the function that gets passed to the query.
+    function deleteFunc(err, data) {
+        self._log.debug(prefix + "returned from DB.deleteItem");
+
+        // Any error returned from the database is fatal.
+        if (err) keyItemDeleteFatal(err);
+
+        defer.resolve("deleted");
+    }
+
+    // Set up the query.
+    var deleteOptions = {
+        TableName: tableName,
+        Key: {}
+    };
+    deleteOptions.Key[options.keyAttributeName] = { "S": options.keyAttributeValue || "*" };
+
+    self._log.debug(prefix + "calling deleteItem");
+    self._DB.deleteItem(deleteOptions, deleteFunc);
+
+    return defer.promise;
+};
+
+
+AWSWrapper.prototype.itemAdd = function(tableName, options) {
+    var self = this;
+    self._log.debug("itemAdd(" + tableName + " )");
+
+    var prefix = "AWSWrapper:itemAdd";
+
+    // Any issues, we bail and throw.
+    function itemAddFatal(err) {
+        var msg = prefix + " " + err;
+        self._log.fatal(msg);
+        throw new Error(msg);
+    }
+
+    if (!awsDB) itemAddFatal("without DB!");
+    if (!options) itemAddFatal("without options!");
+    if (!options.keyAttributeName) itemAddFatal("without options.keyAttributeName!");
+    if (!options.item) itemAddFatal("without options.item!");
+    if (!options.item[options.keyAttributeName]) itemAddFatal("with item not containing key attribute!");
+    if (typeof options.item[options.keyAttributeName] !== "string") itemAddFatal("with item key attribute not a string!");
+
+    var defer = Q.defer();
+
+    function itemAddFunc(err, data) {
+        self._log.debug(prefix + "returned from DB.putItem");
+
+        // Any error returned from the database is fatal.
+        if (err) itemAddFatal(err);
+
+        defer.resolve("added");
+
+    }
+
+    // Set up the basic query
+    var putOptions = {
+        TableName: tableName,
+        Item: {}
+    };
+
+    // We have to go through the properties of the item and massage them.
+    for (var iProp in options.item) {
+        var val = options.item[iProp];
+        if (typeof val !== "string") itemAddFatal(prefix + "item property not a string");
+        putOptions.Item[iProp] = { 'S': val };
+    }
+
+    self._log.debug(prefix + "calling putItem");
+    self._DB.putItem(putOptions, itemAddFunc);
+
+    return defer.promise;
+};
+
+
 
 /*
 *  This table is known not to exist: create it

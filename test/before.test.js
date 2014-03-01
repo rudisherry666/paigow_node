@@ -1,6 +1,7 @@
 // Run before all tests, just run once.
 
-var PGDB = require('../models/db/pgdb'),
+var AWSWrapper = require('../models/db/awswrapper'),
+    PGDB = require('../models/db/pgdb'),
     PGServerApp = require('../pgserverapp');
 
 var pgServerApp;
@@ -13,7 +14,8 @@ before(function(done) {
     // Clear all the tables (which will use the prefix above) so we have a
     // clean database when we're done.  This returns a promise when they're
     // all really gone, and that's when we call 'done()' to start the tests.
-    PGDB.prototype.clearAll().done(function() {
+    var awsWrapper = new AWSWrapper();
+    awsWrapper.tableDeleteMany(/^test-$/).done(function() {
         pgServerApp = new PGServerApp();
         pgServerApp.init();
         pgServerApp.run();

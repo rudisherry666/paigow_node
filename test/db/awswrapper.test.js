@@ -3,13 +3,20 @@ var AWSWrapper = require('../../models/db/awswrapper'),
 
 console.log("test: db.AWSWrapper");
 
-describe('PGDB', function() {
+describe('AWSWrapper', function() {
     var awsWrapper1, awsWrapper2;
 
     before(function(done) {
         awsWrapper1 = new AWSWrapper('test1');
         awsWrapper2 = new AWSWrapper('test2');
         done();
+    });
+
+    after(function(done) {
+        awsWrapper1.tableDeleteMany(/^test.*$/).then(
+            function() {},
+            function() {}
+        ).done(function() { done(); });
     });
 
     it('should use the same DB', function () {
@@ -79,11 +86,45 @@ describe('PGDB', function() {
             }
         );
     });
-    it('should not leave any tables with a certain prefix', function(done) {
-        var tableName = 'test-table-create-prefix';
+    it('should return not-found when searching for a specific item', function(done) {
+        var tableName = 'test-table-return-not-found';
+        var keyName = 'myKey';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
             function() {
-                var regex = /^test.*$/;
+                awsWrapper1.keyItemFind(tableName, {keyAttributeName: keyName}).then(
+                    function()    { assert.fail("did not reject with not-found"); },
+                    function(err) { assert.equal(err, "not-found"); }
+                ).done(function() { done(); });
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should allow adding an item', function(done) {
+        var tableName = 'test-table-test-add';
+        var keyName = 'myKey';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                var item = {};
+                item[keyName] = 'hello';
+                awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
+                    function(data) { assert.equal(item, data); },
+                    function(err)  { assert.fail("rejected adding item: " + err); }
+                ).done(function()  { done(); });
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should not leave any tables with a certain prefix', function(done) {
+        var tableName = 'testx-table-create-prefix';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                var regex = /^testx.*$/;
                 awsWrapper1.tableDeleteMany(regex).then(
                     function() {
                         awsWrapper1.tableList().then(

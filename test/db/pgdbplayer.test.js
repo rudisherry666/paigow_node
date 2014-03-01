@@ -1,8 +1,11 @@
-var Before = require('../before.test'),
+var PGLog = require('../../utils/pglog'),
+    Before = require('../before.test'),
     PGDBPlayer = require('../../models/db/pgdbplayer'),
     assert = require('assert');
 
 console.log("test: db.PGDBPlayer");
+
+var playerLog = new PGLog('Test', 'debug');
 
 describe('PGDBPlayer', function() {
     var pgdbPlayer;
@@ -11,19 +14,19 @@ describe('PGDBPlayer', function() {
         done();
     });
 
-    it('should have a DB', function () {
-        assert(Boolean(pgdbPlayer.DB()));
-    });
     it('should return unknown username', function () {
+        playerLog.debug('should return unknown username');
         assert.equal(pgdbPlayer.currentUsername(), "unknown");
     });
     it('should reject fetching unknown username', function (done) {
+        playerLog.debug('should reject fetching unknown username');
         pgdbPlayer.fetchUsername("unknown")
             .then(  function() { assert.fail("rejected", "allowed"); },
                     function() { /* otherwise rejection gets thrown */ })
             .done(  function() { done(); });
     });
     it('should reject fetching username known not to exist', function (done) {
+        playerLog.debug('should reject fetching username known not to exist');
         var testUsername = 'test-user-unknown';
         var testPassword = 'xyz';
         pgdbPlayer.fetchUsername(testUsername)
@@ -32,6 +35,7 @@ describe('PGDBPlayer', function() {
             .done(  function() { done(); });
     });
     it ('should allow registering a username', function(done) {
+        playerLog.debug('should allow registering a username');
         var testUsername = 'test-user-register';
         var testPassword = 'xyz';
         pgdbPlayer.deleteUser(testUsername)
@@ -44,6 +48,7 @@ describe('PGDBPlayer', function() {
         );
     });
     it ('should recognize an existing username', function(done) {
+        playerLog.debug('should recognize an existing username');
         var testUsername = 'test-user-existing';
         var testPassword = 'xyz';
         pgdbPlayer.deleteUser(testUsername)
@@ -70,6 +75,7 @@ describe('PGDBPlayer', function() {
         );
     });
     it ('should reject re-registering a username', function(done) {
+        playerLog.debug('should reject re-registering a username');
         var testUsername = 'test-user-reregister';
         var testPassword = 'xyz';
         pgdbPlayer.deleteUser(testUsername)

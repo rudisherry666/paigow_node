@@ -8,13 +8,9 @@ describe('PGDB', function() {
     var pgdb1, pgdb2;
 
     before(function(done) {
-        pgdb1 = new PGDB('test1');
-        pgdb2 = new PGDB('test2');
+        pgdb1 = new PGDB('test1', 'key1');
+        pgdb2 = new PGDB('test2', 'key2');
         done();
-    });
-
-    it('should use the same DB', function () {
-        assert.equal(pgdb1.DB(), pgdb2.DB());
     });
 
     it('should have the right table-name prefix', function () {
