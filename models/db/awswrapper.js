@@ -326,7 +326,7 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
         if (!oneVal[options.keyAttributeName])
             keyItemFindFatal("no keyAttribute '" + options.keyAttributeName + "'in one of the returned items");
 
-        retVals.push(retVal);
+        retVals.push(oneVal);
     }
 
 
@@ -387,8 +387,11 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
             return;
         }
 
+        self._log.verbose(JSON.stringify(data));
+
         // We're returning one item.
-        processOneItem(data);
+        if (!data.Item) keyItemFindFatal("no Item in single return");
+        processOneItem(data.Item);
 
         defer.resolve(retVals);
     }
