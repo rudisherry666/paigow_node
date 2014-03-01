@@ -475,7 +475,7 @@ AWSWrapper.prototype.itemAdd = function(tableName, options) {
         // Any error returned from the database is fatal.
         if (err) itemAddFatal(err);
 
-        defer.resolve("added");
+        defer.resolve(options.item);
 
     }
 
