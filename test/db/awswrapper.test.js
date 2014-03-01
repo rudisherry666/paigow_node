@@ -85,7 +85,7 @@ describe('AWSWrapper', function() {
         var keyName = 'myKey';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
             function() {
-                awsWrapper1.keyItemFind(tableName, {keyAttributeName: keyName}).then(
+                awsWrapper1.keyItemFind(tableName, {keyAttributeName: keyName, keyAttributeValue: 'foo'}).then(
                     function()    { assert.fail("did not reject with not-found"); },
                     function(err) { assert.equal(err, "not-found"); }
                 ).done(function() { done(); });
@@ -132,6 +132,42 @@ describe('AWSWrapper', function() {
                     },
                     function() { assert.fail(err); done(); }
                 );
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should return an empty array when getting all results in an empty table', function(done) {
+        var tableName = 'test-table-scan-not-found';
+        var keyName = 'myKey';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                awsWrapper1.keyItemFind(tableName, {keyAttributeName: keyName}).then(
+                    function(data) {
+                        assert.equal(typeof data, "object");
+                        assert(data instanceof Array, "find returned non-Array");
+                        assert.equal(data.length, 0);
+                    },
+                    function(err)  { assert.fail(err); }
+                ).done(function()  { done(); });
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should return a one-length array when getting all results in a table with one item', function(done) {
+        var tableName = 'test-table-return-one-item';
+        var keyName = 'myKey';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                awsWrapper1.keyItemFind(tableName, {keyAttributeName: keyName}).then(
+                    function()    { assert.fail("did not reject with not-found"); },
+                    function(err) { assert.equal(err, "not-found"); }
+                ).done(function() { done(); });
             },
             function() {
                 assert.fail(err);

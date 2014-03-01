@@ -30,7 +30,7 @@ var gDBPrefix = "";
 *
 */
 function AWSWrapper() {
-    this._log = new PGLog("AWS", "debug");
+    this._log = new PGLog("AWS", 'verbose');
     this._DB = awsDB;
 }
 
@@ -302,9 +302,36 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
     if (!options) keyItemFindFatal(err + "no options");
     if (!options.keyAttributeName) keyItemFindFatal(err + "no options.attributeName");
 
+    // We return an array of items; initialize the array.
+    var retVals = [];
+
+    // This item is one to be returned: process it.
+    function processOneItem(item) {
+        // We return an object for this item.
+        var oneVal = {};
+        for (var itemProp in item) {
+            var propItem = item[itemProp];
+
+            // Each property in the the item has to be an object, with a string.
+            if (typeof propItem !== "object") keyItemFindFatal("property '" + itemProp + "'is not object, it's " + typeof propItem);
+
+            // For now we assume everything is a string.
+            if (!propItem.S) keyItemFindFatal("property '" + itemProp + "' doesn't have 'S' property");
+
+            // Add this property to the returned item.
+            oneVal[itemProp] = propItem.S;
+        }
+
+        // The item has to have the keyAttribute.
+        if (!oneVal[options.keyAttributeName])
+            keyItemFindFatal("no keyAttribute '" + options.keyAttributeName + "'in one of the returned items");
+
+        retVals.push(retVal);
+    }
+
 
     // This is the function that gets passed to the query.
-    function queryFunc(err, data) {
+    function scanFunc(err, data) {
         self._log.debug(prefix + "returned from DB.query");
 
         // Any error returned from the database is fatal.
@@ -312,9 +339,9 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
 
         // If we can't find any, we just reject.
         if (data.Count === 0) {
-            self._log.debug(prefix + " rejected: not-found");
-            defer.reject("not-found");
-            return defer.promise;
+            self._log.debug(prefix + " resolved empty");
+            defer.resolve(retVals);
+            return;
         }
 
         // If we find more than one given a value, this means the database is corrupt or we
@@ -323,65 +350,73 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
             keyItemFindFatal("more than one record with '" + options.keyAttributeValue + "'");
 
         // If there isn't an Items array or its size doesn't match Count, something is really wrong.
-        if (!data.Items || !(data.Items instanceof Array) || (data.Items.length !== data.Count))
+        if (!data.Items || !(data.Items instanceof Array) || (data.Items.length !== data.Count)) {
+            self._log.debug(JSON.stringify(data));
             keyItemFindFatal("Items don't match count!");
+        }
 
         self._log.debug(prefix + "found " + data.Count + " items");
 
         // We'll return an array with the item values, stripping the types.
-        var retVals = [];
         for (var di = 0; di < data.Items.length; di++) {
             var item = data.Items[di];
 
-            self._log.debug("     " + JSON.stringify(item));
+            self._log.verbose("     " + JSON.stringify(item));
 
             // The item has to have the keyAttribute
             var foundKeyAttribute = false;
 
             // We return an object for this item.
-            var retVal = {};
-            for (var itemProp in keyItem) {
-                var propItem = keyItem[itemProp];
-
-                // Each property in the the item has to be an object, with a string.
-                if (typeof propItem !== "object") keyItemFindFatal("property '" + itemProp + "'is not object, it's " + typeof propItem);
-
-                // For now we assume everything is a string.
-                if (!propItem.S) keyItemFindFatal("property '" + itemProp + "' doesn't have 'S' property");
-
-                // Add this property to the return.
-                retVal[itemProp] = propItem.S;
-            }
-
-            // The item has to have the keyAttribute.
-            if (!retVal[options.keyAttributeName])
-                keyItemFindFatal("no keyAttribute '" + options.keyAttributeName + "'in one of the returned items");
-
-            retVals.push(retVal);
+            processOneItem(item);
         }
 
         // Done.
+        self._log.verbose(prefix + "returned: " + JSON.stringify(retVals));
         defer.resolve(retVals);
     }
 
-    // Set up the query's basic params.
-    var queryOptions = {
-        TableName: tableName,
-        ConsistentRead: true,
-        Select: "ALL_ATTRIBUTES",
-    };
+    function getFunc(err, data) {
+        self._log.debug(prefix + "returned from DB.query");
 
-    // Create the key attributes and value, if they exist.  If the value doesn't,
-    // then we're searching for all the values in the table, and we don't have
-    // a keyCondition.
-    var keyConditions = {};
-    keyConditions[options.keyAttributeName] = {
-        AttributeValueList: [{'S': options.attributeValue || "*"}],
-        ComparisonOperator: 'EQ'
-    };
-    queryOptions.KeyConditions = keyConditions;
+        // Any error returned from the database is fatal.
+        if (err) keyItemFindFatal(err);
 
-    self._DB.query(queryOptions, queryFunc);
+        // It should return one or zero items.
+        if (Object.keys(data).length === 0) {
+            defer.reject("not-found");
+            return;
+        }
+
+        // We're returning one item.
+        processOneItem(data);
+
+        defer.resolve(retVals);
+    }
+
+    if (options.keyAttributeValue) {
+        // We're querying for a certain value
+        self._log.verbose(prefix + "getting item...");
+
+        // We're getting an item given the primary key
+        var getOptions = {
+            TableName: tableName,
+            Key: {}
+        };
+        getOptions.Key[options.keyAttributeName] = { 'S': options.keyAttributeValue };
+
+        self._DB.getItem(getOptions, getFunc);
+
+    } else {
+        // We're returning all the values.
+        self._log.verbose(prefix + "scanning...");
+
+        // Set up the query's basic params.
+        var scanOptions = {
+            TableName: tableName
+        };
+
+        self._DB.scan(scanOptions, scanFunc);
+    }
 
     return defer.promise;
 };
@@ -449,9 +484,9 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
 
 AWSWrapper.prototype.itemAdd = function(tableName, options) {
     var self = this;
-    self._log.debug("itemAdd(" + tableName + " )");
+    self._log.debug("itemAdd('" + tableName + "')");
 
-    var prefix = "AWSWrapper:itemAdd";
+    var prefix = "AWSWrapper:itemAdd('" + tableName + "')";
 
     // Any issues, we bail and throw.
     function itemAddFatal(err) {

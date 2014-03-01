@@ -20,7 +20,7 @@ var gDBPrefix = "";
 *
 */
 function PGDB(tableName, keyAttributeName) {
-    this._log = new PGLog("PGDB");
+    this._log = new PGLog("PGDB", 'debug');
     if (!tableName) throw new Error("PBDB: no table name!");
     if (!keyAttributeName) throw new Error("PBDB: no keyAttribute name!");
     this._awsWrapper = new AWSWrapper();
@@ -29,6 +29,15 @@ function PGDB(tableName, keyAttributeName) {
 
     this._init();
 }
+
+/*
+* Return the promise that's resolved when it's created
+*
+* @method created
+*/
+PGDB.prototype.created = function() {
+    return this._initPromise;
+};
 
 /*
 * Set a prefix for all tables for this DB connection.  This is used for
@@ -101,6 +110,7 @@ PGDB.prototype.delete = function(keyValue) {
     if (keyValue) options.keyAttributeValue = keyValue;
     return self._awsWrapper.keyItemDelete(self.fullTableName(), options);
 };
+
 /*
 * Add an item, assumed string, assumed key
 *

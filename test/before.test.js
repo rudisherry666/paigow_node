@@ -1,12 +1,15 @@
 // Run before all tests, just run once.
 
-var AWSWrapper = require('../models/db/awswrapper'),
+var PGLog = require('../utils/pglog'),
+    AWSWrapper = require('../models/db/awswrapper'),
     PGDB = require('../models/db/pgdb'),
     PGServerApp = require('../pgserverapp');
 
-var pgServerApp, awsWrapper;
+var pgServerApp, awsWrapper, pgLog;
 
 before(function(done) {
+    pgLog = new PGLog("test", 'debug');
+    pgLog.debug("before all hook called");
 
     // Prefix the DB tables with 'test-' so we don't clobber the real tables.
     PGDB.prototype.setPrefix('test-');
@@ -24,6 +27,8 @@ before(function(done) {
 });
 
 after(function(done) {
+    pgLog.debug("after all hook called");
+
     // Stop the server
     if (pgServerApp) pgServerApp.stop();
 
