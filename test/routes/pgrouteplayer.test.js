@@ -27,18 +27,18 @@ describe('GET /player', function(){
                         var obj = JSON.parse(retVal);
                         assert.equal(obj.username, "unknown");
                     } catch (err) {
-                        assert(false, err);
+                        assert.fail("Exception: " + err);
                     }
                     done();
                 })
                 .on('close', function() {
-                    assert(false); done();
+                    assert.fail("close called"); done();
                 })
                 .on('error', function(err) {
-                    assert(false, err); done();
+                    assert.fail(err); done();
                 } );
         }).on('error', function(err) {
-            assert(false, err);
+            assert.fail(err);
             done();
         }).on('finish', function() {
             // Don't call 'done'; this happens before res.on('end') above.

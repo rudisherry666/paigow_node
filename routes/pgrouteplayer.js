@@ -6,12 +6,14 @@
 */
 
 var util = require('util'),
+    PGLog = require('../utils/pglog'),
     PGRouteBase = require('./pgroutebase'),
     PGDBPlayer = require('../models/db/pgdbplayer');
 
 function PGRoutePlayer(expressApp, pgdbPlayer) {
     PGRouteBase.call(this, expressApp);
     var self = this;
+    self._log = new PGLog("RoutePlayer", 'debug');
 
     // Establish the endpoints.
     self._expressApp.get('/player', function(req, res) { self._getSessionPlayer(req, res); });
@@ -30,9 +32,15 @@ util.inherits(PGRoutePlayer, PGRouteBase);
 */
 PGRoutePlayer.prototype._getSessionPlayer = function(req, res) {
     var self = this;
+    self._log.debug("_getSessionPlayer called");
+
     res.setHeader('Content-Type', 'application/json');
-    if (!req.session['username'])
-        req.session['username'] = self._pgdbPlayer.currentUsername();
+    if (self._pgddbPlayer) {
+        if (!req.session['username'])
+            req.session['username'] = self._pgdbPlayer.currentUsername();
+    } else
+        req.session['username'] = "unknown";
+
     res.end(JSON.stringify({ username: req.session['username'] }));
 };
 
@@ -45,6 +53,7 @@ PGRoutePlayer.prototype._getSessionPlayer = function(req, res) {
 */
 PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
     var self = this;
+    self._log.debug("_registerOrSigninPlayer called");
 
     res.setHeader('Content-Type', 'application/json');
 
