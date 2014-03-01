@@ -20,7 +20,7 @@ before(function(done) {
     awsWrapper = new AWSWrapper();
     awsWrapper.tableDeleteMany(/^test-.*$/).done(function() {
         pgServerApp = new PGServerApp();
-        pgServerApp.init();
+        pgServerApp.init(true);
         pgServerApp.run();
         done();
     });

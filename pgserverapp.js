@@ -32,10 +32,12 @@ function PGServerApp() {
     this._expressApp.use(express.errorHandler());
 }
 
-PGServerApp.prototype.init = function() {
+PGServerApp.prototype.init = function(testing) {
 
     // Initialize the player stuff.
-    var pgdbPlayer = new PGDBPlayer();
+    var pgdbPlayer;
+    if (!testing)
+        pgdbPlayer = new PGDBPlayer();
     var pgRoutePlayer = new PGRoutePlayer(this._expressApp, pgdbPlayer);
 
     // TODO: remove testing stuff below
