@@ -53,23 +53,6 @@ PGDBPlayer.prototype.fetchUsername = function(username) {
     return defer.promise;
 };
 
-PGDBPlayer.prototype.verifySessionUsername = function(username) {
-    var self = this;
-    self._log.debug("verifySessionUsername(" + username + ")");
-
-    var fetchPromise = self.fetchUsername(username);
-
-    // We get first dibs on the promise; we return the same promise but by
-    // the time our caller does a .then() on it, we've already done ours.
-    // If there was a problem and it was rejected, we don't care, but our
-    // client should handle the rejection.
-    fetchPromise.then(function(user) {
-        self._username = username;
-    });
-
-    return fetchPromise;
-};
-
 PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, postedPassword) {
     var self = this;
     var prefix = "verifyPostedUsernameAndPassword('" + postedUsername + "') ";
