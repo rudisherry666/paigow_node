@@ -177,4 +177,8 @@ PGDBPlayer.prototype.username = function() {
     return this._username;
 };
 
+PGDBPlayer.prototype.setUsername = function(username) {
+    this._username = username;
+};
+
 module.exports = PGDBPlayer;

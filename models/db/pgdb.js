@@ -68,6 +68,7 @@ PGDB.prototype.fullTableName = function(tableName) {
 * @method init
 *
 * @param keyAttributeName {string}: assumed to be string and HASH
+* @return promise that resolves to 'this'
 */
 PGDB.prototype._init = function() {
     var self = this;
@@ -77,7 +78,7 @@ PGDB.prototype._init = function() {
 
     // Create the AttributeName from the input Attributes.
     self._awsWrapper.tableCreate(self.fullTableName(), self._keyAttributeName).then(
-        function() { defer.resolve(); },
+        function() { defer.resolve(self); },
         function(err) { defer.reject(err); }
     );
 
