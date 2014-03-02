@@ -28,6 +28,7 @@ function PGServerApp() {
     this._expressApp.use(express.bodyParser());
     this._expressApp.use(express.methodOverride());
     this._expressApp.use(express.cookieParser());
+    this._expressApp.use(express.session({secret: 'P0KJjht$-vbhDww~-++pU6]]|iUyytG43E4E'}));
     this._expressApp.use(this._expressApp.router);
     // this._expressApp.use(require('stylus').middleware(__dirname + '/public'));
     this._expressApp.use(express.static(path.join(__dirname, 'public')));
@@ -42,12 +43,11 @@ PGServerApp.prototype.init = function(testing) {
         self._initWithSecrets(testing);
     } else {
         this._expressApp.post('/setkeys', function(req, res) {
-            if (req.body.key1 && req.body.key2 && req.body.key3 && req.body.key4 && req.body.key5 && req.body.key6 && req.body.key7) {
+            if (req.body.key1 && req.body.key2 && req.body.key3 && req.body.key4 && req.body.key5 && req.body.key6) {
                 process.env.AWS_ACCESS_KEY_ID = req.body.key1;
                 process.env.AWS_SECRET_ACCESS_KEY = req.body.key2;
                 process.env.AWS_REGION = req.body.key3;
                 process.env.AWS_ENDPOINT = req.body.key4 + "://" + req.body.key5 + ":" + req.body.key6;
-                process.env.PG_SECRET = req.body.key7;
                 self._initWithSecrets(testing);
             }
 
@@ -63,8 +63,6 @@ PGServerApp.prototype._initWithSecrets = function(testing) {
     self._initWithSecretsCalled = true;
 
     self._log.debug("_initWithSecrets called");
-
-    self._expressApp.use(express.session({secret: process.env.PG_SECRET}));
 
     // Initialize the player stuff.
     var pgdbPlayer;
