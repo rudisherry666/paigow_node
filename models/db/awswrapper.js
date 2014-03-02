@@ -17,9 +17,10 @@ var PGLog = require('../../utils/pglog'),
 // One global awsDB, subclasses use it.
 var awsDB;
 
-// One global prefix; all tables will be prefixed with this name.
-// This is used for tests usually.
-var gDBPrefix = "";
+// When tables are created, we don't want to try to create them multiple times.  This is a map of
+// table names to promises for tables that are in the process of creation; if a second request
+// comes in for creating, then this promise is returned rather than calling the DB again.
+var awsTablesBeingCreated = {};
 
 /*
 * @constructor PGDB
@@ -57,7 +58,8 @@ AWSWrapper.prototype.DB = function() {
 */
 AWSWrapper.prototype.tableStatus = function(tableName) {
     var self = this;
-    self._log.debug("tableStatus('" + tableName + "')");
+    var prefix = "tableStatus('" + tableName + "') ";
+    self._log.debug(prefix + "called");
 
     if (!awsDB) throw new Error("AWSWrapper.tableStatus: no DB!");
 
@@ -67,15 +69,19 @@ AWSWrapper.prototype.tableStatus = function(tableName) {
         if (!err) {
             // Table exists, we're good. unless there is an issue with the returned data.
             if (data && data.Table && data.Table.TableStatus) {
+                self._log.debug(prefix + data.Table.TableStatus);
                 defer.resolve(data.Table.TableStatus);
             } else {
+                self._log.debug(prefix + " bad error: don't know data");
                 throw new Error('FATAL tableStatus(' + tableName + ') err: returned data does not include status.');
             }
         } else if (err.code && err.code === 'ResourceNotFoundException') {
             // Table doesn't exist, that's OK, we "extend" the aws set of statuses
+            self._log.debug(prefix + " MISSING ");
             defer.resolve("MISSING");
         } else {
             // Hmm, error other than no-table: that's really bad.
+            self._log.debug(prefix + " bad error: " + err);
             throw new Error('FATAL tableStatus(' + tableName + ') err: ' + err);
         }
     });
@@ -100,34 +106,61 @@ AWSWrapper.prototype.tableStatus = function(tableName) {
 */
 AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
     var self = this;
-    self._log.debug("tableCreate(" + tableName + ", " + keyAttributeName + " )");
+    var prefix = "AWSWrapper.tableCreate('" + tableName + "') ";
+    self._log.debug(prefix + "called");
 
-    if (!awsDB) throw new Error("AWSWrapper.tableCreate: no DB!");
-    if (!tableName || (typeof tableName !== "string")) throw new Error("AWSWrapper.tableCreate: bad tableName!");
-    if (!keyAttributeName || (typeof keyAttributeName !== "string")) throw new Error("AWSWrapper.tableCreate: bad keyAttributeName!");
+    // Any issues, we bail and throw.
+    function tableCreateFatal(err) {
+        var msg = prefix + " " + err + "!";
+        self._log.fatal(msg);
+        throw new Error(msg);
+    }
+
+    if (!awsDB) tableCreateFatal("no DB!");
+    if (!tableName || (typeof tableName !== "string")) tableCreateFatal("bad tableName!");
+    if (!keyAttributeName || (typeof keyAttributeName !== "string")) tableCreateFatal("bad keyAttributeName!");
+
+    prefix = "AWSWrapper.tableCreate('" + tableName + "', '" + keyAttributeName + "') ";
+
+    // If we're already creating this table, make sure it's the same key attribute and
+    // return the promise for it.
+    if (awsTablesBeingCreated[tableName]) {
+        if (keyAttributeName !== awsTablesBeingCreated[tableName].keyAttributeName) tableCreateFatal("asked to create same table with different keyAttributeName");
+        self._log.debug(prefix + "returning existing promise");
+        return awsTablesBeingCreated[tableName].promise;
+    }
 
     var defer = Q.defer();
 
+    // Add this to the promise set.
+    awsTablesBeingCreated[tableName] = {
+        promise: defer.promise,
+        keyAttributeName: keyAttributeName
+    };
+
     // If the table already exists, we're done.
-    var existsPromise = self.tableStatus(tableName);
-    existsPromise.then(
+    self.tableStatus(tableName).then(
         function(status) {
             switch (status) {
                 case "CREATING":
+                    // Not yet: wait until it's created.
+                    self._log.debug(prefix + "table is still being created, waiting");
+                    self._waitForCreateToFinish(tableName, defer);
+                break;
+
                 case "UPDATING":
                 case "ACTIVE":
-                    // It already exists: return this status.
+                    // It already exists: return this status (even if it's busy).
+                    self._log.debug(prefix + "table is created!");
                     defer.resolve(status);
                 break;
 
                 case "DELETING":
                     // Bleah, we can't do anything until it's finished deleting.
+                    self._log.debug(prefix + "table is being deleted, waiting");
                     self._waitForDeletToFinish(tableName, defer).then(
                         function(status) {
-                            self._createTable(tableName, keyAttributeName).then(
-                                function(status) { defer.resolve(status); },
-                                function(err)    { defer.reject(err);     }
-                            );
+                            self._createTable(tableName, keyAttributeName, defer);
                         },
                         function(err) {
                             defer.reject(err);
@@ -137,15 +170,14 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
 
                 case "MISSING":
                     // It doesn't exist: create it and return its status.
-                    self._createTable(tableName, keyAttributeName).then(
-                        function(status) { defer.resolve(status); },
-                        function(err)    { defer.reject(err);     }
-                    );
+                    self._log.debug(prefix + "table is missing: creating it");
+                    self._createTable(tableName, keyAttributeName, defer);
                 break;
             }
         },
         function(err) {
             // Bleah, can't even describe the table.
+            self._log(prefix + "error from tableSatatus: " + err);
             defer.reject(err);
         });
 
@@ -283,11 +315,8 @@ AWSWrapper.prototype.tableDeleteMany = function(tableNameRegex) {
 */
 AWSWrapper.prototype.keyItemFind = function(tableName, options) {
     var self = this;
-    self._log.debug("keyItemFind(" + tableName + " )");
-
-    if (!awsDB) throw new Error("AWSWrapper.keyItemFind without DB!");
-
-    var prefix = "AWSWrapper:keyItemFind";
+    var prefix = "AWSWrapper.keyItemFind('" + tableName + "') ";
+    self._log.debug(prefix + "called");
 
     // Any issues, we bail and throw.
     function keyItemFindFatal(err) {
@@ -296,14 +325,14 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
         throw new Error(msg);
     }
 
-    var defer = Q.defer();
-
-    // Set up the error prefix in case something goes wrong.
+    if (!awsDB) keyItemFindFatal("no DB");
     if (!tableName) keyItemFindFatal("no tablename");
-    prefix += "('" + tableName + "') ";
-    // options are mandatory (that comment sounds funny)
     if (!options) keyItemFindFatal(err + "no options");
     if (!options.keyAttributeName) keyItemFindFatal(err + "no options.attributeName");
+
+    prefix = "AWSWrapper.keyItemFind('" + tableName + "', '" + options.keyAttributeValue + "') ";
+
+    var defer = Q.defer();
 
     // We return an array of items; initialize the array.
     var retVals = [];
@@ -410,8 +439,8 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
         };
         getOptions.Key[options.keyAttributeName] = { 'S': options.keyAttributeValue };
 
+        console.log(JSON.stringify(getOptions));
         self._DB.getItem(getOptions, getFunc);
-
     } else {
         // We're returning all the values.
         self._log.verbose(prefix + "scanning...");
@@ -443,11 +472,9 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
 
 AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
     var self = this;
-    self._log.debug("keyItemDelete(" + tableName + " )");
+    var prefix = "AWSWrapper:keyItemDelete('" + tableName + "') ";
+    self._log.debug(prefix + "called");
 
-    if (!awsDB) throw new Error("AWSWrapper.keyItemDelete without DB!");
-
-    var prefix = "AWSWrapper:keyItemDelete";
 
     // Any issues, we bail and throw.
     function keyItemDeleteFatal(err) {
@@ -456,13 +483,14 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
         throw new Error(msg);
     }
 
-    var defer = Q.defer();
-
-    // Set up the error prefix in case something goes wrong.
+    if (!awsDB) keyItemDeleteFatal("no DB!");
     if (!tableName) keyItemDeleteFatal("no tablename");
-    prefix += "('" + tableName + "') ";
     if (!options) keyItemDeleteFatal(err + "no options");
     if (!options.keyAttributeName) keyItemDeleteFatal(err + "no options.attributeName");
+
+    prefix = "AWSWrapper:keyItemDelete('" + tableName + "', '" + options.keyAttributeValue + "') ";
+
+    var defer = Q.defer();
 
     // This is the function that gets passed to the query.
     function deleteFunc(err, data) {
@@ -544,10 +572,8 @@ AWSWrapper.prototype.itemAdd = function(tableName, options) {
 /*
 *  This table is known not to exist: create it
 */
-AWSWrapper.prototype._createTable = function(tableName, keyAttributeName) {
+AWSWrapper.prototype._createTable = function(tableName, keyAttributeName, defer) {
     var self = this;
-
-    var defer = Q.defer();
 
     self._DB.createTable({
         TableName: tableName,
@@ -568,8 +594,6 @@ AWSWrapper.prototype._createTable = function(tableName, keyAttributeName) {
             throw new Error('FATAL _createTable(' + tableName + ') err: no table status to return');
         }
     });
-
-    return defer.promise;
 };
 
 /*
@@ -581,10 +605,11 @@ AWSWrapper.prototype._waitForCreateToFinish = function(tableName, defer) {
     var self = this;
     self.tableStatus(tableName).then(
         function(status) {
-            if (status === "ACTIVE")
+            if (status === "ACTIVE" || status === "UPDATING") {
+                self._log.debug("_waitForCreateToFinish('" + tableName + "') done!");
                 defer.resolve(status);
-            else if (status == "CREATING")
-                setTimeout(function() { self._waitForDeletToFinish(tableName, defer); }, 3000);
+            } else if (status == "CREATING")
+                setTimeout(function() { self._waitForCreateToFinish(tableName, defer); }, 500);
             else
                 throw new Error("AWSWrapper._waitForCreateToFinish: bad table status: " + status);
         },
@@ -605,7 +630,7 @@ AWSWrapper.prototype._waitForDeletToFinish = function(tableName, defer) {
             if (status === "MISSING")
                 defer.resolve(status);
             else
-                setTimeout(function() { self._waitForDeletToFinish(tableName, defer); }, 3000);
+                setTimeout(function() { self._waitForDeletToFinish(tableName, defer); }, 500);
         },
         function(err) {
             defer.reject(err);

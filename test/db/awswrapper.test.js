@@ -1,4 +1,5 @@
 var Before = require('../before.test'),
+    Q = require('q'),
     AWSWrapper = require('../../models/db/awswrapper'),
     assert = require('assert');
 
@@ -79,6 +80,17 @@ describe('AWSWrapper', function() {
                 done();
             }
         );
+    });
+    it('should correctly not re-create tables.', function(done) {
+        var tableName = 'test-table-created-multiple';
+        Q.when([
+            awsWrapper1.tableCreate(tableName, 'myKey'),
+            awsWrapper1.tableCreate(tableName, 'myKey'),
+            awsWrapper1.tableCreate(tableName, 'myKey')
+        ]).then(
+            function(data) { },
+            function(err)  { assert.fail(err); }
+        ).done(function()  { done(); } );
     });
     it('should return not-found when searching for a specific item', function(done) {
         var tableName = 'test-table-return-not-found';
@@ -166,7 +178,6 @@ describe('AWSWrapper', function() {
             function() {
                 var itemToAdd = {};
                 itemToAdd[keyName] = "foo";
-                console.log("2");
                 awsWrapper1.itemAdd(tableName, {
                     keyAttributeName: keyName,
                     item: itemToAdd
