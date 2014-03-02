@@ -25,9 +25,6 @@ function PGDBPlayer() {
     var self = this;
     self._log = new PGLog('player', 'debug');
     self._log.debug("PGDBPlayer constructor called");
-
-    // Original username is 'unknown'.
-    this._username = "unknown";
 }
 
 // Extend from PGDB.
@@ -62,12 +59,13 @@ PGDBPlayer.prototype.deleteUser = function(username) {
     return defer.promise;
 };
 
+// Convenience functions
 PGDBPlayer.prototype.username = function() {
-    return this._username;
+    return this.get('username') || "unknown";
 };
 
 PGDBPlayer.prototype.setUsername = function(username) {
-    this._username = username;
+    return this.set('username', username);
 };
 
 module.exports = PGDBPlayer;

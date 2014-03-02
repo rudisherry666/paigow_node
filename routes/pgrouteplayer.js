@@ -146,8 +146,10 @@ PGRoutePlayer.prototype._verifyPostedUsernameAndPassword = function(req, postedU
                             self._log.debug(prefix + "matching name");
                             if (PasswordHash.verify(postedPassword, user.hashedPassword)) {
                                 self._log.debug(prefix + "password match success");
-                                pgdbPlayer.setUsername(postedUsername);
-                                defer.resolve(pgdbPlayer);
+                                pgdbPlayer.setUsername(postedUsername).then(
+                                    function(data) { defer.resolve(pgdbPlayer); },
+                                    function(err)  { defer.reject(err); }
+                                );
                             } else {
                                 self._log.error(prefix + "password mismatch");
                                 defer.reject();
@@ -207,8 +209,10 @@ PGRoutePlayer.prototype._registerNewUser = function(req, postedUsername, postedP
                         pgdbPlayer.add(user).then(
                             function() {
                                 self._log.debug(prefix + "added user just fine");
-                                pgdbPlayer.setUsername(postedUsername);
-                                defer.resolve(pgdbPlayer);
+                                pgdbPlayer.setUsername(postedUsername).then(
+                                    function(data) { defer.resolve(pgdbPlayer); },
+                                    function(err)  { defer.reject(err); }
+                                );                                
                             },
                             function(err) {
                                 self._log.error(prefix + "adding user: " + err);

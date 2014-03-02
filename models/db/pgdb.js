@@ -27,6 +27,9 @@ function PGDB(tableName, keyAttributeName) {
     this._tableName = tableName;
     this._keyAttributeName = keyAttributeName;
 
+    // This is what gets updated by 'set' and retrieved by 'get'.
+    this._props = {};
+
     this._init();
 }
 
@@ -92,7 +95,8 @@ PGDB.prototype._init = function() {
 */
 PGDB.prototype.find = function(keyValue) {
     var self = this;
-    self._log.debug("PGDB.find called for '" + self.fullTableName() + "'");
+    var prefix = "PGDB.find('" + self.fullTableName() + "') ";
+    self._log.debug(prefix + "called");
 
     var options = { keyAttributeName: self._keyAttributeName };
     if (keyValue) options.keyAttributeValue = keyValue;
@@ -105,7 +109,8 @@ PGDB.prototype.find = function(keyValue) {
 */
 PGDB.prototype.delete = function(keyValue) {
     var self = this;
-    self._log.debug("delete");
+    var prefix = "PGDB.delete('" + self.fullTableName() + "') ";
+    self._log.debug(prefix + "called");
 
     var options = { keyAttributeName: self._keyAttributeName };
     if (keyValue) options.keyAttributeValue = keyValue;
@@ -118,13 +123,100 @@ PGDB.prototype.delete = function(keyValue) {
 */
 PGDB.prototype.add = function(item) {
     var self = this;
-    self._log.debug("add");
+    var prefix = "PGDB.add('" + self.fullTableName() + "') ";
+    self._log.debug(prefix + "called");
 
     var options = {
         item: item,
         keyAttributeName: self._keyAttributeName
     };
-    return self._awsWrapper.itemAdd(self.fullTableName(), options);
+    var promise = self._awsWrapper.itemAdd(self.fullTableName(), options);
+
+    // Make sure we keep track of what was set, if it succeeded.
+    promise.then(function(data) {
+        for (var propName in item)
+            self._props[propName] = item[propName];
+    });
+    return promise;
+};
+
+/*
+* Add an item, assumed string, assumed key
+*
+*/
+PGDB.prototype.update = function(item, options) {
+    var self = this;
+    var prefix = "PGDB.update('" + self.fullTableName() + "') ";
+    self._log.debug(prefix + "called");
+
+    // Set the props now, but reset them if we fail.
+    var oldProps;
+    if (!options || !options.internal) {
+        oldProps = self._props;
+        self._props = item;
+    }
+
+    var updateOptions = {
+        item: self._props,
+        keyAttributeName: self._keyAttributeName
+    };
+    var promise = self._awsWrapper.itemUpdate(self.fullTableName(), updateOptions);
+
+    // Make sure we keep track of what was set, if it succeeded.
+    if (!options || !options.internal) {
+        promise.fail(function(data) { self._props = oldProps; });
+    }
+    return promise;
+};
+
+/*
+* Get a property
+*
+*/
+PGDB.prototype.get = function(propName) {
+    var self = this;
+    var prefix = "PGDB.get('" + self.fullTableName() + "', " + propName + "') ";
+    self._log.debug(prefix + "called");
+
+    return self._props[propName];
+};
+
+/*
+* Set a property
+*
+*/
+PGDB.prototype.set = function(propName, propVal) {
+    var self = this;
+    var prefix = "PGDB.set('" + self.fullTableName() + "', " + propName + "') ";
+    self._log.debug(prefix + "called");
+
+    // Reset the props but in the internal call we don't have to update
+    // all the props.  Also we set the value so retrieval will get it,
+    // but we'll unset it if the update failed.
+    var promise;
+    if (self._props[propName] !== propVal) {
+        self._log.debug(prefix + "new value: " + propVal);
+        var oldVal = self._props[propName];
+        if (typeof propVal === "undefined")
+            delete self._props[propName];
+        else
+            self._props[propName] = propVal;
+        promise = self.update(self._props, {internal:true});
+        promise.fail( function(data) {
+            self._log.error(prefix + "new value FAILED");
+            if (typeof oldVal === "undefined")
+                delete self._props[propName];
+            else
+                self._props[propName] = oldVal;
+        });
+    } else {
+        self._log.debug(prefix + "unchanged");
+        var defer = Q.defer();
+        defer.resolve();
+        promise = defer.promise;
+    }
+
+    return promise;
 };
 
 module.exports = PGDB;
