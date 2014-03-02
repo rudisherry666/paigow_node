@@ -32,27 +32,6 @@ function PGDBPlayer() {
 // Extend from PGDB.
 util.inherits(PGDBPlayer, PGDB);
 
-PGDBPlayer.prototype.fetchUsername = function(username) {
-    var self = this;
-    self._log.debug("fetchUsername(" + username + ")");
-
-    var defer = Q.defer();
-
-    self._initPromise.then(
-        function() {
-            self.find(username).then(
-                function(data) { defer.resolve(data); },
-                function(err)  { defer.reject(err);   }
-            );
-        },
-        function(err) {
-            defer.reject(err);
-        }
-    );
-
-    return defer.promise;
-};
-
 PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, postedPassword) {
     var self = this;
     var prefix = "verifyPostedUsernameAndPassword('" + postedUsername + "') ";
@@ -66,9 +45,9 @@ PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, 
             delete self._username;
 
             // Fetch it and check the password.
-            self.fetchUsername(postedUsername).then(
+            self.find(postedUsername).then(
                 function(data) {
-                    self._log.debug(prefix + "fetchUserName returned: " + JSON.stringify(data));
+                    self._log.debug(prefix + "find returned: " + JSON.stringify(data));
                     if (!(data instanceof Array)) {
                         self._log.fatal(prefix + "non-array returned");
                         defer.reject("non-array");
@@ -94,7 +73,7 @@ PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, 
                     }
                 },
                 function(err) {
-                    self._log.error(prefix + "fetchUsername err: " + err);
+                    self._log.error(prefix + "find err: " + err);
                     defer.reject();
                 });
         },
@@ -129,7 +108,7 @@ PGDBPlayer.prototype.registerNewUser = function(postedUsername, postedPassword) 
         function() {
             // Can't have duplicates.
             // TODO: use 'Exists' in the 'Expected' property to avoid duplicates
-            self.fetchUsername(postedUsername).then(
+            self.find(postedUsername).then(
                 function() {
                     self._log.warn("PGDBPlayer.registerNewUser rejected: name exists");
                     defer.reject("name-exists");

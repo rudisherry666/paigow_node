@@ -21,9 +21,9 @@ describe('PGDBPlayer', function() {
         playerLog.debug('should return unknown username');
         assert.equal(pgdbPlayer.currentUsername(), "unknown");
     });
-    it('should reject fetching unknown username', function (done) {
+    it('should reject findin unknown username', function (done) {
         playerLog.debug('should reject fetching unknown username');
-        pgdbPlayer.fetchUsername("unknown")
+        pgdbPlayer.find("unknown")
             .then(  function() { assert.fail("rejected", "allowed"); },
                     function() { /* otherwise rejection gets thrown */ })
             .done(  function() { done(); });
@@ -32,7 +32,7 @@ describe('PGDBPlayer', function() {
         playerLog.debug('should reject fetching username known not to exist');
         var testUsername = 'test-user-unknown';
         var testPassword = 'xyz';
-        pgdbPlayer.fetchUsername(testUsername)
+        pgdbPlayer.find(testUsername)
             .then(  function() { assert.fail("allowed", "rejected"); },
                     function() { /* otherwise rejection gets thrown */ })
             .done(  function() { done(); });
@@ -63,8 +63,9 @@ describe('PGDBPlayer', function() {
                         .then(  function(data) { assert.equal(data.username, testUsername); },
                                 function(err)  { assert.fail(err); })
                         .done(  function()     { done(); });
-                },
-                function(err) { assert.fail(err); done(); });
+                    },
+                    function(err) { assert.fail(err); done(); }
+                );
             }
         );
     });
