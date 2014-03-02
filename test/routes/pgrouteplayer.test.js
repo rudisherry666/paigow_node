@@ -77,6 +77,7 @@ describe('GET /player', function() {
             // Don't call 'done'; this happens before res.on('end') above.
         });
     });
+
     it('should allow registering a new user', function(done) {
         pgLog.debug("test: should allow registering a new user");
         var testUsername = 'test-player-register';

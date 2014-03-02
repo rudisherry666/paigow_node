@@ -22,12 +22,13 @@ before(function(done) {
         pgServerApp = new PGServerApp();
         pgServerApp.init(true);
         pgServerApp.run();
+        pgLog.debug("----------------- BEFORE DONE -----------------");
         done();
     });
 });
 
 after(function(done) {
-    pgLog.debug("after all hook called");
+    pgLog.debug("----------------- AFTER BEGINS -----------------");
 
     // Stop the server
     if (pgServerApp) pgServerApp.stop();
