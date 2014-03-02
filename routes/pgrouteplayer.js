@@ -16,10 +16,8 @@ function PGRoutePlayer(expressApp, pgdbPlayer) {
     self._log = new PGLog("RoutePlayer", 'debug');
 
     // Establish the endpoints.
-    self._expressApp.get('/player', function(req, res) { self._getSessionPlayer(req, res); });
+    self._expressApp.get('/player', function(req, res) { self._getSessionUsername(req, res); });
     self._expressApp.post('/player', function(req, res) { self._registerOrSigninPlayer(req, res); });
-
-    self._pgdbPlayer = pgdbPlayer;
 }
 
 util.inherits(PGRoutePlayer, PGRouteBase);
@@ -27,22 +25,17 @@ util.inherits(PGRoutePlayer, PGRouteBase);
 /*
 * @method GET /player
 * 
-* Get the current player in the session, or "unknown" if there isn't one.
+* Get the username current player in the session, or "unknown" if there isn't one.
 *
 */
-PGRoutePlayer.prototype._getSessionPlayer = function(req, res) {
+PGRoutePlayer.prototype._getSessionUsername = function(req, res) {
     var self = this;
-    self._log.debug("_getSessionPlayer called");
+    self._log.debug("_getSessionUsername called");
 
     res.setHeader('Content-Type', 'application/json');
-    if (self._pgddbPlayer) {
-        if (!req.session['username'])
-            req.session['username'] = self._pgdbPlayer.currentUsername();
-    } else
-        req.session['username'] = "unknown";
-
-    res.end(JSON.stringify({ username: req.session['username'] }));
+    res.end(JSON.stringify({ username: this._getSessionPlayer(req).username() }));
 };
+
 
 /*
 * Register a new player who provides a username and a password.
@@ -54,6 +47,7 @@ PGRoutePlayer.prototype._getSessionPlayer = function(req, res) {
 PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
     var self = this;
     self._log.debug("_registerOrSigninPlayer called");
+    self._log.debug("register: " + JSON.stringify(req.body));
 
     res.setHeader('Content-Type', 'application/json');
 
@@ -62,7 +56,7 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
         try {
             console.log("PGRoutePlayer _register");
             // This is a register
-            self._pgdbPlayer.registerNewUser(req.body.username, req.body.password).then(
+            self._getSessionPlayer(req).registerNewUser(req.body.username, req.body.password).then(
                 function() {
                     req.session['username'] = req.body.username;
                     res.end(JSON.stringify({ username: req.session['username'] }));
@@ -76,7 +70,7 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
         }
     } else {
         console.log("PGRoutePlayer _signin");
-        self._pgdbPlayer.verifyPostedUsernameAndPassword(req.body.username, req.body.password).then(function() {
+        self._getSessionPlayer(req).verifyPostedUsernameAndPassword(req.body.username, req.body.password).then(function() {
             req.session['username'] = req.body.username;
             res.end(JSON.stringify({ username: req.session['username'] }));
         }).fail(function(err) {
@@ -84,6 +78,22 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
         });
     }
 
+};
+
+/*
+* Return the current player in the session, creating one if necessary.
+*
+* @method _getSessionPlayer
+*
+*/
+PGRoutePlayer.prototype._getSessionPlayer = function(req) {
+    var self = this;
+    self._log.debug("_getSessionPlayer called");
+
+    // If there is no player, now is the time to create one.
+    if (!req.session['pgdbPlayer'])
+        req.session['pgdbPlayer'] = new PGDBPlayer();
+    return req.session['pgdbPlayer'];
 };
 
 module.exports = PGRoutePlayer;

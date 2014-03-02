@@ -1,11 +1,28 @@
-var before = require('../before.test'),
+var Before = require('../before.test'),
+    AWSWrapper = require('../../models/db/awswrapper'),
+    PGDBPlayer = require('../../models/db/pgdbplayer'),
     PGDBPlayerRoute = require('../../routes/pgrouteplayer'),
     assert = require('assert'),
     http = require('http');
 
 console.log("test: routes.PGRoutePlayer");
 
-describe('GET /player', function(){
+describe('GET /player', function() {
+
+    before(function(done) {
+        var awsWrapper = new AWSWrapper();
+        awsWrapper.tableDelete("test-Players").then(
+            function(data) {
+                // Make sure the table is created.
+                var p = new PGDBPlayer();
+                p.created().done(function() { done(); });
+            },
+            function(err)  {
+                assert.fail("cannt delete test-Players: " + err);
+                done();
+            }
+        );
+    });
 
     it('should return a 200 status code', function (done){
         http.get({ host: '0.0.0.0', port: 8088, path: "/player" }, function(res) {
@@ -45,16 +62,22 @@ describe('GET /player', function(){
         });
     });
     
-    // it('should allow register', function(done) {
-    //     var testUsername = 'test-player-register';
-    //     var req = http.request({
-    //         host: '0.0.0.0',
-    //         port: 8088,
-    //         path: "/player",
-    //         method: "POST"
-    //     });
-    //     req.write(JSON.stringify({username: testUserName, password: 'xyz', state: 'registering'}));
-    // });
+    it('should allow registering a new user', function(done) {
+        var testUsername = 'test-player-register';
+        var req = http.request({
+            host: '0.0.0.0',
+            port: 8088,
+            path: "/player",
+            method: "POST",
+            headers: { 'content-type': 'application/json' , 'accept': 'application/json' }
+        });
+        req.write(JSON.stringify({username: testUsername, password: 'xyz', state: 'registering'}));
+        req
+            .on('finish',function() { done(); } )
+            .on('close', function() { assert.fail("closed not ended!"); done(); } )
+            .on('error', function() { assert.fail(err); done(); } );
+        req.end();
+    });
 
 
 });

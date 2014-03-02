@@ -19,7 +19,7 @@ describe('PGDBPlayer', function() {
 
     it('should return unknown username', function () {
         playerLog.debug('should return unknown username');
-        assert.equal(pgdbPlayer.currentUsername(), "unknown");
+        assert.equal(pgdbPlayer.username(), "unknown");
     });
     it('should reject findin unknown username', function (done) {
         playerLog.debug('should reject fetching unknown username');

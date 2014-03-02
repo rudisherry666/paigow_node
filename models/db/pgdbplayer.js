@@ -24,6 +24,7 @@ function PGDBPlayer() {
     PGDB.call(this, 'Players', 'username');
     var self = this;
     self._log = new PGLog('player', 'debug');
+    self._log.debug("PGDBPlayer constructor called");
 
     // Original username is 'unknown'.
     this._username = "unknown";
@@ -166,7 +167,7 @@ PGDBPlayer.prototype.deleteUser = function(username) {
     return defer.promise;
 };
 
-PGDBPlayer.prototype.currentUsername = function() {
+PGDBPlayer.prototype.username = function() {
     return this._username;
 };
 
