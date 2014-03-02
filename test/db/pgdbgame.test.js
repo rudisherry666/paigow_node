@@ -45,5 +45,7 @@ describe('PGDBGame', function() {
     it('should return a PGDBGame object', function() {
         var pgdbGame = new PGDBGame(pgdbPlayer1, pgdbPlayer2);
         assert.notEqual(pgdbGame, null);
+        assert.equal(pgdbGame.player1(), pgdbPlayer1);
+        assert.equal(pgdbGame.player2(), pgdbPlayer2);
     });
 });
