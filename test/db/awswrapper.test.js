@@ -153,7 +153,7 @@ describe('AWSWrapper', function() {
             }
         );
     });
-    it('should allow adding an item', function(done) {
+    it('should allow adding an item and but not again', function(done) {
         var tableName = 'test-table-test-add';
         var keyName = 'myKey';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
@@ -161,9 +161,45 @@ describe('AWSWrapper', function() {
                 var item = {};
                 item[keyName] = 'hello';
                 awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
-                    function(data) { assert.equal(item, data); },
-                    function(err)  { assert.fail("rejected adding item: " + err); }
-                ).done(function()  { done(); });
+                    function(data) {
+                        assert.equal(item, data);
+                        awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
+                            function(data) { assert.fail( "allowed adding again"); },
+                            function(err)  { assert.equal(err, "already-exists"); }
+                        ).done(function()  { done(); });
+                    },
+                    function(err)  {
+                        assert.fail("rejected adding item: " + err);
+                    }
+                );
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should allow adding an item and updating it', function(done) {
+        var tableName = 'test-table-test-add-update';
+        var keyName = 'myKey';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                var item = { foo: "bar" };
+                item[keyName] = 'hello';
+                awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
+                    function(data) {
+                        assert.equal(item, data);
+                        item.foo = "mumble";
+                        awsWrapper1.itemUpdate(tableName, {keyAttributeName: keyName, item:item}).then(
+                            function(data)  { assert.equal(data, item); },
+                            function(err) { assert.fail(err); }
+                        ).done(function()  { done(); });
+                    },
+                    function(err)  {
+                        assert.fail("rejected adding item: " + err);
+                        done();
+                    }
+                );
             },
             function() {
                 assert.fail(err);

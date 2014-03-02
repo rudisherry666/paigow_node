@@ -529,7 +529,7 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
 };
 
 
-AWSWrapper.prototype.itemAdd = function(tableName, options) {
+AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
     var self = this;
     self._log.debug("itemAdd('" + tableName + "')");
 
@@ -554,8 +554,13 @@ AWSWrapper.prototype.itemAdd = function(tableName, options) {
     function itemAddFunc(err, data) {
         self._log.debug(prefix + "returned from DB.putItem");
 
-        // Any error returned from the database is fatal.
-        if (err) itemAddFatal(err);
+        // Any error other than item-already-exists returned from the database is fatal.
+        if (err) {
+            if (err.code === 'ConditionalCheckFailedException')
+                defer.reject('already-exists');
+            else
+                itemAddFatal(err);
+        }
 
         defer.resolve(options.item);
 
@@ -574,11 +579,28 @@ AWSWrapper.prototype.itemAdd = function(tableName, options) {
         putOptions.Item[iProp] = { 'S': val };
     }
 
+    // We don't expect the item to exist
+    if (!options.updating) {
+        putOptions.Expected = {};
+        putOptions.Expected[options.keyAttributeName] = { Exists: false };
+    }
+
     self._log.debug(prefix + "calling putItem");
     self._DB.putItem(putOptions, itemAddFunc);
 
     return defer.promise;
 };
+
+AWSWrapper.prototype.itemUpdate = function(tableName, options) {
+    options.updating = true;
+    return this._itemAddOrUpdate(tableName, options);
+};
+
+AWSWrapper.prototype.itemAdd = function(tableName, options) {
+    options.updating = false;
+    return this._itemAddOrUpdate(tableName, options);
+};
+
 
 
 
