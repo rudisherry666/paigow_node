@@ -1,24 +1,36 @@
 {
-  "name": "paigow_node",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "start": "node app.js"
-  },
-  "engines": {
-    "node": "0.10.x"
-  },
-  "dependencies": {
-    "q": "1.0.0",
-    "express": "3.1.0",
-    "ejs": "0.8.5",
-    "password-hash": "1.2.1",
-    "aws-sdk": ">=2.0"
-  },
-  "scripts": {
-    "test": "./node_modules/mocha/bin/mocha"
-  },
-  "devDependencies": {
-    "mocha": "1.15.1"
-  }
+    "name": "paigow_node",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "node app.js"
+    },
+    "engines": {
+        "node": "0.10.x"
+    },
+    "dependencies": {
+        "q": "1.0.0",
+        "express": "3.1.0",
+        "ejs": "0.8.5",
+        "password-hash": "1.2.1",
+        "aws-sdk": ">=2.0"
+    },
+    "scripts": {
+        "test": "./node_modules/mocha/bin/mocha"
+    },
+    "devDependencies": {
+        "mocha": "~1.15",
+        "grunt": "~0.4",
+        "grunt-contrib-yuidoc": "~0.5",
+        "grunt-contrib-jshint": "~0.9"
+    },
+    "devDependenciesForLater": {
+        "grunt-contrib-uglify": "0",
+        "grunt-contrib-qunit": "0",
+        "grunt-contrib-watch": "0",
+        "grunt-contrib-concat": "0"
+    },
+    "devGlobalDependencies": {
+        "grunt-cli": "0"
+    }
 }
