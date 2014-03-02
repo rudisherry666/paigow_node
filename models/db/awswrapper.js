@@ -16,10 +16,6 @@ var PGLog = require('../../utils/pglog'),
 
 // One global awsDB, subclasses use it.
 var awsDB;
-if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !process.env.AWS_REGION || !process.env.AWS_ENDPOINT)
-    console.log("ERROR cannot start dynamoDB: environment variables are not set up!");
-else
-    awsDB = new AWS.DynamoDB({ endpoint: new AWS.Endpoint(process.env.AWS_ENDPOINT) });
 
 // One global prefix; all tables will be prefixed with this name.
 // This is used for tests usually.
@@ -31,6 +27,13 @@ var gDBPrefix = "";
 */
 function AWSWrapper() {
     this._log = new PGLog("AWS", 'verbose');
+    if (!awsDB) {
+        if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !process.env.AWS_REGION || !process.env.AWS_ENDPOINT) {
+            this._log.fatal("ERROR cannot start dynamoDB: environment variables are not set up!");
+            throw new Error("ERROR cannot start dynamoDB: environment variables are not set up!");
+        } else
+            awsDB = new AWS.DynamoDB({ endpoint: new AWS.Endpoint(process.env.AWS_ENDPOINT) });
+    }
     this._DB = awsDB;
 }
 

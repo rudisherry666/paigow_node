@@ -8,6 +8,7 @@
 var express = require('express'),
     http = require('http'),
     path = require('path'),
+    PGLog = require('./utils/pglog'),
     PGTile = require('./models/pgtile'),
     PGHand = require('./models/pghand'),
     PGDeal = require('./models/pgdeal'),
@@ -15,6 +16,8 @@ var express = require('express'),
     PGRoutePlayer = require('./routes/pgrouteplayer');
 
 function PGServerApp() {
+    this._log = new PGLog("app", 'debug');
+
     // Set up the express application
     this._expressApp = express();
     this._expressApp.set('port', process.env.PORT || 8088);
@@ -33,6 +36,33 @@ function PGServerApp() {
 }
 
 PGServerApp.prototype.init = function(testing) {
+    var self = this;
+
+    // If we already have the DB keys set, just use them.
+    if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY && process.env.AWS_REGION && process.env.AWS_ENDPOINT) {
+        self._initWithSecrets(testing);
+    } else {
+        this._expressApp.post('/setkeys', function(req, res) {
+            if (req.body.key1 && req.body.key2 && req.body.key3 && req.body.key4 && req.body.key5 && req.body.key6) {
+                process.env.AWS_ACCESS_KEY_ID = req.body.key1;
+                process.env.AWS_SECRET_ACCESS_KEY = req.body.key2;
+                process.env.AWS_REGION = req.body.key3;
+                process.env.AWS_ENDPOINT = req.body.key4 + "://" + req.body.key5 + ":" + req.body.key6;
+                self._initWithSecrets(testing);
+            }
+
+            // Always return a 404, so sender doesn't know that it's really here.
+            res.send(404);
+        });
+    }
+};
+
+PGServerApp.prototype._initWithSecrets = function(testing) {
+    var self = this;
+    if (self._initWithSecretsCalled) return;
+    self._initWithSecretsCalled = true;
+
+    self._log.debug("_initWithSecrets called");
 
     // Initialize the player stuff.
     var pgdbPlayer;
@@ -43,7 +73,7 @@ PGServerApp.prototype.init = function(testing) {
     // TODO: remove testing stuff below
 
     // Main endpoint.
-    this._expressApp.get('/', function(req, res) {
+    self._expressApp.get('/', function(req, res) {
         var deal = new PGDeal([
             new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
             new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1),
@@ -57,14 +87,14 @@ PGServerApp.prototype.init = function(testing) {
     });
 
     // Test all the tiles.
-    this._expressApp.get('/tiles', function(req, res) {
+    self._expressApp.get('/tiles', function(req, res) {
         res.render('pgtiles.ejs', {
             title: 'All Tiles'
         });
     });
 
     // Test getting one tile.
-    this._expressApp.get('/tile', function(req, res) {
+    self._expressApp.get('/tile', function(req, res) {
         var tile = new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1);
         res.render('pgtile.ejs', {
             title: 'Tile',
@@ -73,7 +103,7 @@ PGServerApp.prototype.init = function(testing) {
     });
 
     // Test a hand.
-    this._expressApp.get('/hand', function(req, res) {
+    self._expressApp.get('/hand', function(req, res) {
         var hand = new PGHand([
             new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
             new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1)
@@ -85,7 +115,7 @@ PGServerApp.prototype.init = function(testing) {
     });
 
     // Test a deal.
-    this._expressApp.get('/deal', function(req, res) {
+    self._expressApp.get('/deal', function(req, res) {
         var deal = new PGDeal([
             new PGTile(PGTile.prototype.TILE_INDEX.TEEN_1),
             new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1),
