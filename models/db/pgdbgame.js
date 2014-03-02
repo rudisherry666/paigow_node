@@ -37,9 +37,10 @@ util.inherits(PGDBGame, PGDB);
 
 PGDBGame.prototype.player1 = function() {
     return this._pgdbPlayer1;
-}
+};
+
 PGDBGame.prototype.player2 = function() {
     return this._pgdbPlayer2;
-}
+};
 
 module.exports = PGDBGame;

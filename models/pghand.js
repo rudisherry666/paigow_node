@@ -253,7 +253,7 @@ PGHand.prototype.tiles = function() {
 *
 */
 PGHand.prototype.compare = function(hand) {
-    if (!hand) throw "PGTile.compare given null hand to compare"
+    if (!hand) throw "PGTile.compare given null hand to compare";
     var myRank = this.rank();
     var hisRank = hand.rank();
     if (myRank > hisRank)
