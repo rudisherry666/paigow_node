@@ -43,11 +43,13 @@ PGServerApp.prototype.init = function(testing) {
         self._initWithSecrets(testing);
     } else {
         this._expressApp.post('/setkeys', function(req, res) {
-            if (req.body.key1 && req.body.key2 && req.body.key3 && req.body.key4 && req.body.key5 && req.body.key6) {
+            if (req.body.key1 && req.body.key2 && req.body.key3 && req.body.key4 && req.body.key5) {
                 process.env.AWS_ACCESS_KEY_ID = req.body.key1;
                 process.env.AWS_SECRET_ACCESS_KEY = req.body.key2;
                 process.env.AWS_REGION = req.body.key3;
-                process.env.AWS_ENDPOINT = req.body.key4 + "://" + req.body.key5 + ":" + req.body.key6;
+                process.env.AWS_ENDPOINT = req.body.key4 + "://" + req.body.key5;
+                if (req.body.key6)
+                    process.env.AWS_ENDPOINT += ":" + req.body.key6;
                 self._initWithSecrets(testing);
             }
 
