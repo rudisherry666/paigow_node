@@ -218,10 +218,10 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
         if (err) {
             // May already be gone; that's OK.
             if (err.code && err.code === 'ResourceNotFoundException') {
-                // console.log("AWSWrapper.clearAll.deleteTable('" + tableName + "'): already gone!");
+                self._log.debug(prefix + "already gone");
                 defer.resolve();
             } else {
-                throw new Error("AWSWrapper.clearAll.deleteTable('" + tableName + "'): FATAL error describing: " + err);
+                tableDeleteFatal("bad error: " + error);
             }
         } else {
             // No error, resolve when it's gone.
@@ -454,7 +454,6 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
         };
         getOptions.Key[options.keyAttributeName] = { 'S': options.keyAttributeValue };
 
-        console.log(JSON.stringify(getOptions));
         self._DB.getItem(getOptions, getFunc);
     } else {
         // We're returning all the values.

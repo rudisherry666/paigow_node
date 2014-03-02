@@ -71,7 +71,7 @@ PGDB.prototype.fullTableName = function(tableName) {
 */
 PGDB.prototype._init = function() {
     var self = this;
-    self._log.debug("_init");
+    self._log.debug("PGDB._init called for '" + self.fullTableName() + "'");
 
     var defer = Q.defer();
 
@@ -91,7 +91,7 @@ PGDB.prototype._init = function() {
 */
 PGDB.prototype.find = function(keyValue) {
     var self = this;
-    self._log.debug("find");
+    self._log.debug("PGDB.find called for '" + self.fullTableName() + "'");
 
     var options = { keyAttributeName: self._keyAttributeName };
     if (keyValue) options.keyAttributeValue = keyValue;

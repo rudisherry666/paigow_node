@@ -54,19 +54,20 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
     // We know the difference between signing in and registering by the state
     if (req.body.state === 'registering') {
         try {
-            console.log("PGRoutePlayer _register");
+            self._log.debug("registering");
             // This is a register
             self._getSessionPlayer(req).registerNewUser(req.body.username, req.body.password).then(
                 function() {
+                    self._log.debug("registering done");
                     req.session['username'] = req.body.username;
                     res.end(JSON.stringify({ username: req.session['username'] }));
                 },
                 function(err) {
-                    console.log('err setting username: ' + err);
+                    self._log.debug('err registering: ' + err);
                     res.end(JSON.stringify({ err: err }));
                 });
         } catch (err) {
-            console.log("Caught err " + err);
+            self._log.debug('caught err registering: ' + err);
         }
     } else {
         console.log("PGRoutePlayer _signin");
