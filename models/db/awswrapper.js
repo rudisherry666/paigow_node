@@ -126,7 +126,7 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
     // return the promise for it.
     if (awsTablesBeingCreated[tableName]) {
         if (keyAttributeName !== awsTablesBeingCreated[tableName].keyAttributeName) tableCreateFatal("asked to create same table with different keyAttributeName");
-        self._log.debug(prefix + "returning existing promise");
+        self._log.debug(prefix + "returning existing " + (awsTablesBeingCreated[tableName].defer.promise.inspect().state) + " promise");
         return awsTablesBeingCreated[tableName].defer.promise;
     }
 
