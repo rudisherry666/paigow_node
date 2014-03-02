@@ -65,6 +65,7 @@ PGDBPlayer.prototype.verifyPostedUsernameAndPassword = function(postedUsername, 
                             if (PasswordHash.verify(postedPassword, user.hashedPassword)) {
                                 self._log.debug(prefix + "password match success");
                                 self._username = postedUsername;
+                                self._hashedPassword = user.hashedPassword;
                                 defer.resolve({username: postedUsername, password: postedPassword});
                             } else {
                                 self._log.error(prefix + "password mismatch");
@@ -116,10 +117,15 @@ PGDBPlayer.prototype.registerNewUser = function(postedUsername, postedPassword) 
                 },
                 function(err) {
                     if (err === "not-found") {
-                        var user = {username: postedUsername, hashedPassword: PasswordHash.generate(postedPassword)};
+                        var passHash = PasswordHash.generate(postedPassword);
+                        var user = {username: postedUsername, hashedPassword: passHash};
                         self.add(user).then(
-                            function()    { defer.resolve(user); },
-                            function(err) { defer.reject(err);   }
+                            function() {
+                                self._username = postedUsername;
+                                self._hashedPassword = passHash;
+                                defer.resolve(user);
+                            },
+                            function(err) { defer.reject(err); }
                         );
                     } else {
                         // Uh-oh, some other kind of error, bad news.
