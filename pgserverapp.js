@@ -50,6 +50,7 @@ PGServerApp.prototype.init = function(testing) {
                 process.env.AWS_ENDPOINT = req.body.key4 + "://" + req.body.key5;
                 if (req.body.key6)
                     process.env.AWS_ENDPOINT += ":" + req.body.key6;
+                self._log.debug("ep: " + process.env.AWS_ENDPOINT);
                 self._initWithSecrets(testing);
             }
 
