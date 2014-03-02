@@ -37,36 +37,4 @@ describe('PGDBPlayer', function() {
                     function() { /* otherwise rejection gets thrown */ })
             .done(  function() { done(); });
     });
-    it ('should allow registering a username', function(done) {
-        playerLog.debug('should allow registering a username');
-        var testUsername = 'test-user-register';
-        var testPassword = 'xyz';
-        pgdbPlayer.deleteUser(testUsername)
-            .then(  function() {
-                pgdbPlayer.registerNewUser(testUsername, testPassword)
-                    .then(  function(data) { assert.equal(data.username, testUsername); },
-                            function(err)  { assert.fail(err); })
-                    .done(  function()     { done(); });
-            }
-        );
-    });
-    it ('should recognize an existing username', function(done) {
-        playerLog.debug('should recognize an existing username');
-        var testUsername = 'test-user-existing';
-        var testPassword = 'xyz';
-        pgdbPlayer.deleteUser(testUsername).done(
-            function() {
-                pgdbPlayer.registerNewUser(testUsername, testPassword).then(
-                  function(data) {
-                    assert.equal(data.username, testUsername);
-                    pgdbPlayer.verifyPostedUsernameAndPassword(testUsername, testPassword)
-                        .then(  function(data) { assert.equal(data.username, testUsername); },
-                                function(err)  { assert.fail(err); })
-                        .done(  function()     { done(); });
-                    },
-                    function(err) { assert.fail(err); done(); }
-                );
-            }
-        );
-    });
 });
