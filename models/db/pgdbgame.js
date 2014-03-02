@@ -11,8 +11,8 @@
 var PGLog = require('../../utils/pglog'),
     Q = require('q'),
     PGDB = require('./pgdb'),
-    util = require('util'),
-    PasswordHash = require('password-hash');
+    PGDBPlayer = require('./pgdbplayer'),
+    util = require('util');
 
 /*
 * @constructor PGDBGame
@@ -20,13 +20,16 @@ var PGLog = require('../../utils/pglog'),
 *
 */
 
-function PGDBGame() {
+function PGDBGame(pgdbPlayer1, pgdbPlayer2) {
+    if (!pgdbPlayer1 || !(pgdbPlayer1 instanceof PGDBPlayer)) throw new Error("PGDBGame constructor called with bad player 1");
+    if (!pgdbPlayer2 || !(pgdbPlayer2 instanceof PGDBPlayer)) throw new Error("PGDBGame constructor called with bad player 2");
+
     PGDB.call(this, 'Games', 'gameid');
     var self = this;
     self._log = new PGLog('game', 'debug');
 
-    // Original username is 'unknown'.
-    this._username = "unknown";
+    this._pgdbPlayer1 = pgdbPlayer1;
+    this._pgdbPlayer2 = pgdbPlayer2;
 }
 
 // Extend from PGDB.
