@@ -127,14 +127,14 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
     if (awsTablesBeingCreated[tableName]) {
         if (keyAttributeName !== awsTablesBeingCreated[tableName].keyAttributeName) tableCreateFatal("asked to create same table with different keyAttributeName");
         self._log.debug(prefix + "returning existing promise");
-        return awsTablesBeingCreated[tableName].promise;
+        return awsTablesBeingCreated[tableName].defer.promise;
     }
 
     var defer = Q.defer();
 
     // Add this to the promise set.
     awsTablesBeingCreated[tableName] = {
-        promise: defer.promise,
+        defer: defer,
         keyAttributeName: keyAttributeName
     };
 
@@ -192,10 +192,25 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
 */
 AWSWrapper.prototype.tableDelete = function(tableName) {
     var self = this;
-    self._log.debug("tableDelete(" + tableName + " )");
+    var prefix = "AWSWrapper.tableDelete('" + tableName + "') ";
+    self._log.debug(prefix + "called");
 
-    if (!awsDB) throw new Error("AWSWrapper.tableDelete: no DB!");
-    if (!tableName || (typeof tableName !== "string")) throw new Error("AWSWrapper.tableDelete: bad tableName!");
+    // Any issues, we bail and throw.
+    function tableDeleteFatal(err) {
+        var msg = prefix + " " + err + "!";
+        self._log.fatal(msg);
+        throw new Error(msg);
+    }
+
+    if (!awsDB) tableDeleteFatal("no DB");
+    if (!tableName || (typeof tableName !== "string")) tableDeleteFatal("bad tableName");
+
+    // If there is a promise that this table is being created, reject it and remove it.
+    if (awsTablesBeingCreated[tableName]) {
+        self._log.debug(prefix + "removing existing promise");
+        awsTablesBeingCreated[tableName].defer.reject();
+        delete awsTablesBeingCreated[tableName];
+    }
 
     var defer = Q.defer();
 
@@ -474,7 +489,6 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
     var self = this;
     var prefix = "AWSWrapper:keyItemDelete('" + tableName + "') ";
     self._log.debug(prefix + "called");
-
 
     // Any issues, we bail and throw.
     function keyItemDeleteFatal(err) {

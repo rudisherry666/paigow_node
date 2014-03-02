@@ -92,6 +92,51 @@ describe('AWSWrapper', function() {
             function(err)  { assert.fail(err); }
         ).done(function()  { done(); } );
     });
+    it('should correctly handle creating tables that are created then deleted.', function(done) {
+        var tableName = 'test-table-create-delete-create';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function(data) {
+                awsWrapper1.tableDelete(tableName).then(
+                    function(data) {
+                        awsWrapper1.tableCreate(tableName, 'myKey').then(
+                            function(data) {
+                                awsWrapper1.tableStatus(tableName).then(
+                                    function(status) {
+                                        assert.equal(status, 'ACTIVE');
+                                    },
+                                    function(err)  { assert.fail(err); }
+                                ).done(function()  { done(); } );
+                            },
+                            function(err)  { assert.fail(err); done(); }
+                        );
+                    },
+                    function(err) { assert.fail(err); done(); }
+                );
+            },
+            function(err) { assert.fail(err); done(); }
+        );
+    });
+    it('should correctly handle creating tables that are deleted then created immediately.', function(done) {
+        var tableName = 'test-table-create-delete-create-quick';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function(data) {
+                var deletePromise = awsWrapper1.tableDelete(tableName);
+                var createPromise = awsWrapper1.tableCreate(tableName, 'myKey');
+                Q.when([deletePromise, createPromise]).then(
+                    function() {
+                        awsWrapper1.tableStatus(tableName).then(
+                            function(status) {
+                                assert.equal(status, 'ACTIVE');
+                            },
+                            function(err)  { assert.fail(err); }
+                        ).done(function()  { done(); } );
+                    },
+                    function(err) { assert.fail(err); done(); }
+                );
+            },
+            function(err) { assert.fail(err); done(); }
+        );
+    });
     it('should return not-found when searching for a specific item', function(done) {
         var tableName = 'test-table-return-not-found';
         var keyName = 'myKey';
