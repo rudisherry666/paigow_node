@@ -1,10 +1,11 @@
-var Before = require('../before.test'),
+var Q = require('q'),
+    assert = require('assert'),
+    http = require('http'),
+    Before = require('../before.test'),
     AWSWrapper = require('../../models/db/awswrapper'),
     PGDBPlayer = require('../../models/db/pgdbplayer'),
     PGDBPlayerRoute = require('../../routes/pgrouteplayer'),
-    PGLog = require('../../utils/pglog'),
-    assert = require('assert'),
-    http = require('http');
+    PGLog = require('../../utils/pglog');
 
 console.log("test: routes.PGRoutePlayer");
 
@@ -76,7 +77,6 @@ describe('GET /player', function() {
             // Don't call 'done'; this happens before res.on('end') above.
         });
     });
-    
     it('should allow registering a new user', function(done) {
         pgLog.debug("test: should allow registering a new user");
         var testUsername = 'test-player-register';
@@ -91,11 +91,53 @@ describe('GET /player', function() {
                 .on('data',  function() { })
                 .on('end',   function() { done(); })
                 .on('close', function() { assert.fail("closed not ended!"); done(); })
-                .on('error', function() { assert.fail(err); done(); });
+                .on('error', function(err) { assert.fail(err); done(); });
         });
         req.write(JSON.stringify({username: testUsername, password: 'xyz', state: 'registering'}));
         req.end();
     });
+    it ('should reject re-registering a username', function(done) {
+        var defer = Q.defer();
+        pgLog.debug("test: should allow registering a new user");
+        var testUsername = 'test-player-re-register';
+        var req = http.request({
+            host: '0.0.0.0',
+            port: 8088,
+            path: "/player",
+            method: "POST",
+            headers: { 'content-type': 'application/json' , 'accept': 'application/json' }
+        }, function(res) {
+            res
+                .on('data',  function() { })
+                .on('end',   function() { defer.resolve(); })
+                .on('close', function() { assert.fail("closed not ended!"); defer.reject(); })
+                .on('error', function(err) { assert.fail(err); defer.reject(err); });
+        });
+        req.write(JSON.stringify({username: testUsername, password: 'xyz', state: 'registering'}));
+        req.end();
 
-
+        defer.promise.then(
+            function(data) {
+                var req2 = http.request({
+                    host: '0.0.0.0',
+                    port: 8088,
+                    path: "/player",
+                    method: "POST",
+                    headers: { 'content-type': 'application/json' , 'accept': 'application/json' }
+                }, function(res) {
+                    res
+                        .on('data',  function() { })
+                        .on('end',   function() { done(); })
+                        .on('close', function() { assert.fail("closed not ended!"); done(); })
+                        .on('error', function(err) { assert.fail(err); done(err); });
+                });
+                req2.write(JSON.stringify({username: testUsername, password: 'xyz', state: 'registering'}));
+                req2.end();
+            },
+            function(err) {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
 });
