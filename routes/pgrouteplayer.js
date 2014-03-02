@@ -58,7 +58,7 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
             // This is a register
             self._getSessionPlayer(req).registerNewUser(req.body.username, req.body.password).then(
                 function() {
-                    self._log.debug("registering done");
+                    self._log.debug("registering done" );
                     req.session['username'] = req.body.username;
                     res.end(JSON.stringify({ username: req.session['username'] }));
                 },

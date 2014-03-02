@@ -2,6 +2,7 @@ var Before = require('../before.test'),
     AWSWrapper = require('../../models/db/awswrapper'),
     PGDBPlayer = require('../../models/db/pgdbplayer'),
     PGDBPlayerRoute = require('../../routes/pgrouteplayer'),
+    PGLog = require('../../utils/pglog'),
     assert = require('assert'),
     http = require('http');
 
@@ -9,22 +10,35 @@ console.log("test: routes.PGRoutePlayer");
 
 describe('GET /player', function() {
 
+    var pgLog = new PGLog('tstRtPlayer', 'debug');
+
     before(function(done) {
+        pgLog.debug("before: deleting all tables");
         var awsWrapper = new AWSWrapper();
         awsWrapper.tableDelete("test-Players").then(
             function(data) {
                 // Make sure the table is created.
                 var p = new PGDBPlayer();
-                p.created().done(function() { done(); });
+                p.created().done(function() {
+                    pgLog.debug("before: done, success");
+        var wr = new AWSWrapper();
+        wr.tableStatus('test-Players').then(
+            function(status) { pgLog.debug(status); done(); },
+            function(err) { assert.fail(err); }
+        );
+                    // done();
+                });
             },
             function(err)  {
-                assert.fail("cannt delete test-Players: " + err);
+                assert.fail("cant delete test-Players: " + err);
+                pgLog.debug("before: done, fail");
                 done();
             }
         );
     });
 
-    it('should return a 200 status code', function (done){
+    it('should return a 200 status code', function (done) {
+        pgLog.debug("test: should return a 200 status code");
         http.get({ host: '0.0.0.0', port: 8088, path: "/player" }, function(res) {
             assert.deepEqual(res.statusCode, 200);
         }).on('finish', function() {
@@ -33,6 +47,7 @@ describe('GET /player', function() {
     });
 
     it('should return an unknown user', function (done) {
+        pgLog.debug("test: should return an unknown user");
         var retVal = "";    // Build up the response, it may come in more than one data chunk.
         http.get({ host: '0.0.0.0', port: 8088, path: "/player" }, function(res) {
             res
@@ -63,6 +78,7 @@ describe('GET /player', function() {
     });
     
     it('should allow registering a new user', function(done) {
+        pgLog.debug("test: should allow registering a new user");
         var testUsername = 'test-player-register';
         var req = http.request({
             host: '0.0.0.0',
@@ -70,12 +86,14 @@ describe('GET /player', function() {
             path: "/player",
             method: "POST",
             headers: { 'content-type': 'application/json' , 'accept': 'application/json' }
+        }, function(res) {
+            res
+                .on('data',  function() { })
+                .on('end',   function() { done(); })
+                .on('close', function() { assert.fail("closed not ended!"); done(); })
+                .on('error', function() { assert.fail(err); done(); });
         });
         req.write(JSON.stringify({username: testUsername, password: 'xyz', state: 'registering'}));
-        req
-            .on('finish',function() { done(); } )
-            .on('close', function() { assert.fail("closed not ended!"); done(); } )
-            .on('error', function() { assert.fail(err); done(); } );
         req.end();
     });
 
