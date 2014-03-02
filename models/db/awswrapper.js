@@ -584,7 +584,7 @@ AWSWrapper.prototype._waitForCreateToFinish = function(tableName, defer) {
             if (status === "ACTIVE")
                 defer.resolve(status);
             else if (status == "CREATING")
-                setTimeout(function() { self._waitForDeletToFinish(tableName, defer); }, 100);
+                setTimeout(function() { self._waitForDeletToFinish(tableName, defer); }, 3000);
             else
                 throw new Error("AWSWrapper._waitForCreateToFinish: bad table status: " + status);
         },
@@ -605,7 +605,7 @@ AWSWrapper.prototype._waitForDeletToFinish = function(tableName, defer) {
             if (status === "MISSING")
                 defer.resolve(status);
             else
-                setTimeout(function() { self._waitForDeletToFinish(tableName, defer); }, 100);
+                setTimeout(function() { self._waitForDeletToFinish(tableName, defer); }, 3000);
         },
         function(err) {
             defer.reject(err);
