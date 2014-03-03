@@ -24,6 +24,32 @@ function sessionFromReq(req) {
     return null;
 }
 
+// One hour after last touch, session runs out: every call is a touch.
+function touchSession(session) {
+    session.lastTouch = Date.now();
+}
+
+// Check every 5 minutes
+function checkSessionsForTimeout(e) {
+    var now = Date.now();
+
+    var sessionIDs = Object.keys(pgSessions);
+    for (var si = 0; si < sessionIDs.length; si++) {
+        sessionID = sessionIDs[si];
+        var lastTouch = pgSessions[sessionID].lastTouch;
+        if (!lastTouch) {
+            pgSessionLog.error("Session without lastTouch: " + sessionID);
+            lastTouch = 0;
+        }
+        if ((now - lastTouch) > (60 * 60 * 1000)) {
+            pgSession.log("Session timeout: " + sessionID);
+            delete pgSessions[sessionID];
+        }
+    }
+    setTimeout(checkSessionsForTimeout, 5 * 60 * 1000);
+}
+checkSessionsForTimeout();
+
 // It's a singleton so everything is PGSession.blah(sessionID, whatever)
 module.exports = {
 
@@ -33,6 +59,7 @@ module.exports = {
         if (!req.session) throw new Error("no req.session to use!");
         var session = sessionFromReq(req);
         if (session) {
+            touchSession(session);
             pgSessionLog.debug("found existing session");
             return session;
         }
@@ -49,12 +76,14 @@ module.exports = {
     get: function(req, key) {
         var session = this.session(req);
         if (!session) throw new Error("no session for get");
+        touchSession(session);
         return session.key;
     },
 
     set: function(req, key, value) {
         var session = this.session(req);
         if (!session) throw new Error("no session for set");
+        touchSession(session);
         session.key = value;
     }
 };
