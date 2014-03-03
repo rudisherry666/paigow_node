@@ -37,4 +37,9 @@ describe('PGDBPlayer', function() {
                     function() { /* otherwise rejection gets thrown */ })
             .done(  function() { done(); });
     });
+    it('should have a player named "computer"', function(done) {
+        pgdbPlayer.find('computer').fail(
+            function(err) { assert.fail("cannot find computer " + err); }
+        ).done(function() { done(); });
+    });
 });
