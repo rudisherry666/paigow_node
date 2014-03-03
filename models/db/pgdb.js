@@ -175,7 +175,7 @@ PGDB.prototype.update = function(item, options) {
 */
 PGDB.prototype.get = function(propName) {
     var self = this;
-    var prefix = "PGDB.get('" + self.fullTableName() + "', " + propName + "') ";
+    var prefix = "PGDB.get('" + self.fullTableName() + "', '" + propName + "') ";
     self._log.debug(prefix + "called");
 
     return self._props[propName];
