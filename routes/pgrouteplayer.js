@@ -8,6 +8,7 @@
 var Q = require('q'),
     util = require('util'),
     PGLog = require('../utils/pglog'),
+    PGSession = require('../utils/pgsession'),
     PGRouteBase = require('./pgroutebase'),
     PGDBPlayer = require('../models/db/pgdbplayer'),
     PasswordHash = require('password-hash');
@@ -35,7 +36,7 @@ PGRoutePlayer.prototype._getSessionUsername = function(req, res) {
     self._log.debug("_getSessionUsername called");
 
     res.setHeader('Content-Type', 'application/json');
-    this._getSessionPlayer(req).then(
+    self._getSessionPlayer(req).then(
         function(data) { res.end(JSON.stringify({ username: data.username() })); },
         function(err)  { res.end(500); }
     );
@@ -50,8 +51,9 @@ PGRoutePlayer.prototype._getSessionUsername = function(req, res) {
 PGRoutePlayer.prototype._setSessionPlayer = function(req, pgdbPlayer) {
     var self = this;
     self._log.debug("_setSessionPlayer called");
+    if (!(pgdbPlayer instanceof PGDBPlayer)) throw new Error("_setSessionPlayer setting wrong type of object");
 
-    req.session.pgdbPlayer = pgdbPlayer;
+    PGSession.set(req, 'pgdbPlayer', pgdbPlayer);
 
     // Allow chaining.
     return pgdbPlayer;
@@ -80,7 +82,7 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
             function(data) {
                 self._setSessionPlayer(req, data);
                 self._log.debug(prefix + "registering done" );
-                res.end(JSON.stringify({ username: req.session.pgdbPlayer.username() }));
+                res.end(JSON.stringify({ username: PGSession.get(req, 'pgdbPlayer').username() }));
             },
             function(err) {
                 self._log.debug(prefix + "err registering: " + err);
@@ -91,12 +93,11 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
         self._verifyPostedUsernameAndPassword(req, req.body.username, req.body.password).then(
             function(data) {
                 self._setSessionPlayer(req, data);
-                res.end(JSON.stringify({ username: req.session.pgdbPlayer.username() }));
+                res.end(JSON.stringify({ username: PGSession.get(req, 'pgdbPlayer').username() }));
             },
             function(err) { res.end(JSON.stringify({ err: err })); }
         );
     }
-
 };
 
 /*
@@ -110,11 +111,11 @@ PGRoutePlayer.prototype._getSessionPlayer = function(req) {
     self._log.debug("_getSessionPlayer called");
 
     // If there is no player, now is the time to create one.
-    if (!req.session.pgdbPlayer) {
+    if (!PGSession.get(req, 'pgdbPlayer')) {
         self._setSessionPlayer(req, new PGDBPlayer());
         self._log.debug("_getSessionPlayer created player" );
     }
-    return req.session.pgdbPlayer.created();
+    return PGSession.get(req, 'pgdbPlayer').created();
 };
 
 PGRoutePlayer.prototype._verifyPostedUsernameAndPassword = function(req, postedUsername, postedPassword) {

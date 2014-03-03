@@ -27,10 +27,9 @@ function PGServerApp() {
     this._expressApp.use(express.logger('dev'));
     this._expressApp.use(express.bodyParser());
     this._expressApp.use(express.methodOverride());
-    this._expressApp.use(express.cookieParser());
-    this._expressApp.use(express.session({secret: 'P0KJjht$-vbhDww~-++pU6]]|iUyytG43E4E'}));
+    this._expressApp.use(express.cookieParser('P0KJjhtvbhDwwpU6iUyytG43E4E'));
+    this._expressApp.use(express.cookieSession());
     this._expressApp.use(this._expressApp.router);
-    // this._expressApp.use(require('stylus').middleware(__dirname + '/public'));
     this._expressApp.use(express.static(path.join(__dirname, 'public')));
     this._expressApp.use(express.errorHandler());
 }
