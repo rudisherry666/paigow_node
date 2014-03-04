@@ -18,8 +18,10 @@ describe('DeferSeq', function() {
     it('should execute in order', function(done) {
         var firstDone = false;
         function doMeFirst2(defer, err, param) {
-            firstDone = true;
-            defer.resolve();
+            setTimeout(function() {
+                firstDone = true;
+                defer.resolve();
+            }, 100);
         }
         function doMeSecond2(defer, err, param) {
             assert(firstDone, "second done before first finished!");
