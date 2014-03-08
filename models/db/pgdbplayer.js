@@ -60,7 +60,7 @@ function PGDBPlayer(props) {
                             _pgdbPlayerComputer.add(computerItem).then(
                                 function(data) {
                                     pgdbPlayerComputer = _pgdbPlayerComputer;
-                                    pgdbPlayerCreateComputerDefer.resolve();   // created computer, that's good
+                                    pgdbPlayerCreateComputerDefer.resolve(pgdbPlayerComputer);   // created computer, that's good
                                 },
                                 function(err) {
                                     pgPlayerLog.fatal(prefix + "error trying to add computer: " + err);
@@ -101,8 +101,17 @@ PGDBPlayer.prototype.created = function() {
 
 // Return the computer player
 PGDBPlayer.prototype.computer = function() {
-    if (!pgdbPlayerComputer) throw new Error("PGDBPLayer.computer: called too soon!");
+    if (!pgdbPlayerComputer) {
+        var err = "PGDBPLayer.computer: called too soon!";
+        pgPlayerLog.fatal(err);
+        throw new Error(err);
+    }
     return pgdbPlayerComputer;
+};
+
+// Return the computer player promise so clients can know when it's done.
+PGDBPlayer.prototype.computerPromise = function() {
+    return pgdbPlayerCreateComputerDefer.promise;
 };
 
 PGDBPlayer.prototype.deleteUser = function(username) {

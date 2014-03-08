@@ -17,11 +17,18 @@ describe('PGDBPlayer', function() {
         );
     });
 
-    it('should have a specific computer player', function (done) {
-        pgdbPlayer.computer()
-            .then(  function(data) { assert(data instanceof PGDBPlayer, "computer is not a player"); },
-                    function(err) { assert.fail(err); })
-            .done(  function()    { done(); });
+    it('should have a specific computer player', function () {
+        assert(pgdbPlayer.computer() instanceof PGDBPlayer, "computer is not a player");
+        assert.equal(pgdbPlayer.computer().username(), "computer", "computer's name is not 'computer'");
+    });
+    it('its computerPromise should return the computer', function (done) {
+        PGDBPlayer.prototype.computerPromise()
+            .then(  function(data) {
+                        assert(data instanceof PGDBPlayer, "computer promise result is not a player");
+                        assert.equal(data, pgdbPlayer.computer(), "computer promise result is not computer");
+                    },
+                    function(err)  { assert.fail(err); })
+            .done(  function()     { done(); });
     });
     it('should return unknown username', function () {
         assert.equal(pgdbPlayer.username(), "unknown");
