@@ -99,6 +99,14 @@ PGDBPlayer.prototype.created = function() {
     return defer.promise;
 };
 
+// Return the computer player
+PGDBPlayer.prototype.computer = function() {
+    return this._initPromise.then(
+        function(data) { return pgdbPlayerComputer; },
+        function(err)  { throw new Error(err); }
+    );
+};
+
 PGDBPlayer.prototype.deleteUser = function(username) {
     var self = this;
     pgPlayerLog.debug("PGDBPlayer.deleteUser('" + username + "')");

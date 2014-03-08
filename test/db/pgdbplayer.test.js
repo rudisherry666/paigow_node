@@ -17,19 +17,22 @@ describe('PGDBPlayer', function() {
         );
     });
 
+    it('should have a specific computer player', function (done) {
+        pgdbPlayer.computer()
+            .then(  function(data) { assert(data instanceof PGDBPlayer, "computer is not a player"); },
+                    function(err) { assert.fail(err); })
+            .done(  function()    { done(); });
+    });
     it('should return unknown username', function () {
-        playerLog.debug('should return unknown username');
         assert.equal(pgdbPlayer.username(), "unknown");
     });
     it('should reject finding unknown username', function (done) {
-        playerLog.debug('should reject fetching unknown username');
         pgdbPlayer.find("unknown")
             .then(  function() { assert.fail("rejected", "allowed"); },
                     function() { /* otherwise rejection gets thrown */ })
             .done(  function() { done(); });
     });
     it('should reject fetching username known not to exist', function (done) {
-        playerLog.debug('should reject fetching username known not to exist');
         var testUsername = 'test-user-unknown';
         var testPassword = 'xyz';
         pgdbPlayer.find(testUsername)
