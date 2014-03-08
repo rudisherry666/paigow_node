@@ -4,7 +4,6 @@ var Q = require('q'),
     Before = require('../before.test'),
     AWSWrapper = require('../../models/db/awswrapper'),
     PGDBPlayer = require('../../models/db/pgdbplayer'),
-    PGDBPlayerRoute = require('../../routes/pgrouteplayer'),
     PGLog = require('../../utils/pglog');
 
 console.log("test: routes.PGRoutePlayer");
