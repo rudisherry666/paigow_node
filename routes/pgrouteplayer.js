@@ -55,7 +55,7 @@ PGRoutePlayer.prototype._setSessionPlayer = function(req, pgdbPlayer) {
     pgRoutePlayerLog.debug("_setSessionPlayer called");
     if (!(pgdbPlayer instanceof PGDBPlayer)) throw new Error("_setSessionPlayer setting wrong type of object");
 
-    PGSession.set(req, 'pgdbPlayer', pgdbPlayer);
+    PGSession.set(req, 'player', pgdbPlayer);
 
     // Allow chaining.
     return pgdbPlayer;
@@ -84,7 +84,7 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
             function(data) {
                 self._setSessionPlayer(req, data);
                 pgRoutePlayerLog.debug(prefix + "registering done" );
-                res.end(JSON.stringify({ username: PGSession.get(req, 'pgdbPlayer').username() }));
+                res.end(JSON.stringify({ username: PGSession.get(req, 'player').username() }));
             },
             function(err) {
                 pgRoutePlayerLog.debug(prefix + "err registering: " + err);
@@ -95,7 +95,7 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
         self._verifyPostedUsernameAndPassword(req, req.body.username, req.body.password).then(
             function(data) {
                 self._setSessionPlayer(req, data);
-                res.end(JSON.stringify({ username: PGSession.get(req, 'pgdbPlayer').username() }));
+                res.end(JSON.stringify({ username: PGSession.get(req, 'player').username() }));
             },
             function(err) { res.end(JSON.stringify({ err: err })); }
         );
@@ -113,11 +113,11 @@ PGRoutePlayer.prototype._getSessionPlayer = function(req) {
     pgRoutePlayerLog.debug("_getSessionPlayer called");
 
     // If there is no player, now is the time to create one.
-    if (!PGSession.get(req, 'pgdbPlayer')) {
+    if (!PGSession.get(req, 'player')) {
         self._setSessionPlayer(req, new PGDBPlayer());
         pgRoutePlayerLog.debug("_getSessionPlayer created player" );
     }
-    return PGSession.get(req, 'pgdbPlayer').created();
+    return PGSession.get(req, 'player').created();
 };
 
 PGRoutePlayer.prototype._verifyPostedUsernameAndPassword = function(req, postedUsername, postedPassword) {
