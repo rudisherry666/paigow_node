@@ -14,7 +14,8 @@ var PGLog = require('../../utils/pglog'),
     util = require('util'),
     PasswordHash = require('password-hash');
 
-var pgdbPlayerCreateComputerDefer,
+var pgdbPlayerCreateComputerDefer = Q.defer(),
+    pgdbPlayerCreatingComputer = false,
     pgdbPlayerComputer;
 
 var pgPlayerLog = new PGLog('Player', 'debug');
@@ -35,9 +36,9 @@ function PGDBPlayer(props) {
     if (props) {
         pgPlayerLog.debug(prefix + "creating the computer player from props");
         self._props = props;
-    } else if (!pgdbPlayerCreateComputerDefer) {
+    } else if (!pgdbPlayerCreatingComputer) {
         // We're the first one in; make sure there is a computer in the database.
-        pgdbPlayerCreateComputerDefer = Q.defer();
+        pgdbPlayerCreatingComputer = true;
         self._initPromise.then(
             function(data) {
                 self.find('computer').then(
