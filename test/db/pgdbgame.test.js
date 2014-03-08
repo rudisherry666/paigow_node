@@ -33,6 +33,7 @@ describe('PGDBGame', function() {
             pgdbGame = new PGDBGame(pgdbPlayer1);
         });
     });
+
     it('should throw if called with non-players', function() {
         var pgdbGame;
         assert.throws(function() {
@@ -42,6 +43,7 @@ describe('PGDBGame', function() {
             pgdbGame = new PGDBGame(pgdbPlayer1, {});
         });
     });
+
     it('should return a PGDBGame object', function() {
         var pgdbGame = new PGDBGame(pgdbPlayer1, pgdbPlayer2);
         assert.notEqual(pgdbGame, null);

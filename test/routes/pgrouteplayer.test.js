@@ -22,12 +22,11 @@ describe('GET /player', function() {
                 var p = new PGDBPlayer();
                 p.created().done(function() {
                     pgLog.debug("before: done, success");
-        var wr = new AWSWrapper();
-        wr.tableStatus('test-Players').then(
-            function(status) { pgLog.debug(status); done(); },
-            function(err) { assert.fail(err); }
-        );
-                    // done();
+                    var wr = new AWSWrapper();
+                    wr.tableStatus('test-Players').then(
+                        function(status) { pgLog.debug(status); done(); },
+                        function(err) { assert.fail(err); }
+                    );
                 });
             },
             function(err)  {
