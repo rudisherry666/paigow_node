@@ -250,4 +250,10 @@ PGTile.prototype.pairRank = function() {
     return tiles[this._index].pairRank;
 };
 
-module.exports = PGTile;
+// Sneaky way to make this either a require module or a Node module
+if (typeof module === "undefined") {
+    define([], function() {
+        return PGTile;
+    });
+} else
+    module.exports = PGTile;
