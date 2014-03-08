@@ -8,6 +8,8 @@
 
 // Get the SDK and make sure it's set to the right thing.
 var PGLog = require('../../utils/pglog'),
+    PGUtils = require('../../utils/pgutils'),
+    DeferSeq = require('../../utils/deferseq'),
     Q = require('q'),
     AWS = require('aws-sdk');
 
@@ -17,10 +19,10 @@ var PGLog = require('../../utils/pglog'),
 // One global awsDB, subclasses use it.
 var awsDB;
 
-// When tables are created, we don't want to try to create them multiple times.  This is a map of
-// table names to promises for tables that are in the process of creation; if a second request
-// comes in for creating, then this promise is returned rather than calling the DB again.
-var awsTablesBeingCreated = {};
+// When tables are created or deleted, we don't want to try to do something else with them.  This
+// is the list of tables in process and contains the promises that are resolved when the process
+// is done.
+var awsTablesInProcess = {};
 
 /*
 * @constructor PGDB
@@ -122,66 +124,56 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
 
     prefix = "AWSWrapper.tableCreate('" + tableName + "', '" + keyAttributeName + "') ";
 
-    // If we're already creating this table, make sure it's the same key attribute and
-    // return the promise for it.
-    if (awsTablesBeingCreated[tableName]) {
-        if (keyAttributeName !== awsTablesBeingCreated[tableName].keyAttributeName) tableCreateFatal("asked to create same table with different keyAttributeName");
-        self._log.debug(prefix + "returning existing " + (awsTablesBeingCreated[tableName].defer.promise.inspect().state) + " promise");
-        return awsTablesBeingCreated[tableName].defer.promise;
-    }
-
-    var defer = Q.defer();
-
-    // Add this to the promise set.
-    awsTablesBeingCreated[tableName] = {
-        defer: defer,
-        keyAttributeName: keyAttributeName
-    };
-
-    // If the table already exists, we're done.
-    self.tableStatus(tableName).then(
-        function(status) {
-            switch (status) {
-                case "CREATING":
-                    // Not yet: wait until it's created.
-                    self._log.debug(prefix + "table is still being created, waiting");
-                    self._waitForCreateToFinish(tableName, defer);
-                break;
-
-                case "UPDATING":
-                case "ACTIVE":
-                    // It already exists: return this status (even if it's busy).
-                    self._log.debug(prefix + "table is created!");
-                    defer.resolve(status);
-                break;
-
-                case "DELETING":
-                    // Bleah, we can't do anything until it's finished deleting.
-                    self._log.debug(prefix + "table is being deleted, waiting");
-                    self._waitForDeletToFinish(tableName, defer).then(
-                        function(status) {
-                            self._createTable(tableName, keyAttributeName, defer);
-                        },
-                        function(err) {
-                            defer.reject(err);
-                        }
-                    );
-                break;
-
-                case "MISSING":
-                    // It doesn't exist: create it and return its status.
-                    self._log.debug(prefix + "table is missing: creating it");
-                    self._createTable(tableName, keyAttributeName, defer);
-                break;
-            }
-        },
-        function(err) {
-            // Bleah, can't even describe the table.
-            self._log(prefix + "error from tableSatatus: " + err);
+    // When the previous is done, we do our stuff.  If it fails, we want to fail.
+    return DeferSeq.add(tableName, function(defer, err, param) {
+        if (err) {
             defer.reject(err);
-        });
+            return;
+        }
 
-    return defer.promise;
+        // If the table already exists, we're done.
+        self.tableStatus(tableName).then(
+            function(status) {
+                switch (status) {
+                    case "CREATING":
+                        // Not yet: wait until it's created.
+                        self._log.debug(prefix + "table is still being created, waiting");
+                        self._waitForCreateToFinish(tableName, defer);
+                    break;
+
+                    case "UPDATING":
+                    case "ACTIVE":
+                        // It already exists: return this status (even if it's busy).
+                        self._log.debug(prefix + "table is created!");
+                        defer.resolve(status);
+                    break;
+
+                    case "DELETING":
+                        // Bleah, we can't do anything until it's finished deleting.
+                        self._log.debug(prefix + "table is being deleted, waiting");
+                        self._waitForDeletToFinish(tableName, defer).then(
+                            function(status) {
+                                self._createTable(tableName, keyAttributeName, defer);
+                            },
+                            function(err) {
+                                defer.reject(err);
+                            }
+                        );
+                    break;
+
+                    case "MISSING":
+                        // It doesn't exist: create it and return its status.
+                        self._log.debug(prefix + "table is missing: creating it");
+                        self._createTable(tableName, keyAttributeName, defer);
+                    break;
+                }
+            },
+            function(err) {
+                // Bleah, can't even describe the table.
+                self._log(prefix + "error from tableSatatus: " + err);
+                defer.reject(err);
+            });
+    });
 };
 
 /*
@@ -205,31 +197,28 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
     if (!awsDB) tableDeleteFatal("no DB");
     if (!tableName || (typeof tableName !== "string")) tableDeleteFatal("bad tableName");
 
-    // If there is a promise that this table is being created, reject it and remove it.
-    if (awsTablesBeingCreated[tableName]) {
-        self._log.debug(prefix + "removing existing promise");
-        awsTablesBeingCreated[tableName].defer.reject();
-        delete awsTablesBeingCreated[tableName];
-    }
-
-    var defer = Q.defer();
-
-    awsDB.deleteTable({TableName:tableName}, function(err, data) {
+    // When the previous is done, we do our stuff.  If it fails, we want to fail.
+    return DeferSeq.add(tableName, function(defer, err, param) {
         if (err) {
-            // May already be gone; that's OK.
-            if (err.code && err.code === 'ResourceNotFoundException') {
-                self._log.debug(prefix + "already gone");
-                defer.resolve();
-            } else {
-                tableDeleteFatal("bad error: " + error);
-            }
-        } else {
-            // No error, resolve when it's gone.
-            self._waitForDeletToFinish(tableName, defer);
+            defer.reject(err);
+            return;
         }
-    });
 
-    return defer.promise;
+        awsDB.deleteTable({TableName:tableName}, function(err, data) {
+            if (err) {
+                // May already be gone; that's OK.
+                if (err.code && err.code === 'ResourceNotFoundException') {
+                    self._log.debug(prefix + "already gone");
+                    defer.resolve();
+                } else {
+                    tableDeleteFatal("bad error: " + error);
+                }
+            } else {
+                // No error, resolve when it's gone.
+                self._waitForDeletToFinish(tableName, defer);
+            }
+        });
+    });
 };
 
 /*
@@ -347,127 +336,131 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
 
     prefix = "AWSWrapper.keyItemFind('" + tableName + "', '" + options.keyAttributeValue + "') ";
 
-    var defer = Q.defer();
-
-    // We return an array of items; initialize the array.
-    var retVals = [];
-
-    // This item is one to be returned: process it.
-    function processOneItem(item) {
-        // We return an object for this item.
-        var oneVal = {};
-        for (var itemProp in item) {
-            var propItem = item[itemProp];
-
-            // Each property in the the item has to be an object, with a string.
-            if (typeof propItem !== "object") keyItemFindFatal("property '" + itemProp + "'is not object, it's " + typeof propItem);
-
-            // For now we assume everything is a string.
-            if (!propItem.S) keyItemFindFatal("property '" + itemProp + "' doesn't have 'S' property");
-
-            // Add this property to the returned item.
-            oneVal[itemProp] = propItem.S;
-        }
-
-        // The item has to have the keyAttribute.
-        if (!oneVal[options.keyAttributeName])
-            keyItemFindFatal("no keyAttribute '" + options.keyAttributeName + "'in one of the returned items");
-
-        retVals.push(oneVal);
-    }
-
-
-    // This is the function that gets passed to the query.
-    function scanFunc(err, data) {
-        self._log.debug(prefix + "returned from DB.query");
-
-        // Any error returned from the database is fatal.
-        if (err) keyItemFindFatal(err);
-
-        // If we can't find any, we just reject.
-        if (data.Count === 0) {
-            self._log.debug(prefix + " resolved empty");
-            defer.resolve(retVals);
+    // When the previous is done, we do our stuff.  If it fails, we want to fail.
+    return DeferSeq.add(tableName, function(defer, err, param) {
+        if (err) {
+            defer.reject(err);
             return;
         }
 
-        // If we find more than one given a value, this means the database is corrupt or we
-        // managed to get two records with the same key: that's *really* bad.
-        if (data.Count > 1 && options.keyAttributeValue)
-            keyItemFindFatal("more than one record with '" + options.keyAttributeValue + "'");
+        // We return an array of items; initialize the array.
+        var retVals = [];
 
-        // If there isn't an Items array or its size doesn't match Count, something is really wrong.
-        if (!data.Items || !(data.Items instanceof Array) || (data.Items.length !== data.Count)) {
-            self._log.debug(JSON.stringify(data));
-            keyItemFindFatal("Items don't match count!");
-        }
-
-        self._log.debug(prefix + "found " + data.Count + " items");
-
-        // We'll return an array with the item values, stripping the types.
-        for (var di = 0; di < data.Items.length; di++) {
-            var item = data.Items[di];
-
-            self._log.verbose("     " + JSON.stringify(item));
-
-            // The item has to have the keyAttribute
-            var foundKeyAttribute = false;
-
+        // This item is one to be returned: process it.
+        function processOneItem(item) {
             // We return an object for this item.
-            processOneItem(item);
+            var oneVal = {};
+            for (var itemProp in item) {
+                var propItem = item[itemProp];
+
+                // Each property in the the item has to be an object, with a string.
+                if (typeof propItem !== "object") keyItemFindFatal("property '" + itemProp + "'is not object, it's " + typeof propItem);
+
+                // For now we assume everything is a string.
+                if (!propItem.S) keyItemFindFatal("property '" + itemProp + "' doesn't have 'S' property");
+
+                // Add this property to the returned item.
+                oneVal[itemProp] = propItem.S;
+            }
+
+            // The item has to have the keyAttribute.
+            if (!oneVal[options.keyAttributeName])
+                keyItemFindFatal("no keyAttribute '" + options.keyAttributeName + "'in one of the returned items");
+
+            retVals.push(oneVal);
         }
 
-        // Done.
-        self._log.verbose(prefix + "returned: " + JSON.stringify(retVals));
-        defer.resolve(retVals);
-    }
 
-    function getFunc(err, data) {
-        self._log.debug(prefix + "returned from DB.query");
+        // This is the function that gets passed to the query.
+        function scanFunc(err, data) {
+            self._log.debug(prefix + "returned from DB.query");
 
-        // Any error returned from the database is fatal.
-        if (err) keyItemFindFatal(err);
+            // Any error returned from the database is fatal.
+            if (err) keyItemFindFatal(err);
 
-        // It should return one or zero items.
-        if (Object.keys(data).length === 0) {
-            defer.reject("not-found");
-            return;
+            // If we can't find any, we just reject.
+            if (data.Count === 0) {
+                self._log.debug(prefix + " resolved empty");
+                defer.resolve(retVals);
+                return;
+            }
+
+            // If we find more than one given a value, this means the database is corrupt or we
+            // managed to get two records with the same key: that's *really* bad.
+            if (data.Count > 1 && options.keyAttributeValue)
+                keyItemFindFatal("more than one record with '" + options.keyAttributeValue + "'");
+
+            // If there isn't an Items array or its size doesn't match Count, something is really wrong.
+            if (!data.Items || !(data.Items instanceof Array) || (data.Items.length !== data.Count)) {
+                self._log.debug(JSON.stringify(data));
+                keyItemFindFatal("Items don't match count!");
+            }
+
+            self._log.debug(prefix + "found " + data.Count + " items");
+
+            // We'll return an array with the item values, stripping the types.
+            for (var di = 0; di < data.Items.length; di++) {
+                var item = data.Items[di];
+
+                self._log.verbose("     " + JSON.stringify(item));
+
+                // The item has to have the keyAttribute
+                var foundKeyAttribute = false;
+
+                // We return an object for this item.
+                processOneItem(item);
+            }
+
+            // Done.
+            self._log.verbose(prefix + "returned: " + JSON.stringify(retVals));
+            defer.resolve(retVals);
         }
 
-        self._log.verbose(JSON.stringify(data));
+        function getFunc(err, data) {
+            self._log.debug(prefix + "returned from DB.query");
 
-        // We're returning one item.
-        if (!data.Item) keyItemFindFatal("no Item in single return");
-        processOneItem(data.Item);
+            // Any error returned from the database is fatal.
+            if (err) keyItemFindFatal(err);
 
-        defer.resolve(retVals);
-    }
+            // It should return one or zero items.
+            if (Object.keys(data).length === 0) {
+                defer.reject("not-found");
+                return;
+            }
 
-    if (options.keyAttributeValue) {
-        // We're querying for a certain value
-        self._log.verbose(prefix + "getting item...");
+            self._log.verbose(JSON.stringify(data));
 
-        // We're getting an item given the primary key
-        var getOptions = {
-            TableName: tableName,
-            Key: {}
-        };
-        getOptions.Key[options.keyAttributeName] = { 'S': options.keyAttributeValue };
+            // We're returning one item.
+            if (!data.Item) keyItemFindFatal("no Item in single return");
+            processOneItem(data.Item);
 
-        self._DB.getItem(getOptions, getFunc);
-    } else {
-        // We're returning all the values.
-        self._log.verbose(prefix + "scanning...");
+            defer.resolve(retVals);
+        }
 
-        // Set up the query's basic params.
-        var scanOptions = {
-            TableName: tableName
-        };
+        if (options.keyAttributeValue) {
+            // We're querying for a certain value
+            self._log.verbose(prefix + "getting item...");
 
-        self._DB.scan(scanOptions, scanFunc);
-    }
+            // We're getting an item given the primary key
+            var getOptions = {
+                TableName: tableName,
+                Key: {}
+            };
+            getOptions.Key[options.keyAttributeName] = { 'S': options.keyAttributeValue };
 
-    return defer.promise;
+            self._DB.getItem(getOptions, getFunc);
+        } else {
+            // We're returning all the values.
+            self._log.verbose(prefix + "scanning...");
+
+            // Set up the query's basic params.
+            var scanOptions = {
+                TableName: tableName
+            };
+
+            self._DB.scan(scanOptions, scanFunc);
+        }
+    });
 };
 
 /*
@@ -503,29 +496,34 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
 
     prefix = "AWSWrapper:keyItemDelete('" + tableName + "', '" + options.keyAttributeValue + "') ";
 
-    var defer = Q.defer();
 
-    // This is the function that gets passed to the query.
-    function deleteFunc(err, data) {
-        self._log.debug(prefix + "returned from DB.deleteItem");
+    // When the previous is done, we do our stuff.  If it fails, we want to fail.
+    return DeferSeq.add(tableName, function(defer, err, param) {
+        if (err) {
+            defer.reject(err);
+            return;
+        }
 
-        // Any error returned from the database is fatal.
-        if (err) keyItemDeleteFatal(err);
+        // This is the function that gets passed to the query.
+        function deleteFunc(err, data) {
+            self._log.debug(prefix + "returned from DB.deleteItem");
 
-        defer.resolve("deleted");
-    }
+            // Any error returned from the database is fatal.
+            if (err) keyItemDeleteFatal(err);
 
-    // Set up the query.
-    var deleteOptions = {
-        TableName: tableName,
-        Key: {}
-    };
-    deleteOptions.Key[options.keyAttributeName] = { "S": options.keyAttributeValue || "*" };
+            defer.resolve("deleted");
+        }
 
-    self._log.debug(prefix + "calling deleteItem");
-    self._DB.deleteItem(deleteOptions, deleteFunc);
+        // Set up the query.
+        var deleteOptions = {
+            TableName: tableName,
+            Key: {}
+        };
+        deleteOptions.Key[options.keyAttributeName] = { "S": options.keyAttributeValue || "*" };
 
-    return defer.promise;
+        self._log.debug(prefix + "calling deleteItem");
+        self._DB.deleteItem(deleteOptions, deleteFunc);
+    });
 };
 
 
@@ -549,46 +547,51 @@ AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
     if (!options.item[options.keyAttributeName]) itemAddFatal("with item not containing key attribute!");
     if (typeof options.item[options.keyAttributeName] !== "string") itemAddFatal("with item key attribute not a string!");
 
-    var defer = Q.defer();
 
-    function itemAddFunc(err, data) {
-        self._log.debug(prefix + "returned from DB.putItem");
-
-        // Any error other than item-already-exists returned from the database is fatal.
+    // When the previous is done, we do our stuff.  If it fails, we want to fail.
+    return DeferSeq.add(tableName, function(defer, err, param) {
         if (err) {
-            if (err.code === 'ConditionalCheckFailedException')
-                defer.reject('already-exists');
-            else
-                itemAddFatal(err);
+            defer.reject(err);
+            return;
         }
 
-        defer.resolve(options.item);
+        function itemAddFunc(err, data) {
+            self._log.debug(prefix + "returned from DB.putItem");
 
-    }
+            // Any error other than item-already-exists returned from the database is fatal.
+            if (err) {
+                if (err.code === 'ConditionalCheckFailedException')
+                    defer.reject('already-exists');
+                else
+                    itemAddFatal(err);
+            }
 
-    // Set up the basic query
-    var putOptions = {
-        TableName: tableName,
-        Item: {}
-    };
+            defer.resolve(options.item);
 
-    // We have to go through the properties of the item and massage them.
-    for (var iProp in options.item) {
-        var val = options.item[iProp];
-        if (typeof val !== "string") itemAddFatal(prefix + "item property not a string");
-        putOptions.Item[iProp] = { 'S': val };
-    }
+        }
 
-    // We don't expect the item to exist
-    if (!options.updating) {
-        putOptions.Expected = {};
-        putOptions.Expected[options.keyAttributeName] = { Exists: false };
-    }
+        // Set up the basic query
+        var putOptions = {
+            TableName: tableName,
+            Item: {}
+        };
 
-    self._log.debug(prefix + "calling putItem");
-    self._DB.putItem(putOptions, itemAddFunc);
+        // We have to go through the properties of the item and massage them.
+        for (var iProp in options.item) {
+            var val = options.item[iProp];
+            if (typeof val !== "string") itemAddFatal(prefix + "item property not a string");
+            putOptions.Item[iProp] = { 'S': val };
+        }
 
-    return defer.promise;
+        // We don't expect the item to exist
+        if (!options.updating) {
+            putOptions.Expected = {};
+            putOptions.Expected[options.keyAttributeName] = { Exists: false };
+        }
+
+        self._log.debug(prefix + "calling putItem");
+        self._DB.putItem(putOptions, itemAddFunc);
+    });
 };
 
 AWSWrapper.prototype.itemUpdate = function(tableName, options) {
@@ -600,8 +603,6 @@ AWSWrapper.prototype.itemAdd = function(tableName, options) {
     options.updating = false;
     return this._itemAddOrUpdate(tableName, options);
 };
-
-
 
 
 /*

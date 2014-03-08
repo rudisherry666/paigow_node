@@ -87,6 +87,8 @@ module.exports = {
                 func(defer, err, params);
             }
         );
+
+        return defer.promise;
     }
 };
 

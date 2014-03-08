@@ -5,9 +5,9 @@ console.log("test: PGUtils");
 
 describe('PGUtils', function() {
 
-    it('should return a resolved defer', function(done) {
-        PGUtils.resolvedDefer().promise
-            .fail( function(err) { assert.fail(err); })
-            .done( function()    { done(); });
+    it('should return a resolved defer', function() {
+        PGUtils.resolvedDefer().promise.then(
+            function(data) { assert.equal("PGUtils resolved defer", data); },
+            function(err)  { assert.fail(err); });
     });
 });
