@@ -101,7 +101,7 @@ PGDBPlayer.prototype.created = function() {
 
 // Return the computer player
 PGDBPlayer.prototype.computer = function() {
-    return this._initPromise.then(
+    return pgdbPlayerCreateComputerDefer.promise.then(
         function(data) { return pgdbPlayerComputer; },
         function(err)  { throw new Error(err); }
     );
