@@ -20,9 +20,18 @@ var PGLog = require('../../utils/pglog'),
 *
 */
 
+var pgdbGameLog = new PGLog('pgdbgame', 'debug');
+
 function PGDBGame(pgdbPlayer1, pgdbPlayer2) {
-    if (!pgdbPlayer1 || !(pgdbPlayer1 instanceof PGDBPlayer)) throw new Error("PGDBGame constructor called with bad player 1");
-    if (!pgdbPlayer2 || !(pgdbPlayer2 instanceof PGDBPlayer)) throw new Error("PGDBGame constructor called with bad player 2");
+    var prefix = "PGDBGame constructor ";
+    pgdbGameLog.debug(prefix + "called");
+    function pgdbGameConstructorFatal(err) {
+        pgdbGameLog.debug(prefix + err);
+        throw new Error(prefix + err);
+    }
+
+    if (!pgdbPlayer1 || !(pgdbPlayer1 instanceof PGDBPlayer)) pgdbGameConstructorFatal("bad player 1");
+    if (!pgdbPlayer2 || !(pgdbPlayer2 instanceof PGDBPlayer)) pgdbGameConstructorFatal("bad player 2");
 
     PGDB.call(this, 'Games', 'gameid');
     var self = this;
