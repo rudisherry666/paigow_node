@@ -8,9 +8,10 @@ console.log("test: PGDBGame");
 
 describe('PGDBGame', function() {
 
-    var pgdbPlayer1, pgdbPlayer2;
+    var pgdbPlayer1, computer;
 
     before(function(done) {
+        computer = PGDBPlayer.prototype.computer();
         pgdbPlayer1 = new PGDBPlayer();
         pgdbPlayer1.created().then(
             function(data) {

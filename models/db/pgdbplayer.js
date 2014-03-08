@@ -101,10 +101,8 @@ PGDBPlayer.prototype.created = function() {
 
 // Return the computer player
 PGDBPlayer.prototype.computer = function() {
-    return pgdbPlayerCreateComputerDefer.promise.then(
-        function(data) { return pgdbPlayerComputer; },
-        function(err)  { throw new Error(err); }
-    );
+    if (!pgdbPlayerComputer) throw new Error("PGDBPLayer.computer: called too soon!");
+    return pgdbPlayerComputer;
 };
 
 PGDBPlayer.prototype.deleteUser = function(username) {
