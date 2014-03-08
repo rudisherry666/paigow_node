@@ -13,7 +13,8 @@ var express = require('express'),
     PGHand = require('./models/pghand'),
     PGDeal = require('./models/pgdeal'),
     PGDBPlayer = require('./models/db/pgdbplayer'),
-    PGRoutePlayer = require('./routes/pgrouteplayer');
+    PGRoutePlayer = require('./routes/pgrouteplayer'),
+    PGRouteGame = require('./routes/pgroutegame');
 
 function PGServerApp() {
     this._log = new PGLog("app", 'debug');
@@ -70,7 +71,10 @@ PGServerApp.prototype._initWithSecrets = function(testing) {
     var pgdbPlayer;
     if (!testing)
         pgdbPlayer = new PGDBPlayer();
-    var pgRoutePlayer = new PGRoutePlayer(this._expressApp, pgdbPlayer);
+
+    // Initialize the routes
+    var pgRoutePlayer = new PGRoutePlayer(this._expressApp);
+    var pgRouteGame = new PGRouteGame(this._expressApp);
 
     // TODO: remove testing stuff below
 

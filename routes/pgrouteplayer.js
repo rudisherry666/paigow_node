@@ -13,10 +13,12 @@ var Q = require('q'),
     PGDBPlayer = require('../models/db/pgdbplayer'),
     PasswordHash = require('password-hash');
 
-function PGRoutePlayer(expressApp, pgdbPlayer) {
+var pgRoutePlayerLog = new PGLog("rteplayer", 'debug');
+
+function PGRoutePlayer(expressApp) {
     PGRouteBase.call(this, expressApp);
     var self = this;
-    self._log = new PGLog("rteplayer", 'debug');
+    pgRoutePlayerLog.debug("PGRoutePlayer constructor called");
 
     // Establish the endpoints.
     self._expressApp.get('/player', function(req, res) { self._getSessionUsername(req, res); });
@@ -33,7 +35,7 @@ util.inherits(PGRoutePlayer, PGRouteBase);
 */
 PGRoutePlayer.prototype._getSessionUsername = function(req, res) {
     var self = this;
-    self._log.debug("_getSessionUsername called");
+    pgRoutePlayerLog.debug("_getSessionUsername called");
 
     res.setHeader('Content-Type', 'application/json');
     self._getSessionPlayer(req).then(
@@ -50,7 +52,7 @@ PGRoutePlayer.prototype._getSessionUsername = function(req, res) {
 */
 PGRoutePlayer.prototype._setSessionPlayer = function(req, pgdbPlayer) {
     var self = this;
-    self._log.debug("_setSessionPlayer called");
+    pgRoutePlayerLog.debug("_setSessionPlayer called");
     if (!(pgdbPlayer instanceof PGDBPlayer)) throw new Error("_setSessionPlayer setting wrong type of object");
 
     PGSession.set(req, 'pgdbPlayer', pgdbPlayer);
@@ -70,26 +72,26 @@ PGRoutePlayer.prototype._setSessionPlayer = function(req, pgdbPlayer) {
 PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
     var self = this;
     var prefix = "PGRoutePlayer._registerOrSigninPlayer() ";
-    self._log.debug(prefix + "called ");
+    pgRoutePlayerLog.debug(prefix + "called ");
 
     res.setHeader('Content-Type', 'application/json');
 
     // We know the difference between signing in and registering by the state
     if (req.body.state === 'registering') {
-        self._log.debug("registering");
+        pgRoutePlayerLog.debug("registering");
         // This is a register
         self._registerNewUser(req, req.body.username, req.body.password).then(
             function(data) {
                 self._setSessionPlayer(req, data);
-                self._log.debug(prefix + "registering done" );
+                pgRoutePlayerLog.debug(prefix + "registering done" );
                 res.end(JSON.stringify({ username: PGSession.get(req, 'pgdbPlayer').username() }));
             },
             function(err) {
-                self._log.debug(prefix + "err registering: " + err);
+                pgRoutePlayerLog.debug(prefix + "err registering: " + err);
                 res.end(JSON.stringify({ err: err }));
             });
     } else {
-        self._log.debug(prefix + "signing in");
+        pgRoutePlayerLog.debug(prefix + "signing in");
         self._verifyPostedUsernameAndPassword(req, req.body.username, req.body.password).then(
             function(data) {
                 self._setSessionPlayer(req, data);
@@ -108,12 +110,12 @@ PGRoutePlayer.prototype._registerOrSigninPlayer = function(req, res) {
 */
 PGRoutePlayer.prototype._getSessionPlayer = function(req) {
     var self = this;
-    self._log.debug("_getSessionPlayer called");
+    pgRoutePlayerLog.debug("_getSessionPlayer called");
 
     // If there is no player, now is the time to create one.
     if (!PGSession.get(req, 'pgdbPlayer')) {
         self._setSessionPlayer(req, new PGDBPlayer());
-        self._log.debug("_getSessionPlayer created player" );
+        pgRoutePlayerLog.debug("_getSessionPlayer created player" );
     }
     return PGSession.get(req, 'pgdbPlayer').created();
 };
@@ -121,45 +123,45 @@ PGRoutePlayer.prototype._getSessionPlayer = function(req) {
 PGRoutePlayer.prototype._verifyPostedUsernameAndPassword = function(req, postedUsername, postedPassword) {
     var self = this;
     var prefix = "verifyPostedUsernameAndPassword('" + postedUsername + "') ";
-    self._log.debug(prefix + "called");
+    pgRoutePlayerLog.debug(prefix + "called");
 
     var defer = Q.defer();
     self._getSessionPlayer(req).then(
         function(pgdbPlayer) {
-            self._log.debug("getSessionPlayer returned a player");
+            pgRoutePlayerLog.debug("getSessionPlayer returned a player");
 
             // Fetch it and check the password.
             pgdbPlayer.find(postedUsername).then(
                 function(data) {
-                    self._log.debug(prefix + "find returned: " + JSON.stringify(data));
+                    pgRoutePlayerLog.debug(prefix + "find returned: " + JSON.stringify(data));
                     if (!(data instanceof Array)) {
-                        self._log.fatal(prefix + "non-array returned");
+                        pgRoutePlayerLog.fatal(prefix + "non-array returned");
                         defer.reject("non-array");
                     } else if (data.length !== 1) {
-                        self._log.fatal(prefix + "bad number of items returned");
+                        pgRoutePlayerLog.fatal(prefix + "bad number of items returned");
                         defer.reject("bad-array-length");
                     } else {
                         var user = data[0];
                         if (user.username !== postedUsername) {
-                            self._log.fatal(prefix + "username mismatch");
+                            pgRoutePlayerLog.fatal(prefix + "username mismatch");
                             defer.reject("bad-username");
                         } else {
-                            self._log.debug(prefix + "matching name");
+                            pgRoutePlayerLog.debug(prefix + "matching name");
                             if (PasswordHash.verify(postedPassword, user.hashedPassword)) {
-                                self._log.debug(prefix + "password match success");
+                                pgRoutePlayerLog.debug(prefix + "password match success");
                                 pgdbPlayer.setUsername(postedUsername).then(
                                     function(data) { defer.resolve(pgdbPlayer); },
                                     function(err)  { defer.reject(err); }
                                 );
                             } else {
-                                self._log.error(prefix + "password mismatch");
+                                pgRoutePlayerLog.error(prefix + "password mismatch");
                                 defer.reject();
                             }
                         }
                     }
                 },
                 function(err) {
-                    self._log.error(prefix + "find err: " + err);
+                    pgRoutePlayerLog.error(prefix + "find err: " + err);
                     defer.reject();
                 });
         },
@@ -187,42 +189,42 @@ PGRoutePlayer.prototype._verifyPostedUsernameAndPassword = function(req, postedU
 PGRoutePlayer.prototype._registerNewUser = function(req, postedUsername, postedPassword) {
     var self = this;
     var prefix = "PGRoutePlayer._registerNewUser('" + postedUsername + "') ";
-    self._log.debug(prefix + "called");
+    pgRoutePlayerLog.debug(prefix + "called");
 
     var defer = Q.defer();
 
     self._getSessionPlayer(req).then(
         function(pgdbPlayer) {
-            self._log.debug(prefix + "getSessionPlayer returned a player");
+            pgRoutePlayerLog.debug(prefix + "getSessionPlayer returned a player");
 
             // Can't have duplicates.
             // TODO: use 'Exists' in the 'Expected' property to avoid duplicates
             pgdbPlayer.find(postedUsername).then(
                 function() {
-                    self._log.warn(prefix + "rejected: name exists");
+                    pgRoutePlayerLog.warn(prefix + "rejected: name exists");
                     defer.reject("name-exists");
                 },
                 function(err) {
                     if (err === "not-found") {
-                        self._log.debug(prefix + "returned not-found, this is good");
+                        pgRoutePlayerLog.debug(prefix + "returned not-found, this is good");
                         var passHash = PasswordHash.generate(postedPassword);
                         var user = {username: postedUsername, hashedPassword: passHash};
                         pgdbPlayer.add(user).then(
                             function() {
-                                self._log.debug(prefix + "added user just fine");
+                                pgRoutePlayerLog.debug(prefix + "added user just fine");
                                 pgdbPlayer.setUsername(postedUsername).then(
                                     function(data) { defer.resolve(pgdbPlayer); },
                                     function(err)  { defer.reject(err); }
-                                );                                
+                                );                             
                             },
                             function(err) {
-                                self._log.error(prefix + "adding user: " + err);
+                                pgRoutePlayerLog.error(prefix + "adding user: " + err);
                                 defer.reject(err);
                             }
                         );
                     } else {
                         // Uh-oh, some other kind of error, bad news.
-                        self._log.error(prefix + "trying to fetch username" + err);
+                        pgRoutePlayerLog.error(prefix + "trying to fetch username" + err);
                         defer.reject("fetch-error " + err);
                     }
                 }
