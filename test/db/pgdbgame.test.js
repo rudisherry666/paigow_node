@@ -8,20 +8,20 @@ console.log("test: PGDBGame");
 
 describe('PGDBGame', function() {
 
-    var pgdbPlayer1, computer;
+    var pgdbPlayer, computer;
 
     before(function(done) {
-        computer = PGDBPlayer.prototype.computer();
-        pgdbPlayer1 = new PGDBPlayer();
-        pgdbPlayer1.created().then(
+        var cp = PGDBPlayer.prototype.computerPromise();
+        var pp = new PGDBPlayer().created();
+        Q.all([cp, pp]).then(
             function(data) {
-                pgdbPlayer2 = new PGDBPlayer();
-                pgdbPlayer2.created().then(
-                    function(data) { },
-                    function(err) { assert.fail(err); }
-                ).done(function()  { done(); });
+                computer = data[0];
+                pgdbPlayer = data[1];
+                assert(computer instanceof PGDBPlayer, "Computer is not a PGDBPlayer");
+                assert(pgdbPlayer instanceof PGDBPlayer, "Player is not a PGDBPlayer");
+                done();
             },
-            function(err) { assert.fail(err); done(); }
+            function(err)  { assert.fail(err); }
         );
     });
 
@@ -31,24 +31,24 @@ describe('PGDBGame', function() {
             pgdbGame = new PGDBGame();
         });
         assert.throws(function() {
-            pgdbGame = new PGDBGame(pgdbPlayer1);
+            pgdbGame = new PGDBGame(pgdbPlayer);
         });
     });
 
     it('should throw if called with non-players', function() {
         var pgdbGame;
         assert.throws(function() {
-            pgdbGame = new PGDBGame(5, pgdbPlayer2);
+            pgdbGame = new PGDBGame(5, pgdbPlayer);
         });
         assert.throws(function() {
-            pgdbGame = new PGDBGame(pgdbPlayer1, {});
+            pgdbGame = new PGDBGame(pgdbPlayer, {});
         });
     });
 
     it('should return a PGDBGame object', function() {
-        var pgdbGame = new PGDBGame(pgdbPlayer1, pgdbPlayer2);
+        var pgdbGame = new PGDBGame(pgdbPlayer, computer);
         assert.notEqual(pgdbGame, null);
-        assert.equal(pgdbGame.player1(), pgdbPlayer1);
-        assert.equal(pgdbGame.player2(), pgdbPlayer2);
+        assert.equal(pgdbGame.player1(), pgdbPlayer);
+        assert.equal(pgdbGame.player2(), computer);
     });
 });
