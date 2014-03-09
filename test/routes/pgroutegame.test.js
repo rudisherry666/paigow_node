@@ -29,6 +29,7 @@ describe('GET /game', function() {
         pgLog.debug("test: should return a 200 status code");
         http.get({ host: '0.0.0.0', port: 8088, path: "/games" }, function(res) {
             assert.deepEqual(res.statusCode, 200);
+            assert.equal(res.body, {});
         }).on('finish', function() {
             done();
         });
