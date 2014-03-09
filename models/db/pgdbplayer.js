@@ -49,7 +49,7 @@ function PGDBPlayer(props) {
                     },
                     function(err)  {
                         if (err !== "not-found") {
-                            pgPlayerLog.fatal(prefix + "error trying to find computer: " + err);
+                            pgPlayerLog.error(prefix + "error trying to find computer: " + err);
                             pgdbPlayerCreateComputerDefer.reject(err);                             // uh-oh
                         } else {
                             pgPlayerLog.debug(prefix + "need to create computer");
@@ -58,13 +58,22 @@ function PGDBPlayer(props) {
                                 passwordHash: PasswordHash.generate('I am the computer')
                             };
                             var _pgdbPlayerComputer = new PGDBPlayer(computerItem);
-                            _pgdbPlayerComputer.add(computerItem).then(
+                            _pgdbPlayerComputer._initPromise.then(
                                 function(data) {
-                                    pgdbPlayerComputer = _pgdbPlayerComputer;
-                                    pgdbPlayerCreateComputerDefer.resolve(pgdbPlayerComputer);   // created computer, that's good
+                                    pgPlayerLog.debug(prefix + "initPromise for computer resolved");
+                                    _pgdbPlayerComputer.add(computerItem).then(
+                                        function(data) {
+                                            pgdbPlayerComputer = _pgdbPlayerComputer;
+                                            pgdbPlayerCreateComputerDefer.resolve(pgdbPlayerComputer);   // created computer, that's good
+                                        },
+                                        function(err) {
+                                            pgPlayerLog.error(prefix + "error trying to add computer: " + err);
+                                            pgdbPlayerCreateComputerDefer.reject(err);                     // uh-oh
+                                        }
+                                    );
                                 },
                                 function(err) {
-                                    pgPlayerLog.fatal(prefix + "error trying to add computer: " + err);
+                                    pgPlayerLog.error(prefix + "initPromise error trying to add computer: " + err);
                                     pgdbPlayerCreateComputerDefer.reject(err);                     // uh-oh
                                 }
                             );
