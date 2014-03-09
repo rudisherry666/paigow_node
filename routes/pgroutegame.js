@@ -38,7 +38,7 @@ PGRouteGame.prototype._getSessionGame = function(req, res) {
     pgRouteGameLog.debug("_getSessionGame called");
 
     // If there is no game, we return 404
-    PGSession.get(req, 'pgdbGame').then(
+    PGSession.get(req, 'game').then(
         function(data) { res.end(JSON.stringify(pgdbGame)); },
         function(err)  { res.end(404); }
     );
@@ -57,8 +57,9 @@ PGRouteGame.prototype._getSessionGames = function(req, res) {
 
     res.setHeader('Content-Type', 'application/json');
 
+    // There is a player. Find out what games he's in.
+
     // Get the games from the player.  Right now there are none.
-    res.end(JSON.stringify({}));
 };
 
 
@@ -77,8 +78,17 @@ PGRouteGame.prototype._newGame = function(req, res) {
 
     res.setHeader('Content-Type', 'application/json');
 
-    // We know the difference between signing in and registering by the state
-    res.end(404);
+    // Get the player so we can find games for this player.
+    var sessionPlayer = PGSession.get(req, 'player');
+    if (!sessionPlayer) {
+        pgRoutGameLog.error(prefix + "no player for this game");
+        res.end(500);
+    }
+
+    var sessionGame = new PGDBGame(sessionPlayer, PGDBPlayer.prototype.computer());
+    sessionGame.add()
+    PGSession.set('game', sessionGame);
+
 };
 
 
