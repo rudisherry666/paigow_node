@@ -48,8 +48,9 @@ module.exports = {
     * @param params {anything} the params to call the function with
     */
     add: function(key, func, params) {
+        var prefix = "add('" + key + "') ";
 
-        dsPGLog.debug("add called");
+        dsPGLog.debug(prefix + "called");
 
         // Every func gets a new defer.
         var defer = Q.defer();
@@ -59,7 +60,7 @@ module.exports = {
         if (!keyDefers)
             keyDefers = dsKeys[key] = [];
 
-        dsPGLog.debug("already " + keyDefers.length + " defers on list");
+        dsPGLog.debug(prefix + "already " + keyDefers.length + " defers on list");
 
         // Get the previous defer so we can trigger executing this func when it's done.
         var lastDefer = keyDefers.length > 0 ? keyDefers[keyDefers.length-1] : null;
@@ -69,26 +70,35 @@ module.exports = {
         // Add this defer to the defer list.
         keyDefers.push(defer);
 
-        // When this defer is done, the first thing we do is take it off the list.
-        // We have to use .then() rather than done because all the then()s get
-        // executed before done.  We want to it on rejection or success.
-        defer.promise.then(
-            function() { removeDoneDefer(key, defer); },
-            function() { removeDoneDefer(key, defer); }
-        );
-
-        // Set up to execute this function when the previous defer is done.
-        lastDefer.promise.then(
+        // Set up to execute this function when the previous defer is done, and return
+        // its value (which may be a promise or the output of this promise).
+        return lastDefer.promise.then(
             function(data) {
-                func(defer, null, params);
+                dsPGLog.debug(prefix + "calling function");
+                var funcVal = func(null, params);
+                dsPGLog.debug(prefix + "function returned: " + funcVal);
+                return funcVal;
             },
             function(err) {
-                dsPGLog.error("rejected defer from '" + key + "': " + err);
-                func(defer, err, params);
+                dsPGLog.error(prefix + "rejected defer from '" + key + "': " + err);
+                func(err, params);
+                throw new Error(prefix + "rejected defer from '" + key + "': " + err);
             }
-        );
+        ).fin(function() {
+            // When this defer.then is done, the first thing we do is take it off the list.
+            // We have to use .then() rather than done because all the then()s get
+            // executed before done.  We want to it on rejection or success.
+            dsPGLog.debug(prefix + "previous promise done, removing");
+            removeDoneDefer(key, defer);
 
-        return defer.promise;
+            // Whatever hapened in the last one, we let the next guy go, but pass
+            // the success or error on.
+            switch (lastDefer.promise.inspect().state) {
+                case "fulfilled": defer.resolve(lastDefer.promise.inspect().value); break;
+                case "rejected": defer.reject(lastDefer.promise.inspect().reason); break;
+                default: throw new Error("bad promise state: " + lastDefer.promise.inspect().state);
+            }
+        });
     }
 };
 
