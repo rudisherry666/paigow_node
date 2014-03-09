@@ -67,7 +67,7 @@ describe('PGDB', function() {
         );
     });
 
-    it('should allow adding properties', function(done) {
+    it('should allow adding single properties', function(done) {
         var item = { key1: "add-prop" };
         var finalItem = {
             key1: "add-prop",

@@ -15,12 +15,13 @@ var PGLog = require('../../utils/pglog'),
 // This is used for tests usually.
 var gDBPrefix = "";
 
+var pgdbLog = new PGLog('pgdb', 'debug');
+
 /*
 * @constructor PGDB
 *
 */
 function PGDB(tableName, keyAttributeName) {
-    this._log = new PGLog("PGDB", 'debug');
     if (!tableName) throw new Error("PBDB: no table name!");
     if (!keyAttributeName) throw new Error("PBDB: no keyAttribute name!");
     this._awsWrapper = new AWSWrapper();
@@ -75,7 +76,7 @@ PGDB.prototype.fullTableName = function(tableName) {
 */
 PGDB.prototype._init = function() {
     var self = this;
-    self._log.debug("PGDB._init called for '" + self.fullTableName() + "'");
+    pgdbLog.debug("PGDB._init called for '" + self.fullTableName() + "'");
 
     var defer = Q.defer();
 
@@ -96,7 +97,7 @@ PGDB.prototype._init = function() {
 PGDB.prototype.find = function(keyValue) {
     var self = this;
     var prefix = "PGDB.find('" + self.fullTableName() + "') ";
-    self._log.debug(prefix + "called");
+    pgdbLog.debug(prefix + "called");
 
     var options = { keyAttributeName: self._keyAttributeName };
     if (keyValue) options.keyAttributeValue = keyValue;
@@ -110,7 +111,7 @@ PGDB.prototype.find = function(keyValue) {
 PGDB.prototype.delete = function(keyValue) {
     var self = this;
     var prefix = "PGDB.delete('" + self.fullTableName() + "') ";
-    self._log.debug(prefix + "called");
+    pgdbLog.debug(prefix + "called");
 
     var options = { keyAttributeName: self._keyAttributeName };
     if (keyValue) options.keyAttributeValue = keyValue;
@@ -124,7 +125,7 @@ PGDB.prototype.delete = function(keyValue) {
 PGDB.prototype.add = function(item) {
     var self = this;
     var prefix = "PGDB.add('" + self.fullTableName() + "') ";
-    self._log.debug(prefix + "called");
+    pgdbLog.debug(prefix + "called");
 
     var options = {
         item: item,
@@ -141,13 +142,14 @@ PGDB.prototype.add = function(item) {
 };
 
 /*
-* Add an item, assumed string, assumed key
+* Update an item, assumed string, assumed key.  This completely overwrites
+* the previous item; to change properties, use set() for each one.
 *
 */
 PGDB.prototype.update = function(item, options) {
     var self = this;
     var prefix = "PGDB.update('" + self.fullTableName() + "') ";
-    self._log.debug(prefix + "called");
+    pgdbLog.debug(prefix + "called");
 
     // Set the props now, but reset them if we fail.
     var oldProps;
@@ -176,7 +178,7 @@ PGDB.prototype.update = function(item, options) {
 PGDB.prototype.get = function(propName) {
     var self = this;
     var prefix = "PGDB.get('" + self.fullTableName() + "', '" + propName + "') ";
-    self._log.debug(prefix + "called");
+    pgdbLog.debug(prefix + "called");
 
     return self._props[propName];
 };
@@ -188,14 +190,21 @@ PGDB.prototype.get = function(propName) {
 PGDB.prototype.set = function(propName, propVal) {
     var self = this;
     var prefix = "PGDB.set('" + self.fullTableName() + "', " + propName + "') ";
-    self._log.debug(prefix + "called");
+    pgdbLog.debug(prefix + "called");
+
+    function setFatal(err) {
+        pgdbLog.fatal(prefix + err);
+        throw new Error(prefix + err);
+    }
+
+    if (!propName) setFatal("no propName");
 
     // Reset the props but in the internal call we don't have to update
     // all the props.  Also we set the value so retrieval will get it,
     // but we'll unset it if the update failed.
     var promise;
     if (self._props[propName] !== propVal) {
-        self._log.debug(prefix + "new value: " + propVal);
+        pgdbLog.debug(prefix + "new value: " + propVal);
         var oldVal = self._props[propName];
         if (typeof propVal === "undefined")
             delete self._props[propName];
@@ -203,16 +212,16 @@ PGDB.prototype.set = function(propName, propVal) {
             self._props[propName] = propVal;
         promise = self.update(self._props, {internal:true});
         promise.fail( function(data) {
-            self._log.error(prefix + "new value FAILED");
+            pgdbLog.error(prefix + "new value FAILED");
             if (typeof oldVal === "undefined")
                 delete self._props[propName];
             else
                 self._props[propName] = oldVal;
         });
     } else {
-        self._log.debug(prefix + "unchanged");
+        pgdbLog.debug(prefix + "unchanged");
         var defer = Q.defer();
-        defer.resolve();
+        defer.resolve(self);
         promise = defer.promise;
     }
 

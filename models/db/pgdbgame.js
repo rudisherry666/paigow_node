@@ -8,7 +8,8 @@
 */
 
 // Module dependencies.
-var PGLog = require('../../utils/pglog'),
+var crypto = require('crypto'),
+    PGLog = require('../../utils/pglog'),
     Q = require('q'),
     PGDB = require('./pgdb'),
     PGDBPlayer = require('./pgdbplayer'),
@@ -22,34 +23,60 @@ var PGLog = require('../../utils/pglog'),
 
 var pgdbGameLog = new PGLog('pgdbgame', 'debug');
 
-function PGDBGame(pgdbPlayer1, pgdbPlayer2) {
+function PGDBGame(player1, player2) {
     var prefix = "PGDBGame constructor ";
     pgdbGameLog.debug(prefix + "called");
+
     function pgdbGameConstructorFatal(err) {
         pgdbGameLog.debug(prefix + err);
         throw new Error(prefix + err);
     }
-
-    if (!pgdbPlayer1 || !(pgdbPlayer1 instanceof PGDBPlayer)) pgdbGameConstructorFatal("bad player 1");
-    if (!pgdbPlayer2 || !(pgdbPlayer2 instanceof PGDBPlayer)) pgdbGameConstructorFatal("bad player 2");
+    if (!player1 || !(player1 instanceof PGDBPlayer)) pgdbGameConstructorFatal("bad player 1");
+    if (!player2 || !(player2 instanceof PGDBPlayer)) pgdbGameConstructorFatal("bad player 2");
 
     PGDB.call(this, 'Games', 'gameid');
     var self = this;
-    self._log = new PGLog('game', 'debug');
 
-    this._pgdbPlayer1 = pgdbPlayer1;
-    this._pgdbPlayer2 = pgdbPlayer2;
+    // Create a random game ID.  In the extremely unlikely event that the random string is already
+    // created, too bad.
+    self._origSavePromise =
+        self.set('gameid', crypto.randomBytes(10).toString('base64')).then(
+            function(data) {
+                return self.set('players', [
+                    player1.username(),
+                    player2.username()
+                ]);
+            },
+            function(err)  { pgdbGameConstructorFatal("random game ID already exists"); }
+        );
 }
 
 // Extend from PGDB.
 util.inherits(PGDBGame, PGDB);
 
+// Override created.
+PGDBGame.prototype.created = function() {
+    console.log('created');
+    return this._initPromise.then(
+        function(data) { return self._origSavePromise; },
+        function(err)  { throw new Error(err); }
+    );
+};
+
 PGDBGame.prototype.player1 = function() {
-    return this._pgdbPlayer1;
+    var players = this.get('players');
+    if (players)
+        return players[0];
+    else
+        return null;
 };
 
 PGDBGame.prototype.player2 = function() {
-    return this._pgdbPlayer2;
+    var players = this.get('players');
+    if (players)
+        return players[1];
+    else
+        return null;
 };
 
 module.exports = PGDBGame;
