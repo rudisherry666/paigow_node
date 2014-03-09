@@ -357,11 +357,11 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
                 // Each property in the the item has to be an object, with a string.
                 if (typeof propItem !== "object") keyItemFindFatal("property '" + itemProp + "'is not object, it's " + typeof propItem);
 
-                // For now we assume everything is a string.
-                if (!propItem.S) keyItemFindFatal("property '" + itemProp + "' doesn't have 'S' property");
+                // For now we assume everything is a string or array of strings.
+                if (!propItem.S && !propItem.SS) keyItemFindFatal("property '" + itemProp + "' doesn't have 'S' or 'SS' property");
 
                 // Add this property to the returned item.
-                oneVal[itemProp] = propItem.S;
+                oneVal[itemProp] = propItem.S || propItem.SS;
             }
 
             // The item has to have the keyAttribute.
@@ -530,9 +530,9 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
 
 AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
     var self = this;
-    self._log.debug("itemAdd('" + tableName + "')");
+    var prefix = "AWSWrapper:itemAdd('" + tableName + "') ";
+    self._log.debug(prefix + "called");
 
-    var prefix = "AWSWrapper:itemAdd('" + tableName + "')";
 
     // Any issues, we bail and throw.
     function itemAddFatal(err) {
@@ -580,8 +580,14 @@ AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
         // We have to go through the properties of the item and massage them.
         for (var iProp in options.item) {
             var val = options.item[iProp];
-            if (typeof val !== "string") itemAddFatal(prefix + "item property not a string");
-            putOptions.Item[iProp] = { 'S': val };
+            if (typeof val === "string")
+                    putOptions.Item[iProp] = { 'S': val };
+            else if (val instanceof Array) {
+                for (var vi = 0; vi < val.length; vi++)
+                    if (typeof val[vi] !== "string") itemAddFatal("array contains non-string");
+                putOptions.Item[iProp] = { 'SS': val };
+            } else
+                itemAddFatal("prop value is neither array nor string");
         }
 
         // We don't expect the item to exist

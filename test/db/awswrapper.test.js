@@ -137,76 +137,6 @@ describe('AWSWrapper', function() {
             function(err) { assert.fail(err); done(); }
         );
     });
-    it('should return not-found when searching for a specific item', function(done) {
-        var tableName = 'test-table-return-not-found';
-        var keyName = 'myKey';
-        awsWrapper1.tableCreate(tableName, 'myKey').then(
-            function() {
-                awsWrapper1.keyItemFind(tableName, {keyAttributeName: keyName, keyAttributeValue: 'foo'}).then(
-                    function()    { assert.fail("did not reject with not-found"); },
-                    function(err) { assert.equal(err, "not-found"); }
-                ).done(function() { done(); });
-            },
-            function() {
-                assert.fail(err);
-                done();
-            }
-        );
-    });
-    it('should allow adding an item and but not again', function(done) {
-        var tableName = 'test-table-test-add';
-        var keyName = 'myKey';
-        awsWrapper1.tableCreate(tableName, 'myKey').then(
-            function() {
-                var item = {};
-                item[keyName] = 'hello';
-                awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
-                    function(data) {
-                        assert.equal(item, data);
-                        awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
-                            function(data) { assert.fail( "allowed adding again"); },
-                            function(err)  { assert.equal(err, "already-exists"); }
-                        ).done(function()  { done(); });
-                    },
-                    function(err)  {
-                        assert.fail("rejected adding item: " + err);
-                    }
-                );
-            },
-            function() {
-                assert.fail(err);
-                done();
-            }
-        );
-    });
-    it('should allow adding an item and updating it', function(done) {
-        var tableName = 'test-table-test-add-update';
-        var keyName = 'myKey';
-        awsWrapper1.tableCreate(tableName, 'myKey').then(
-            function() {
-                var item = { foo: "bar" };
-                item[keyName] = 'hello';
-                awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
-                    function(data) {
-                        assert.equal(item, data);
-                        item.foo = "mumble";
-                        awsWrapper1.itemUpdate(tableName, {keyAttributeName: keyName, item:item}).then(
-                            function(data)  { assert.equal(data, item); },
-                            function(err) { assert.fail(err); }
-                        ).done(function()  { done(); });
-                    },
-                    function(err)  {
-                        assert.fail("rejected adding item: " + err);
-                        done();
-                    }
-                );
-            },
-            function() {
-                assert.fail(err);
-                done();
-            }
-        );
-    });
     it('should not leave any tables with a certain prefix', function(done) {
         var tableName = 'testx-table-create-prefix';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
@@ -280,6 +210,93 @@ describe('AWSWrapper', function() {
                         done();
                     }
                 );
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should return not-found when searching for a specific item', function(done) {
+        var tableName = 'test-table-return-not-found';
+        var keyName = 'myKey';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                awsWrapper1.keyItemFind(tableName, {keyAttributeName: keyName, keyAttributeValue: 'foo'}).then(
+                    function()    { assert.fail("did not reject with not-found"); },
+                    function(err) { assert.equal(err, "not-found"); }
+                ).done(function() { done(); });
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should allow adding an item and but not again', function(done) {
+        var tableName = 'test-table-test-add';
+        var keyName = 'myKey';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                var item = {};
+                item[keyName] = 'hello';
+                awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
+                    function(data) {
+                        assert.equal(item, data);
+                        awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
+                            function(data) { assert.fail( "allowed adding again"); },
+                            function(err)  { assert.equal(err, "already-exists"); }
+                        ).done(function()  { done(); });
+                    },
+                    function(err)  {
+                        assert.fail("rejected adding item: " + err);
+                    }
+                );
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should allow adding an item and updating it', function(done) {
+        var tableName = 'test-table-test-add-update';
+        var keyName = 'myKey';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                var item = { foo: "bar" };
+                item[keyName] = 'hello';
+                awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
+                    function(data) {
+                        assert.equal(item, data);
+                        item.foo = "mumble";
+                        awsWrapper1.itemUpdate(tableName, {keyAttributeName: keyName, item:item}).then(
+                            function(data)  { assert.equal(data, item); },
+                            function(err) { assert.fail(err); }
+                        ).done(function()  { done(); });
+                    },
+                    function(err)  {
+                        assert.fail("rejected adding item: " + err);
+                        done();
+                    }
+                );
+            },
+            function() {
+                assert.fail(err);
+                done();
+            }
+        );
+    });
+    it('should correctly set an array value', function(done) {
+        var tableName = 'test-table-test-add-array';
+        var keyName = 'myKey';
+        awsWrapper1.tableCreate(tableName, 'myKey').then(
+            function() {
+                var item = { myKey: 'test', otherKey: ['hello', 'darling'] };
+                awsWrapper1.itemAdd(tableName, {keyAttributeName: keyName, item:item}).then(
+                    function(data) { assert.equal(item, data); },
+                    function(err)  { assert.fail("rejected adding array: " + err); }
+                ).done(function()  { done(); });
             },
             function() {
                 assert.fail(err);
