@@ -31,7 +31,6 @@ var awsLog = new PGLog('aws', 'warn');
 *
 */
 function AWSWrapper() {
-    awsLog = new PGLog("AWS", 'debug');
     if (!awsDB) {
         if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !process.env.AWS_REGION || !process.env.AWS_ENDPOINT) {
             awsLog.fatal("ERROR cannot start dynamoDB: environment variables are not set up!");

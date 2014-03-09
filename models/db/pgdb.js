@@ -15,7 +15,7 @@ var PGLog = require('../../utils/pglog'),
 // This is used for tests usually.
 var gDBPrefix = "";
 
-var pgdbLog = new PGLog('pgdb', 'debug');
+var pgdbLog = new PGLog('pgdb', 'warn');
 
 /*
 * @constructor PGDB
@@ -170,7 +170,7 @@ PGDB.prototype.update = function(item, options) {
     // props to the old props.
     promise.then(
         function(data) {
-            pgdbLog.debug(prefix + "aws resolved, resolving with " + self);
+            pgdbLog.verbose(prefix + "aws resolved, resolving with " + self);
             defer.resolve(self);
         },
         function(err)  {
@@ -190,8 +190,8 @@ PGDB.prototype.update = function(item, options) {
 PGDB.prototype.get = function(propName) {
     var self = this;
     var prefix = "PGDB.get('" + self.fullTableName() + "', '" + propName + "') ";
-    pgdbLog.debug(prefix + "called");
-
+    pgdbLog.verbose(prefix + "called");
+    pgdbLog.verbose(prefix + "returning: " + JSON.stringify(self._props[propName]));
     return self._props[propName];
 };
 
@@ -216,7 +216,7 @@ PGDB.prototype.set = function(propName, propVal) {
     // but we'll unset it if the update failed.
     var promise;
     if (self._props[propName] !== propVal) {
-        pgdbLog.debug(prefix + "new value: " + propVal);
+        pgdbLog.verbose(prefix + "new value: " + propVal);
         var oldVal = self._props[propName];
         if (typeof propVal === "undefined")
             delete self._props[propName];
@@ -231,7 +231,7 @@ PGDB.prototype.set = function(propName, propVal) {
                 self._props[propName] = oldVal;
         });
     } else {
-        pgdbLog.debug(prefix + "unchanged");
+        pgdbLog.verbose(prefix + "unchanged");
         var defer = Q.defer();
         defer.resolve(self);
         promise = defer.promise;
