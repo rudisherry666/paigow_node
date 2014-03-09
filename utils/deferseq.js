@@ -11,7 +11,7 @@ var Q = require('q'),
     PGLog = require('./pglog'),
     PGUtils = require('./pgutils');
 
-var dsPGLog = new PGLog('deferseq', 'debug');
+var dsPGLog = new PGLog('deferseq', 'warn');
 
 // The keys for this defer.
 var dsKeys = {};
