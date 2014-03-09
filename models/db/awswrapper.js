@@ -127,6 +127,7 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
     // When the previous is done, we do our stuff.  If it fails, we want to fail.
     return DeferSeq.add(tableName, function(defer, err, param) {
         if (err) {
+            self._log(prfix + "defer rejected, rejecting add");
             defer.reject(err);
             return;
         }
@@ -209,7 +210,7 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
                 // May already be gone; that's OK.
                 if (err.code && err.code === 'ResourceNotFoundException') {
                     self._log.debug(prefix + "already gone");
-                    defer.resolve();
+                    defer.resolve("table deleted");
                 } else {
                     tableDeleteFatal("bad error: " + error);
                 }
