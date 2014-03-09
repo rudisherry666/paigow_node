@@ -1,6 +1,6 @@
 var Q = require('q'),
-    Before = require('../before.test'),
-    PGDB = require('../../models/db/pgdb'),
+    Before = require('../../before.test'),
+    PGDB = require('../../../models/db/pgdb'),
     assert = require('assert');
 
 console.log("test: db.PGDB");

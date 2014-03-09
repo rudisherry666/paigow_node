@@ -1,6 +1,6 @@
-var PGLog = require('../../utils/pglog'),
-    Before = require('../before.test'),
-    PGDBPlayer = require('../../models/db/pgdbplayer'),
+var PGLog = require('../../../utils/pglog'),
+    Before = require('../../before.test'),
+    PGDBPlayer = require('../../../models/db/pgdbplayer'),
     assert = require('assert');
 
 console.log("test: db.PGDBPlayer");

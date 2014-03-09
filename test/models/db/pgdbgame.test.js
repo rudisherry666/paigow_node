@@ -1,8 +1,8 @@
 var Q = require('q'),
-    Before = require('../before.test'),
+    Before = require('../../before.test'),
     assert = require('assert'),
-    PGDBPlayer = require('../../models/db/pgdbplayer'),
-    PGDBGame = require('../../models/db/pgdbgame');
+    PGDBPlayer = require('../../../models/db/pgdbplayer'),
+    PGDBGame = require('../../../models/db/pgdbgame');
 
 console.log("test: PGDBGame");
 

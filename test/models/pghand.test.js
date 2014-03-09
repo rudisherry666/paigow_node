@@ -1,7 +1,7 @@
-var before = require('./before.test'),
+var before = require('../before.test'),
     assert = require('assert'),
-    PGTile = require('../models/pgtile'),
-    PGHand = require('../models/pghand');
+    PGTile = require('../../models/pgtile'),
+    PGHand = require('../../models/pghand');
 
 console.log("test: PGHand");
 

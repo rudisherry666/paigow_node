@@ -1,6 +1,6 @@
-var Before = require('../before.test'),
+var Before = require('../../before.test'),
     Q = require('q'),
-    AWSWrapper = require('../../models/db/awswrapper'),
+    AWSWrapper = require('../../../models/db/awswrapper'),
     assert = require('assert');
 
 console.log("test: db.AWSWrapper");
