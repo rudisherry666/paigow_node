@@ -21,11 +21,11 @@ var crypto = require('crypto'),
 *
 */
 
-var pgdbGameLog = new PGLog('pgdbgame', 'debug');
+var pgdbGameLog = new PGLog('pgdbgame', 'verbose');
 
 function PGDBGame(player1, player2) {
     var prefix = "PGDBGame constructor ";
-    pgdbGameLog.debug(prefix + "called");
+    pgdbGameLog.verbose(prefix + "called");
 
     function pgdbGameConstructorFatal(err) {
         pgdbGameLog.fatal(prefix + err);
@@ -42,7 +42,7 @@ function PGDBGame(player1, player2) {
     self._origSavePromise =
         self.set('gameid', crypto.randomBytes(10).toString('base64')).then(
             function(data) {
-                pgdbGameLog.debug(prefix + "orig name resolved: " + data);
+                pgdbGameLog.verbose(prefix + "orig name resolved: " + data);
                 return self.set('players', [
                     player1.username(),
                     player2.username()
@@ -57,14 +57,12 @@ util.inherits(PGDBGame, PGDB);
 
 // Override created.
 PGDBGame.prototype.created = function() {
-    pgdbGameLog.debug('PGDBGame.created called');
-    return this._initPromise.then(
-        function(data) {
-            pgdbGameLog.debug('PGDBGame.created resolved');
-            return this._origSavePromise;
-        },
+    var self = this;
+
+    return self._initPromise.then(
+        function(data) { return self._origSavePromise; },
         function(err)  {
-            pgdbGameLog.debug('PGDBGame.created rejected');
+            pgdbGameLog.verbose('PGDBGame.created rejected');
             throw new Error(err);
         }
     );
