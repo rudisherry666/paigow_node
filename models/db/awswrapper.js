@@ -125,12 +125,12 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
     prefix = "AWSWrapper.tableCreate('" + tableName + "', '" + keyAttributeName + "') ";
 
     // When the previous is done, we do our stuff.  If it fails, we want to fail.
-    return DeferSeq.add(tableName, function(defer, err, param) {
-        if (err) {
-            self._log(prfix + "defer rejected, rejecting add");
-            defer.reject(err);
-            return;
-        }
+    return DeferSeq.add(tableName, function(err, param) {
+
+        if (err) tableCreateFatal(prefix + "deferSeq rejected");
+
+        // We return a promise so we're finished before the next guy.
+        var defer = Q.defer();
 
         // If the table already exists, we're done.
         self.tableStatus(tableName).then(
@@ -174,6 +174,8 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
                 self._log(prefix + "error from tableSatatus: " + err);
                 defer.reject(err);
             });
+
+        return defer.promise;
     });
 };
 
@@ -199,11 +201,12 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
     if (!tableName || (typeof tableName !== "string")) tableDeleteFatal("bad tableName");
 
     // When the previous is done, we do our stuff.  If it fails, we want to fail.
-    return DeferSeq.add(tableName, function(defer, err, param) {
-        if (err) {
-            defer.reject(err);
-            return;
-        }
+    return DeferSeq.add(tableName, function(err, param) {
+
+        if (err) tableDeleteFatal(prefix + "deferSeq rejected");
+
+        // We return a promise so we're finished before the next guy.
+        var defer = Q.defer();
 
         awsDB.deleteTable({TableName:tableName}, function(err, data) {
             if (err) {
@@ -219,6 +222,8 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
                 self._waitForDeletToFinish(tableName, defer);
             }
         });
+
+        return defer.promise;
     });
 };
 
@@ -338,11 +343,12 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
     prefix = "AWSWrapper.keyItemFind('" + tableName + "', '" + options.keyAttributeValue + "') ";
 
     // When the previous is done, we do our stuff.  If it fails, we want to fail.
-    return DeferSeq.add(tableName, function(defer, err, param) {
-        if (err) {
-            defer.reject(err);
-            return;
-        }
+    return DeferSeq.add(tableName, function(err, param) {
+
+        if (err) keyItemFindFatal(prefix + "deferSeq rejected");
+
+        // We return a promise so we're finished before the next guy.
+        var defer = Q.defer();
 
         // We return an array of items; initialize the array.
         var retVals = [];
@@ -461,6 +467,8 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
 
             self._DB.scan(scanOptions, scanFunc);
         }
+
+        return defer.promise;
     });
 };
 
@@ -499,11 +507,12 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
 
 
     // When the previous is done, we do our stuff.  If it fails, we want to fail.
-    return DeferSeq.add(tableName, function(defer, err, param) {
-        if (err) {
-            defer.reject(err);
-            return;
-        }
+    return DeferSeq.add(tableName, function(err, param) {
+
+        if (err) keyItemDeleteFatal(prefix + "deferSeq rejected");
+
+        // We return a promise so we're finished before the next guy.
+        var defer = Q.defer();
 
         // This is the function that gets passed to the query.
         function deleteFunc(err, data) {
@@ -524,6 +533,8 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
 
         self._log.debug(prefix + "calling deleteItem");
         self._DB.deleteItem(deleteOptions, deleteFunc);
+
+        return defer.promise;
     });
 };
 
@@ -550,11 +561,12 @@ AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
 
 
     // When the previous is done, we do our stuff.  If it fails, we want to fail.
-    return DeferSeq.add(tableName, function(defer, err, param) {
-        if (err) {
-            defer.reject(err);
-            return;
-        }
+    return DeferSeq.add(tableName, function(err, param) {
+
+        if (err) itemAddFatal(prefix + "deferSeq rejected");
+
+        // We return a promise so we're finished before the next guy.
+        var defer = Q.defer();
 
         function itemAddFunc(err, data) {
             self._log.debug(prefix + "returned from DB.putItem");
@@ -568,7 +580,6 @@ AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
             }
 
             defer.resolve(options.item);
-
         }
 
         // Set up the basic query
@@ -598,6 +609,8 @@ AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
 
         self._log.debug(prefix + "calling putItem");
         self._DB.putItem(putOptions, itemAddFunc);
+
+        return defer.promise;
     });
 };
 

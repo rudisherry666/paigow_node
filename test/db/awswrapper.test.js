@@ -17,20 +17,23 @@ describe('AWSWrapper', function() {
     it('should use the same DB', function () {
         assert.equal(awsWrapper1.DB(), awsWrapper2.DB());
     });
+
     it('should be able to create a table', function(done) {
-        awsWrapper1.tableCreate('test-table', 'myKey')
+        awsWrapper1.tableCreate('test-table-create', 'myKey')
             .then(  function() {},
                     function() { assert.fail(err); })
             .done(function() { done(); });
     });
+
     it('should throw on bad table params', function() {
         assert.throws(function() { awsWrapper1.tableCreate(); }, Error);
         assert.throws(function() { awsWrapper1.tableCreate('test-table'); }, Error);
         assert.throws(function() { awsWrapper1.tableCreate(5, 'myKey'); }, Error);
         assert.throws(function() { awsWrapper1.tableCreate('test-table', {}); }, Error);
     });
+
     it('should be able to delete a table', function(done) {
-        awsWrapper1.tableCreate('test-table', 'myKey').then(
+        awsWrapper1.tableCreate('test-table-delete', 'myKey').then(
             function() {
                 awsWrapper1.tableDelete('test-table').then(
                     function() {},
@@ -43,14 +46,16 @@ describe('AWSWrapper', function() {
             }
         );
     });
+
     it('should be able to delete a table that doesn\'t exist', function(done) {
         awsWrapper1.tableDelete('test-table-never-created').then(
             function() {},
             function(err) { assert.fail(err); }
         ).done(function() { done(); });
     });
+
     it('should list tables it has created', function(done) {
-        var tableName = 'test-table-created';
+        var tableName = 'test-table-created-list';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
             function() {
                 awsWrapper1.tableList().then(
@@ -66,6 +71,7 @@ describe('AWSWrapper', function() {
             }
         );
     });
+
     it('should be OK with creating tables that already exist', function(done) {
         var tableName = 'test-table-created';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
@@ -81,6 +87,7 @@ describe('AWSWrapper', function() {
             }
         );
     });
+
     it('should correctly not re-create tables.', function(done) {
         var tableName = 'test-table-created-multiple';
         Q.when([
@@ -92,6 +99,7 @@ describe('AWSWrapper', function() {
             function(err)  { assert.fail(err); }
         ).done(function()  { done(); } );
     });
+
     it('should correctly handle creating tables that are created then deleted.', function(done) {
         var tableName = 'test-table-create-delete-create';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
@@ -116,6 +124,7 @@ describe('AWSWrapper', function() {
             function(err) { assert.fail(err); done(); }
         );
     });
+
     it('should correctly handle creating tables that are deleted then created immediately.', function(done) {
         var tableName = 'test-table-create-delete-create-quick';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
@@ -137,6 +146,7 @@ describe('AWSWrapper', function() {
             function(err) { assert.fail(err); done(); }
         );
     });
+
     it('should not leave any tables with a certain prefix', function(done) {
         var tableName = 'testx-table-create-prefix';
         awsWrapper1.tableCreate(tableName, 'myKey').then(
@@ -162,6 +172,7 @@ describe('AWSWrapper', function() {
             }
         );
     });
+
     it('should return an empty array when getting all results in an empty table', function(done) {
         var tableName = 'test-table-scan-not-found';
         var keyName = 'myKey';
@@ -182,6 +193,7 @@ describe('AWSWrapper', function() {
             }
         );
     });
+
     it('should return a one-length array when getting all results in a table with one item', function(done) {
         var tableName = 'test-table-return-one-item';
         var keyName = 'myKey';
@@ -217,6 +229,7 @@ describe('AWSWrapper', function() {
             }
         );
     });
+
     it('should return not-found when searching for a specific item', function(done) {
         var tableName = 'test-table-return-not-found';
         var keyName = 'myKey';
