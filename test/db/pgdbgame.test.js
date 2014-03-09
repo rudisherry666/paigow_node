@@ -45,16 +45,20 @@ describe('PGDBGame', function() {
         });
     });
 
-    it('should return a PGDBGame object with the input players', function() {
+    it('should return a PGDBGame object with the input players', function(done) {
         var pgdbGame = new PGDBGame(pgdbPlayer, computer);
         assert.notEqual(pgdbGame, null);
         pgdbGame.created().then(
             function(data) {
                 assert.equal(data, pgdbGame);
-                assert.equal(pgdbGame.player1(), pgdbPlayer);
-                assert.equal(pgdbGame.player2(), computer);
+                assert.equal(pgdbGame.player1(), pgdbPlayer.username());
+                assert.equal(pgdbGame.player2(), computer.username());
             },
-            function(err) { assert.fail(err); }
-        ).done(function() { done(); });
+            function(err) {
+                assert.fail(err);
+            }
+        ).done(function() {
+            done();
+        });
     });
 });
