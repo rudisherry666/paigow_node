@@ -12,7 +12,10 @@ describe('PGDBPlayer', function() {
     before(function(done) {
         pgdbPlayer = new PGDBPlayer();
         pgdbPlayer.created().then(
-            function(data) { done(); },
+            function(data) {
+                assert.equal(data, pgdbPlayer);
+                done();
+            },
             function(err)  { assert.fail(err); done(); }
         );
     });
@@ -32,6 +35,21 @@ describe('PGDBPlayer', function() {
     });
     it('should return unknown username', function () {
         assert.equal(pgdbPlayer.username(), "unknown");
+    });
+    it('should take and return a username', function (done) {
+        var pgdbPlayerName = new PGDBPlayer();
+        pgdbPlayerName.created().then(
+            function(data) {
+                assert.equal(pgdbPlayerName.username(), "unknown");
+                pgdbPlayerName.setUsername("Jerry").then(
+                    function(data) {
+                        assert.equal(pgdbPlayerName.username(), "Jerry");
+                    },
+                    function(err) { assert.fail(err); }
+                ).done(function() { done(); });
+            },
+            function(err) { assert.fail(err); }
+        );
     });
     it('should reject finding unknown username', function (done) {
         pgdbPlayer.find("unknown")
