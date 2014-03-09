@@ -28,7 +28,7 @@ function PGDBGame(player1, player2) {
     pgdbGameLog.debug(prefix + "called");
 
     function pgdbGameConstructorFatal(err) {
-        pgdbGameLog.debug(prefix + err);
+        pgdbGameLog.fatal(prefix + err);
         throw new Error(prefix + err);
     }
     if (!player1 || !(player1 instanceof PGDBPlayer)) pgdbGameConstructorFatal("bad player 1");
@@ -42,6 +42,7 @@ function PGDBGame(player1, player2) {
     self._origSavePromise =
         self.set('gameid', crypto.randomBytes(10).toString('base64')).then(
             function(data) {
+                pgdbGameLog.debug(prefix + "orig name resolved: " + data);
                 return self.set('players', [
                     player1.username(),
                     player2.username()
@@ -56,10 +57,16 @@ util.inherits(PGDBGame, PGDB);
 
 // Override created.
 PGDBGame.prototype.created = function() {
-    console.log('created');
+    pgdbGameLog.debug('PGDBGame.created called');
     return this._initPromise.then(
-        function(data) { return self._origSavePromise; },
-        function(err)  { throw new Error(err); }
+        function(data) {
+            pgdbGameLog.debug('PGDBGame.created resolved');
+            return this._origSavePromise;
+        },
+        function(err)  {
+            pgdbGameLog.debug('PGDBGame.created rejected');
+            throw new Error(err);
+        }
     );
 };
 
