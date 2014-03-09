@@ -24,15 +24,17 @@ var awsDB;
 // is done.
 var awsTablesInProcess = {};
 
+var awsLog = new PGLog('aws', 'warn');
+
 /*
 * @constructor PGDB
 *
 */
 function AWSWrapper() {
-    this._log = new PGLog("AWS", 'verbose');
+    awsLog = new PGLog("AWS", 'debug');
     if (!awsDB) {
         if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !process.env.AWS_REGION || !process.env.AWS_ENDPOINT) {
-            this._log.fatal("ERROR cannot start dynamoDB: environment variables are not set up!");
+            awsLog.fatal("ERROR cannot start dynamoDB: environment variables are not set up!");
             throw new Error("ERROR cannot start dynamoDB: environment variables are not set up!");
         } else
             awsDB = new AWS.DynamoDB({ endpoint: new AWS.Endpoint(process.env.AWS_ENDPOINT) });
@@ -61,7 +63,7 @@ AWSWrapper.prototype.DB = function() {
 AWSWrapper.prototype.tableStatus = function(tableName) {
     var self = this;
     var prefix = "tableStatus('" + tableName + "') ";
-    self._log.debug(prefix + "called");
+    awsLog.verbose(prefix + "called");
 
     if (!awsDB) throw new Error("AWSWrapper.tableStatus: no DB!");
 
@@ -71,19 +73,19 @@ AWSWrapper.prototype.tableStatus = function(tableName) {
         if (!err) {
             // Table exists, we're good. unless there is an issue with the returned data.
             if (data && data.Table && data.Table.TableStatus) {
-                self._log.debug(prefix + data.Table.TableStatus);
+                awsLog.verbose(prefix + data.Table.TableStatus);
                 defer.resolve(data.Table.TableStatus);
             } else {
-                self._log.debug(prefix + " bad error: don't know data");
+                awsLog.verbose(prefix + " bad error: don't know data");
                 throw new Error('FATAL tableStatus(' + tableName + ') err: returned data does not include status.');
             }
         } else if (err.code && err.code === 'ResourceNotFoundException') {
             // Table doesn't exist, that's OK, we "extend" the aws set of statuses
-            self._log.debug(prefix + " MISSING ");
+            awsLog.verbose(prefix + " MISSING ");
             defer.resolve("MISSING");
         } else {
             // Hmm, error other than no-table: that's really bad.
-            self._log.debug(prefix + " bad error: " + err);
+            awsLog.verbose(prefix + " bad error: " + err);
             throw new Error('FATAL tableStatus(' + tableName + ') err: ' + err);
         }
     });
@@ -109,12 +111,12 @@ AWSWrapper.prototype.tableStatus = function(tableName) {
 AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
     var self = this;
     var prefix = "AWSWrapper.tableCreate('" + tableName + "') ";
-    self._log.debug(prefix + "called");
+    awsLog.verbose(prefix + "called");
 
     // Any issues, we bail and throw.
     function tableCreateFatal(err) {
         var msg = prefix + " " + err + "!";
-        self._log.fatal(msg);
+        awsLog.fatal(msg);
         throw new Error(msg);
     }
 
@@ -127,6 +129,8 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
     // When the previous is done, we do our stuff.  If it fails, we want to fail.
     return DeferSeq.add(tableName, function(err, param) {
 
+        // awsLog.debug("tableCreate deferSeq callback called");
+
         if (err) tableCreateFatal(prefix + "deferSeq rejected");
 
         // We return a promise so we're finished before the next guy.
@@ -138,20 +142,20 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
                 switch (status) {
                     case "CREATING":
                         // Not yet: wait until it's created.
-                        self._log.debug(prefix + "table is still being created, waiting");
+                        awsLog.verbose(prefix + "table is still being created, waiting");
                         self._waitForCreateToFinish(tableName, defer);
                     break;
 
                     case "UPDATING":
                     case "ACTIVE":
                         // It already exists: return this status (even if it's busy).
-                        self._log.debug(prefix + "table is created!");
+                        awsLog.verbose(prefix + "table is created!");
                         defer.resolve(status);
                     break;
 
                     case "DELETING":
                         // Bleah, we can't do anything until it's finished deleting.
-                        self._log.debug(prefix + "table is being deleted, waiting");
+                        awsLog.verbose(prefix + "table is being deleted, waiting");
                         self._waitForDeletToFinish(tableName, defer).then(
                             function(status) {
                                 self._createTable(tableName, keyAttributeName, defer);
@@ -164,14 +168,14 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
 
                     case "MISSING":
                         // It doesn't exist: create it and return its status.
-                        self._log.debug(prefix + "table is missing: creating it");
+                        awsLog.verbose(prefix + "table is missing: creating it");
                         self._createTable(tableName, keyAttributeName, defer);
                     break;
                 }
             },
             function(err) {
                 // Bleah, can't even describe the table.
-                self._log(prefix + "error from tableSatatus: " + err);
+                awsLog(prefix + "error from tableSatatus: " + err);
                 defer.reject(err);
             });
 
@@ -188,12 +192,12 @@ AWSWrapper.prototype.tableCreate = function(tableName, keyAttributeName) {
 AWSWrapper.prototype.tableDelete = function(tableName) {
     var self = this;
     var prefix = "AWSWrapper.tableDelete('" + tableName + "') ";
-    self._log.debug(prefix + "called");
+    awsLog.verbose(prefix + "called");
 
     // Any issues, we bail and throw.
     function tableDeleteFatal(err) {
         var msg = prefix + " " + err + "!";
-        self._log.fatal(msg);
+        awsLog.fatal(msg);
         throw new Error(msg);
     }
 
@@ -202,6 +206,8 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
 
     // When the previous is done, we do our stuff.  If it fails, we want to fail.
     return DeferSeq.add(tableName, function(err, param) {
+
+        // awsLog.debug("tableDelete deferSeq callback called");
 
         if (err) tableDeleteFatal(prefix + "deferSeq rejected");
 
@@ -212,7 +218,7 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
             if (err) {
                 // May already be gone; that's OK.
                 if (err.code && err.code === 'ResourceNotFoundException') {
-                    self._log.debug(prefix + "already gone");
+                    awsLog.verbose(prefix + "already gone");
                     defer.resolve("table deleted");
                 } else {
                     tableDeleteFatal("bad error: " + error);
@@ -237,7 +243,7 @@ AWSWrapper.prototype.tableDelete = function(tableName) {
 */
 AWSWrapper.prototype.tableList = function(tableNameRegex) {
     var self = this;
-    self._log.debug("tableList(" + tableNameRegex + ")");
+    awsLog.verbose("tableList(" + tableNameRegex + ")");
 
     if (!awsDB) throw new Error("AWSWrapper.tableList without DB!");
 
@@ -277,7 +283,7 @@ AWSWrapper.prototype.tableList = function(tableNameRegex) {
 */
 AWSWrapper.prototype.tableDeleteMany = function(tableNameRegex) {
     var self = this;
-    self._log.debug("tableDeleteMany(" + tableNameRegex + ")");
+    awsLog.verbose("tableDeleteMany(" + tableNameRegex + ")");
 
     if (!awsDB) throw new Error("AWSWrapper.tableDeleteMany without DB!");
 
@@ -326,12 +332,12 @@ AWSWrapper.prototype.tableDeleteMany = function(tableNameRegex) {
 AWSWrapper.prototype.keyItemFind = function(tableName, options) {
     var self = this;
     var prefix = "AWSWrapper.keyItemFind('" + tableName + "') ";
-    self._log.debug(prefix + "called");
+    awsLog.verbose(prefix + "called");
 
     // Any issues, we bail and throw.
     function keyItemFindFatal(err) {
         var msg = prefix + " " + err + "!";
-        self._log.fatal(msg);
+        awsLog.fatal(msg);
         throw new Error(msg);
     }
 
@@ -380,14 +386,14 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
 
         // This is the function that gets passed to the query.
         function scanFunc(err, data) {
-            self._log.debug(prefix + "returned from DB.query");
+            awsLog.verbose(prefix + "returned from DB.query");
 
             // Any error returned from the database is fatal.
             if (err) keyItemFindFatal(err);
 
             // If we can't find any, we just reject.
             if (data.Count === 0) {
-                self._log.debug(prefix + " resolved empty");
+                awsLog.verbose(prefix + " resolved empty");
                 defer.resolve(retVals);
                 return;
             }
@@ -399,17 +405,17 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
 
             // If there isn't an Items array or its size doesn't match Count, something is really wrong.
             if (!data.Items || !(data.Items instanceof Array) || (data.Items.length !== data.Count)) {
-                self._log.debug(JSON.stringify(data));
+                awsLog.verbose(JSON.stringify(data));
                 keyItemFindFatal("Items don't match count!");
             }
 
-            self._log.debug(prefix + "found " + data.Count + " items");
+            awsLog.verbose(prefix + "found " + data.Count + " items");
 
             // We'll return an array with the item values, stripping the types.
             for (var di = 0; di < data.Items.length; di++) {
                 var item = data.Items[di];
 
-                self._log.verbose("     " + JSON.stringify(item));
+                awsLog.verbose("     " + JSON.stringify(item));
 
                 // The item has to have the keyAttribute
                 var foundKeyAttribute = false;
@@ -419,12 +425,12 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
             }
 
             // Done.
-            self._log.verbose(prefix + "returned: " + JSON.stringify(retVals));
+            awsLog.verbose(prefix + "returned: " + JSON.stringify(retVals));
             defer.resolve(retVals);
         }
 
         function getFunc(err, data) {
-            self._log.debug(prefix + "returned from DB.query");
+            awsLog.verbose(prefix + "returned from DB.query");
 
             // Any error returned from the database is fatal.
             if (err) keyItemFindFatal(err);
@@ -435,7 +441,7 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
                 return;
             }
 
-            self._log.verbose(JSON.stringify(data));
+            awsLog.verbose(JSON.stringify(data));
 
             // We're returning one item.
             if (!data.Item) keyItemFindFatal("no Item in single return");
@@ -446,7 +452,7 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
 
         if (options.keyAttributeValue) {
             // We're querying for a certain value
-            self._log.verbose(prefix + "getting item...");
+            awsLog.verbose(prefix + "getting item...");
 
             // We're getting an item given the primary key
             var getOptions = {
@@ -458,7 +464,7 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
             self._DB.getItem(getOptions, getFunc);
         } else {
             // We're returning all the values.
-            self._log.verbose(prefix + "scanning...");
+            awsLog.verbose(prefix + "scanning...");
 
             // Set up the query's basic params.
             var scanOptions = {
@@ -489,12 +495,12 @@ AWSWrapper.prototype.keyItemFind = function(tableName, options) {
 AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
     var self = this;
     var prefix = "AWSWrapper:keyItemDelete('" + tableName + "') ";
-    self._log.debug(prefix + "called");
+    awsLog.verbose(prefix + "called");
 
     // Any issues, we bail and throw.
     function keyItemDeleteFatal(err) {
         var msg = prefix + " " + err + "!";
-        self._log.fatal(msg);
+        awsLog.fatal(msg);
         throw new Error(msg);
     }
 
@@ -516,7 +522,7 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
 
         // This is the function that gets passed to the query.
         function deleteFunc(err, data) {
-            self._log.debug(prefix + "returned from DB.deleteItem");
+            awsLog.verbose(prefix + "returned from DB.deleteItem");
 
             // Any error returned from the database is fatal.
             if (err) keyItemDeleteFatal(err);
@@ -531,7 +537,7 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
         };
         deleteOptions.Key[options.keyAttributeName] = { "S": options.keyAttributeValue || "*" };
 
-        self._log.debug(prefix + "calling deleteItem");
+        awsLog.verbose(prefix + "calling deleteItem");
         self._DB.deleteItem(deleteOptions, deleteFunc);
 
         return defer.promise;
@@ -542,13 +548,13 @@ AWSWrapper.prototype.keyItemDelete = function(tableName, options) {
 AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
     var self = this;
     var prefix = "AWSWrapper:itemAdd('" + tableName + "') ";
-    self._log.debug(prefix + "called");
+    awsLog.verbose(prefix + "called");
 
 
     // Any issues, we bail and throw.
     function itemAddFatal(err) {
         var msg = prefix + " " + err;
-        self._log.fatal(msg);
+        awsLog.fatal(msg);
         throw new Error(msg);
     }
 
@@ -569,7 +575,7 @@ AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
         var defer = Q.defer();
 
         function itemAddFunc(err, data) {
-            self._log.debug(prefix + "returned from DB.putItem");
+            awsLog.verbose(prefix + "returned from DB.putItem");
 
             // Any error other than item-already-exists returned from the database is fatal.
             if (err) {
@@ -607,7 +613,7 @@ AWSWrapper.prototype._itemAddOrUpdate = function(tableName, options) {
             putOptions.Expected[options.keyAttributeName] = { Exists: false };
         }
 
-        self._log.debug(prefix + "calling putItem");
+        awsLog.verbose(prefix + "calling putItem");
         self._DB.putItem(putOptions, itemAddFunc);
 
         return defer.promise;
@@ -662,7 +668,7 @@ AWSWrapper.prototype._waitForCreateToFinish = function(tableName, defer) {
     self.tableStatus(tableName).then(
         function(status) {
             if (status === "ACTIVE" || status === "UPDATING") {
-                self._log.debug("_waitForCreateToFinish('" + tableName + "') done!");
+                awsLog.verbose("_waitForCreateToFinish('" + tableName + "') done!");
                 defer.resolve(status);
             } else if (status == "CREATING")
                 setTimeout(function() { self._waitForCreateToFinish(tableName, defer); }, 500);
