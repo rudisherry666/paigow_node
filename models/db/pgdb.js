@@ -151,6 +151,8 @@ PGDB.prototype.update = function(item, options) {
     var prefix = "PGDB.update('" + self.fullTableName() + "') ";
     pgdbLog.debug(prefix + "called");
 
+    var defer = Q.defer();
+
     // Set the props now, but reset them if we fail.
     var oldProps;
     if (!options || !options.internal) {
@@ -164,11 +166,21 @@ PGDB.prototype.update = function(item, options) {
     };
     var promise = self._awsWrapper.itemUpdate(self.fullTableName(), updateOptions);
 
-    // Make sure we keep track of what was set, if it succeeded.
-    if (!options || !options.internal) {
-        promise.fail(function(data) { self._props = oldProps; });
-    }
-    return promise;
+    // If it succeeds, we return ourself; if it fails, we need to restore our
+    // props to the old props.
+    promise.then(
+        function(data) {
+            pgdbLog.debug(prefix + "aws resolved, resolving with " + self);
+            defer.resolve(self);
+        },
+        function(err)  {
+            if (!options || !options.internal)
+                self._props = oldProps;
+            defer.reject(err);
+        }
+    );
+
+    return defer.promise;
 };
 
 /*
