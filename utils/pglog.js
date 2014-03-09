@@ -31,6 +31,6 @@ PGLog.prototype.error   = function(str) { this._log("[ERROR  ] " + str, "error" 
 PGLog.prototype.warn    = function(str) { this._log("[WARN   ] " + str, "warn"   ); };
 PGLog.prototype.info    = function(str) { this._log("[INFO   ] " + str, "info"   ); };
 PGLog.prototype.debug   = function(str) { this._log("[DEBUG  ] " + str, "debug"  ); };
-PGLog.prototype.verbose = function(str) { this._log("[DEBUG  ] " + str, "verbose"); };
+PGLog.prototype.verbose = function(str) { this._log("[VERBOSE] " + str, "verbose"); };
 
 module.exports = PGLog;
