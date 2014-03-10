@@ -13,33 +13,22 @@ describe('GET /player', function() {
     var pgLog = new PGLog('tstRtPlayer', 'debug');
 
     before(function(done) {
-        pgLog.debug("before: deleting all tables");
-        var awsWrapper = new AWSWrapper();
-        awsWrapper.tableDelete("test-Players").then(
-            function(data) {
-                // Make sure the table is created.
-                var p = new PGDBPlayer();
-                p.created().done(function() {
-                    pgLog.debug("before: done, success");
-                    var wr = new AWSWrapper();
-                    wr.tableStatus('test-Players').then(
-                        function(status) { pgLog.debug(status); done(); },
-                        function(err) { assert.fail(err); }
-                    );
-                });
-            },
-            function(err)  {
-                assert.fail("cant delete test-Players: " + err);
-                pgLog.debug("before: done, fail");
-                done();
-            }
-        );
+        var p = new PGDBPlayer();
+        pgLog.debug("before: gonna call p.created()");
+        p.created().done(function() {
+            pgLog.debug("before: done, success");
+            var wr = new AWSWrapper();
+            wr.tableStatus('test-Players').then(
+                function(status) { pgLog.debug(status); done(); },
+                function(err) { assert.fail(err); done(); }
+            );
+        });
     });
 
     it('should return a 200 status code', function (done) {
         pgLog.debug("test: should return a 200 status code");
         http.get({ host: '0.0.0.0', port: 8088, path: "/player" }, function(res) {
-            assert.deepEqual(res.statusCode, 200);
+            assert.equal(res.statusCode, 200);
         }).on('finish', function() {
             done();
         });
