@@ -42,7 +42,7 @@ function checkSessionsForTimeout(e) {
             lastTouch = 0;
         }
         if ((now - lastTouch) > (60 * 60 * 1000)) {
-            pgSessionLog.log("Session timeout: " + sessionID);
+            pgSessionLog.debug("Session timeout: " + sessionID);
             delete pgSessions[sessionID];
         }
     }
