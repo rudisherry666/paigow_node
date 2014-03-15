@@ -18,7 +18,11 @@ define(['backbone'], function(Backbone) {
 
         // A game is specific to a player.
         defaults: {
-            'hands': [],
+            'hands': [
+                [],
+                [],
+                []
+            ],
             'player_score': 0,
             'opponent_score': 0,
             'opponent_name': "computer"

@@ -9,23 +9,39 @@ define([
     'backbone',
     'underscore',
     'classes/pgtile',
-    'models/pghandmodel'
+    'models/pghandmodel',
+    'views/pghandview'
 ], function(
     Backbone,
     _,
     PGTile,
-    PGHandModel
+    PGHandModel,
+    PGHandView
 ) {
     
     var PGGameView = Backbone.View.extend({
 
         // Startup
         initialize: function(options) {
+            this._$el = options.$el;
+
             this._pgPlayerModel = options.pgPlayerModel;
             this._pgGameModel = options.pgGameModel;
-            this._$el = options.$el;
+
+            // Initialize all the models.
+            this._handModels = [];
+            for (var hmi = 0; hmi < 3; hmi++) {
+                var handModel = new PGHandModel();
+                this._handModels.push(handModel);
+            }
+
+            // Listen to the models for changes.
             this._addModelListeners();
 
+            // This is not inside our view so we use the old-style
+            // jquery for that.
+            // TODO: have the button in the app or navbar and change
+            // the game model in some way.
             $('#pg-new-game').click(
                 _.bind(function(e) {
                     this._newGame();
@@ -37,8 +53,19 @@ define([
         render: function() {
             if (!this.renderedTemplate) {
                 this.renderedTemplate = true;
-                this._$el.html('<div class="pggame"></div>');
+                var $game = $('<div class="pggame"></div>');
+                this._$el.append($game);
+
+                this._handViews = [];
+                for (var hvi = 0; hvi < 3; hvi++) {
+                    this._handViews.push(new PGHandView({
+                        $el: $game,
+                        handModel: this._handModels[hvi],
+                        index: hvi
+                    }));
+                }
             }
+            _.each(this._handViews, function(handView) { handView.render(); });
         },
 
         // Listen for changes
@@ -48,64 +75,37 @@ define([
 
         _showOrHide: function() {
             if ((this._pgPlayerModel.get('state') === 'static') && (this._pgPlayerModel.get('username') !== "unknown")) {
-                this._$el.finish().fadeIn(500);
-                this.render();
             } else {
                 this._$el.finish().fadeOut(500);
             }
         },
 
         _newGame: function() {
+            this.render();
+            this._$el.finish().fadeIn(500);
             this._washTiles();
 
             var $game = $(".pggame");
-            $game.empty();
+            $game.find('.pgscore').remove();
             var score = _.template('<h2 class="pgscore"><%=player_name%>: <%=player_score%> <%=opponent_name%>: <%=opponent_score%></h2>', {
                 player_name: this._pgPlayerModel.get('username'),
                 opponent_name: this._pgGameModel.get('opponent_name'),
                 player_score: this._pgGameModel.get('player_score'),
                 opponent_score: this._pgGameModel.get('opponent_score')
             });
-            $game.append(score);
+            $game.prepend(score);
 
             var hands = this._pgGameModel.get('hands');
             for (var hi = 1; hi <= 3; hi++) {
-                if (!hands[hi-1]) hands[hi-1] = [];
                 var hand = hands[hi-1];
-                var $hand = $(  '<div id="pghand-' + hi + '" class="pghand">' +
-                                    '<div class="pghand-tiles">' +
-                                    '</div>' +
-                                '</div>');
-
-                var $handTiles = $hand.children(".pghand-tiles");
                 for (var ti = 0; ti < 4; ti++) {
                     hand[ti] = this._dealNextTile();
-                    var $tile = $(  '<div class="pgtile pgtile-' + hi + '-' + ti + ' ' + hand[ti].divClass() + '">' +
-                                        '<div class="pgdot pgdot-1"></div>' +
-                                        '<div class="pgdot pgdot-2"></div>' +
-                                        '<div class="pgdot pgdot-3"></div>' +
-                                        '<div class="pgdot pgdot-4"></div>' +
-                                        '<div class="pgdot pgdot-5"></div>' +
-                                        '<div class="pgdot pgdot-6"></div>' +
-                                        '<div class="pgdot pgdot-7"></div>' +
-                                        '<div class="pgdot pgdot-8"></div>' +
-                                        '<div class="pgdot pgdot-9"></div>' +
-                                        '<div class="pgdot pgdot-10"></div>' +
-                                        '<div class="pgdot pgdot-11"></div>' +
-                                        '<div class="pgdot pgdot-12"></div>' +
-                                        '<div class="pgdot pgdot-13"></div>' +
-                                        '<div class="pgdot pgdot-14"></div>' +
-                                        '<div class="pgdot pgdot-15"></div>' +
-                                        '<div class="pgdot pgdot-16"></div>' +
-                                        '<div class="pgdot pgdot-17"></div>' +
-                                        '<div class="pgdot pgdot-18"></div>' +
-                                        '<div class="pgdot pgdot-19"></div>' +
-                                        '<div class="pgdot pgdot-20"></div>' +
-                                    '</div>');
-                    $handTiles.append($tile);
                 }
-
-                $game.append($hand);
+                // We have to manually trigger the change event because the old and new
+                // values are 4-long arrays of PGTile and _.isEqual() returns true for
+                // equal, so backbone doesn't think anything changed.
+                this._handModels[hi-1].set('tiles', hand);
+                this._handModels[hi-1].trigger('change:tiles');
             }
         },
 
