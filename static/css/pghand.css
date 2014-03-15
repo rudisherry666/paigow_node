@@ -1,13 +1,13 @@
 .pghand {
-    /*margin-right: 20px;*/
+    display: block;
+    margin-bottom: 20px;
     padding: 10px 10px 3px 10px;
     text-align: center;
-    display: block;
 }
 
 .pghand .pghand-tiles {
-    width: auto;
     display: inline-block;
+    width: auto;
 }
 
 .pghand .pghand-name {
