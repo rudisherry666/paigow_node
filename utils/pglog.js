@@ -26,6 +26,10 @@ PGLog.prototype._log = function(str, level) {
         console.log('[' + "               ".slice(0, 15-this._moduleName.length) + this._moduleName + '] ' + str);
 };
 
+PGLog.prototype.level = function(level) {
+    this._level = _levelMap[level || _defaultLevel];
+};
+
 PGLog.prototype.fatal   = function(str) { this._log("[FATAL  ] " + str, "fatal"  ); };
 PGLog.prototype.error   = function(str) { this._log("[ERROR  ] " + str, "error"  ); };
 PGLog.prototype.warn    = function(str) { this._log("[WARN   ] " + str, "warn"   ); };
