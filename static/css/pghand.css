@@ -13,3 +13,9 @@
 .pghand .pghand-name {
     font-family: Helvetica,Arial;
 }
+
+.pghand .pgtile-spacer {
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+}

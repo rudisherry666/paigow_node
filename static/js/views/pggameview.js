@@ -94,7 +94,7 @@ define([
 
             var $game = $(".pggame");
             $game.find('.pgscore').remove();
-            var score = _.template('<h2 class="pgscore"><%=playerName%>: <%=playerScore%> <%=opponentName%>: <%=opponentScore%></h2>', {
+            var score = _.template('<p class="pgscore"><%=playerName%>: <%=playerScore%> <%=opponentName%>: <%=opponentScore%></p>', {
                 playerName: this._playerModel.get('username'),
                 opponentName: this._gameModel.get('opponentName'),
                 playerScore: this._gameModel.get('playerScore'),

@@ -62,6 +62,8 @@ define(['backbone'], function(Backbone) {
                                         '<div class="pgdot pgdot-20"></div>' +
                                     '</div>');
                     $handTiles.append($tile);
+                    if (ti == 1)
+                        $handTiles.append('<div class="pgtile-spacer"></div>');
                 }
             }
         },
