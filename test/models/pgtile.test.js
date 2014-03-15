@@ -1,6 +1,6 @@
 var before = require('../before.test'),
     assert = require('assert'),
-    PGTile = require('../../models/pgtile.js');
+    PGTile = require('../../static/js/classes/pgtile');
 
 console.log("test: PGTile");
 

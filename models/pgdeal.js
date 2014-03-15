@@ -8,7 +8,7 @@
 * There are three ways to split the tiles.
 */
 
-var PGTile = require('./pgtile'),
+var PGTile = require('../static/js/classes/pgtile'),
     PGHand = require('./pghand');
 
 /*
