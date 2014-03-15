@@ -9,7 +9,7 @@
 */
 
 var PGTile = require('../static/js/classes/pgtile'),
-    PGHand = require('./pghand');
+    PGHand = require('../static/js/classes/pghand');
 
 /*
 * @constructor PGDeal

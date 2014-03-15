@@ -8,7 +8,7 @@
 * against each other; the order of the tiles do not matter.
 */
 
-var PGTile = require('../static/js/classes/pgtile');
+var PGTile = require('./pgtile');
 
 /*
 * @attribute HANDS
