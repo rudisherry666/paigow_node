@@ -152,7 +152,7 @@ var tiles = [
     { tileName: PGTile.prototype.TILE_NAME.MIXED_SEVEN,     handChar: PGTile.prototype.HAND_CHAR.MIXED_SEVEN,     divClass: 'pgtile-mixed-seven-1',   tileRank: 2, pairRank: 1 },
     { tileName: PGTile.prototype.TILE_NAME.MIXED_SEVEN,     handChar: PGTile.prototype.HAND_CHAR.MIXED_SEVEN,     divClass: 'pgtile-mixed-seven-2',   tileRank: 2, pairRank: 1 },
     { tileName: PGTile.prototype.TILE_NAME.MIXED_FIVE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_FIVE,      divClass: 'pgtile-mixed-five-1',    tileRank: 1, pairRank: 0 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_FIVE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_FIVE,      divClass: 'pgtile-mixed-five1',     tileRank: 1, pairRank: 0 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_FIVE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_FIVE,      divClass: 'pgtile-mixed-five-2',    tileRank: 1, pairRank: 0 },
     { tileName: PGTile.prototype.TILE_NAME.GEE_JOON,        handChar: PGTile.prototype.HAND_CHAR.GEE_JOON,        divClass: 'pgtile-gee-joon-1',      tileRank: 0, pairRank:15 },
     { tileName: PGTile.prototype.TILE_NAME.GEE_JOON,        handChar: PGTile.prototype.HAND_CHAR.GEE_JOON,        divClass: 'pgtile-gee-joon-2',      tileRank: 0, pairRank:15 }
 ];
