@@ -5,7 +5,13 @@
 * This file controls the signing or register view on the main page.
 */
 
-define(['backbone'], function(Backbone) {
+define([
+    'backbone',
+    'classes/pghand'
+], function(
+    Backbone,
+    PGHand
+) {
     
     var PGHandView = Backbone.View.extend({
 
@@ -38,31 +44,38 @@ define(['backbone'], function(Backbone) {
 
                 var $handTiles = this._$hand.children(".pghand-tiles");
                 var tiles = this._handModel.get('tiles');
-                for (var ti = 0; ti < 4; ti++) {
-                    var $tile = $(  '<div class="pgtile">' +
-                                        '<div class="pgdot pgdot-1"></div>' +
-                                        '<div class="pgdot pgdot-2"></div>' +
-                                        '<div class="pgdot pgdot-3"></div>' +
-                                        '<div class="pgdot pgdot-4"></div>' +
-                                        '<div class="pgdot pgdot-5"></div>' +
-                                        '<div class="pgdot pgdot-6"></div>' +
-                                        '<div class="pgdot pgdot-7"></div>' +
-                                        '<div class="pgdot pgdot-8"></div>' +
-                                        '<div class="pgdot pgdot-9"></div>' +
-                                        '<div class="pgdot pgdot-10"></div>' +
-                                        '<div class="pgdot pgdot-11"></div>' +
-                                        '<div class="pgdot pgdot-12"></div>' +
-                                        '<div class="pgdot pgdot-13"></div>' +
-                                        '<div class="pgdot pgdot-14"></div>' +
-                                        '<div class="pgdot pgdot-15"></div>' +
-                                        '<div class="pgdot pgdot-16"></div>' +
-                                        '<div class="pgdot pgdot-17"></div>' +
-                                        '<div class="pgdot pgdot-18"></div>' +
-                                        '<div class="pgdot pgdot-19"></div>' +
-                                        '<div class="pgdot pgdot-20"></div>' +
-                                    '</div>');
-                    $handTiles.append($tile);
-                    if (ti == 1)
+                for (var di = 0; di < 2; di++) {
+                    var $2tile = $('<div class="pg2tile"></div>');
+                    $handTiles.append($2tile);
+                    var $tileBlock = $('<div></div>');
+                    $2tile.append($tileBlock);
+                    for (var ti = 0; ti < 2; ti++) {
+                        var $tile = $(  '<div class="pgtile">' +
+                                            '<div class="pgdot pgdot-1"></div>' +
+                                            '<div class="pgdot pgdot-2"></div>' +
+                                            '<div class="pgdot pgdot-3"></div>' +
+                                            '<div class="pgdot pgdot-4"></div>' +
+                                            '<div class="pgdot pgdot-5"></div>' +
+                                            '<div class="pgdot pgdot-6"></div>' +
+                                            '<div class="pgdot pgdot-7"></div>' +
+                                            '<div class="pgdot pgdot-8"></div>' +
+                                            '<div class="pgdot pgdot-9"></div>' +
+                                            '<div class="pgdot pgdot-10"></div>' +
+                                            '<div class="pgdot pgdot-11"></div>' +
+                                            '<div class="pgdot pgdot-12"></div>' +
+                                            '<div class="pgdot pgdot-13"></div>' +
+                                            '<div class="pgdot pgdot-14"></div>' +
+                                            '<div class="pgdot pgdot-15"></div>' +
+                                            '<div class="pgdot pgdot-16"></div>' +
+                                            '<div class="pgdot pgdot-17"></div>' +
+                                            '<div class="pgdot pgdot-18"></div>' +
+                                            '<div class="pgdot pgdot-19"></div>' +
+                                            '<div class="pgdot pgdot-20"></div>' +
+                                        '</div>');
+                        $tileBlock.append($tile);
+                    }
+                    $2tile.append('<span class="pg2tile-label"></span>');
+                    if (di === 0)
                         $handTiles.append('<div class="pgtile-spacer"></div>');
                 }
             }
@@ -85,6 +98,13 @@ define(['backbone'], function(Backbone) {
                 $tile.removeClass();
                 $tile.addClass('pgtile pgtile-' + this._index + '-' + ti + ' ' + divClass);
             }
+
+            // Update the label.
+            var $labels = this._$hand.find('.pg2tile-label');
+            var highHand = new PGHand(tiles[0], tiles[1]);
+            var lowHand = new PGHand(tiles[2], tiles[3]);
+            $($labels[0]).text(highHand.name());
+            $($labels[1]).text(lowHand.name());
         }
 
     });

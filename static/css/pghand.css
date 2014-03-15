@@ -19,3 +19,15 @@
     width: 20px;
     height: 1px;
 }
+
+.pghand .pg2tile {
+    display: inline-block;
+    padding: 0;
+    overflow: hidden;
+    text-align: center;
+}
+
+.pghand .pg2tile-label {
+    font-size: 18px;
+    font-weight: 700;
+}
