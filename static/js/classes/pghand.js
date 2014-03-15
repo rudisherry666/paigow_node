@@ -186,7 +186,7 @@ function PGHand(tile1, tile2) {
     }
 
     // If we don't have this in the rankings, it's bad.
-    if (!this.rank())
+    if (typeof this.rank() !== "number")
         throw "PGHand constructor got bad chars " + this._chars;
 }
 
