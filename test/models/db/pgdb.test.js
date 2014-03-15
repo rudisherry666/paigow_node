@@ -31,40 +31,25 @@ describe('PGDB', function() {
 
     it('should find an added item', function(done) {
         var item = {key1: 'foo2'};
-        pgdb1.add(item).then(
-            function(data) {
-                pgdb1.find('foo2').then(
-                    function(data) {
-                        assert.equal(typeof data, "object");
-                        assert(data instanceof Array, "find returned non-Array");
-                        assert.equal(data.length, 1);
-                        assert.equal(typeof data[0], "object");
-                        assert.deepEqual(data[0], item);
-                    },
-                    function(err)  { assert.fail("cannot find an item: " + err); }
-                ).done(function()  { done(); });
-            },
-            function(err)  {
-                assert.fail("cannot add an item: " + err);
-                done();
-            }
-        );
+        pgdb1.add(item)
+            .then(function(data) { return pgdb1.find('foo2'); })
+            .then(function(data) {
+                assert.equal(typeof data, "object");
+                assert(data instanceof Array, "find returned non-Array");
+                assert.equal(data.length, 1);
+                assert.equal(typeof data[0], "object");
+                assert.deepEqual(data[0], item);
+            })
+            .fail(function(err)  { assert.fail(err); })
+            .done(function()     { done(); });
     });
 
     it('should allow deleting an added item', function(done) {
         var deleteItemVal = "fooDelete";
-        pgdb1.add({key1: deleteItemVal}).then(
-            function(data) {
-                pgdb1.delete(deleteItemVal).then(
-                    function(data) { },
-                    function(err)  { assert.fail("cannot delete an item: " + err); }
-                ).done(function()  { done(); });
-            },
-            function(err)  {
-                assert.fail("cannot add an item for deletion: " + err);
-                done();
-            }
-        );
+        pgdb1.add({key1: deleteItemVal})
+            .then(function(data) { return pgdb1.delete(deleteItemVal); })
+            .fail(function(err)  { assert.fail(err); })
+            .done(function()  { done(); });
     });
 
     it('should allow adding single properties', function(done) {
@@ -73,22 +58,11 @@ describe('PGDB', function() {
             key1: "add-prop",
             foo2: "added"
         };
-        pgdb1.add(item).then(
-            function(data) {
-                pgdb1.set("foo2", "added").then(
-                    function(data) {
-                        pgdb1.find('add-prop').then(
-                            function(data) { assert.deepEqual(data[0], finalItem); },
-                            function(err)  { assert.fail("cannot find add-prop item " + err); }
-                        ).done(function()  { done(); });
-                    },
-                    function(err)  { assert.fail("cannot set-prop an item: " + err); }
-                );
-            },
-            function(err)  {
-                assert.fail("cannot add an item for prop-adding: " + err);
-                done();
-            }
-        );
+        pgdb1.add(item)
+            .then(function(data) { return  pgdb1.set("foo2", "added"); })
+            .then(function(data) { return pgdb1.find('add-prop'); })
+            .then(function(data) { assert.deepEqual(data[0], finalItem); })
+            .fail(function(err)  { assert.fail(err); })
+            .done(function()  { done(); });
     });
 });
