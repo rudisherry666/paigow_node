@@ -264,4 +264,10 @@ PGHand.prototype.compare = function(hand) {
         return 0;
 };
 
-module.exports = PGHand;
+// Sneaky way to make this either a require module or a Node module
+if (typeof module === "undefined") {
+    define([], function() {
+        return PGHand;
+    });
+} else
+    module.exports = PGHand;
