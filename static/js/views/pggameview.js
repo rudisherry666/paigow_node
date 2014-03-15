@@ -9,14 +9,14 @@ define([
     'backbone',
     'underscore',
     'classes/pgtile',
-    'models/pghandmodel',
-    'views/pghandview'
+    'models/pgdealmodel',
+    'views/pgdealview'
 ], function(
     Backbone,
     _,
     PGTile,
-    PGHandModel,
-    PGHandView
+    PGDealModel,
+    PGDealView
 ) {
     
     var PGGameView = Backbone.View.extend({
@@ -26,14 +26,18 @@ define([
             this._$el = options.$el;
 
             this._playerModel = options.pgPlayerModel;
+            this._deckModel = options.pgDeckModel;
             this._gameModel = options.pgGameModel;
 
             // Initialize all the models.
-            this._handModels = [];
-            for (var hmi = 0; hmi < 3; hmi++) {
-                var handModel = new PGHandModel();
-                this._handModels.push(handModel);
-            }
+            this._playerDealModel = new PGDealModel({
+                username: this._playerModel.get('username'),
+                deckModel: this._deckModel
+            });
+            this._computerDealModel = new PGDealModel({
+                username: this._playerModel.get('computer'),
+                deckModel: this._deckModel
+            });
 
             // Listen to the models for changes.
             this._addModelListeners();
@@ -56,16 +60,20 @@ define([
                 var $game = $('<div class="pggame"></div>');
                 this._$el.append($game);
 
-                this._handViews = [];
-                for (var hvi = 0; hvi < 3; hvi++) {
-                    this._handViews.push(new PGHandView({
+                this._dealViews = [
+                    new PGDealView({
                         $el: $game,
-                        handModel: this._handModels[hvi],
-                        index: hvi
-                    }));
-                }
+                        dealModel: this._playerDealModel,
+                        deckModel: this._deckModel
+                    }),
+                    new PGDealView({
+                        $el: $game,
+                        dealModel: this._computerDealModel,
+                        deckModel: this._deckModel
+                    })
+                ];
             }
-            _.each(this._handViews, function(handView) { handView.render(); });
+            _.each(this._dealViews, function(dealView) { dealView.render(); });
         },
 
         // Listen for changes
@@ -81,9 +89,8 @@ define([
         },
 
         _newGame: function() {
+            this._$el.finish().fadeOut(500);
             this.render();
-            this._$el.finish().fadeIn(500);
-            this._gameModel._washTiles();
 
             var $game = $(".pggame");
             $game.find('.pgscore').remove();
@@ -95,18 +102,8 @@ define([
             });
             $game.prepend(score);
 
-            var hands = this._gameModel.get('hands');
-            for (var hi = 1; hi <= 3; hi++) {
-                var hand = hands[hi-1];
-                for (var ti = 0; ti < 4; ti++) {
-                    hand[ti] = this._gameModel._dealNextTile();
-                }
-                // We have to manually trigger the change event because the old and new
-                // values are 4-long arrays of PGTile and _.isEqual() returns true for
-                // equal, so backbone doesn't think anything changed.
-                this._handModels[hi-1].set('tiles', hand);
-                this._handModels[hi-1].trigger('change:tiles');
-            }
+            this._deckModel.washTiles();
+            this._$el.finish().fadeIn(500);
         },
 
     });

@@ -9,12 +9,14 @@ define([
     'models/pgplayermodel',
     'views/pgplayernameview',
     'views/pgsigninview',
+    'models/pgdeckmodel',
     'models/pggamemodel',
     'views/pggameview'
 ], function(
     PGPlayerModel,
     PGPlayerNameView,
     PGSigninView,
+    PGDeckModel,
     PGGameModel,
     PGGameView) {
 
@@ -29,8 +31,11 @@ define([
             error:   function() { console.log('error');   defer.reject();  }
         });
 
+        // Create a deck model that everyone will use.
+        var pgDeckModel = new PGDeckModel();
+
         // Create a game model.  For now we don't fetch it.
-        var pgGameModel = new PGGameModel();
+        var pgGameModel = new PGGameModel({ pgDeckModel: pgDeckModel });
 
         // Create the views that show the player's name or other attributes in
         // various parts of the UI.
@@ -40,6 +45,7 @@ define([
             var pgGameView = new PGGameView({
                 $el: $("#pg-game"),
                 pgPlayerModel: pgPlayerModel,
+                pgDeckModel: pgDeckModel,
                 pgGameModel: pgGameModel
             });
 

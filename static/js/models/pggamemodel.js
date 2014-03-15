@@ -9,27 +9,25 @@
 
 define([
     'backbone',
-    '../classes/pgtile'
+    'models/pgdealmodel'
 ],
 function(
     Backbone,
-    PTGile
+    PGDealModel
 ) {
     
     var PGGameModel = Backbone.Model.extend({
 
         // Startup
-        initialize: function() {
+        initialize: function(options) {
             this.set(this.defaults);
+
+            // There are always two dealModels.
+            var dealOptions = { deckModel: options.pgDeckModel };
         },
 
         // A game is specific to a player.
         defaults: {
-            'hands': [
-                [],
-                [],
-                []
-            ],
             'nextTileIndex': 0,
             'playerScore': 0,
             'opponentScore': 0,
@@ -37,34 +35,6 @@ function(
         },
 
         urlRoot: '/game',
-
-        // Shuffle an array.
-        _washTiles: function() {
-            var obj = PGTile.prototype.deck();
-            var washed = [], rand;
-            for (var index = 0; index < obj.length; index++) {
-                value = obj[index];
-                if (index === 0) {
-                    washed[0] = value;
-                } else {
-                    rand = Math.floor(Math.random() * (index + 1));
-                    washed[index] = washed[rand];
-                    washed[rand] = value;
-                }
-            }
-            this.set('deck', washed);
-            this.set('nextTileIndex', 0);
-        },
-
-        _dealNextTile: function() {
-            var deck = this.get('deck');
-            if (!deck) throw new Error("No tiles");
-            var nextTileIndex = this.get('nextTileIndex');
-            if (nextTileIndex > 31) throw new Error("No more tiles");
-            var tile = deck[nextTileIndex];
-            this.set('nextTileIndex', nextTileIndex+1);
-            return tile;
-        }
 
     });
 

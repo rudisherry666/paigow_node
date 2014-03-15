@@ -25,15 +25,8 @@ define([
         initialize: function(options) {
             this._$el = options.$el;
 
-            this._pgPlayerModel = options.pgPlayerModel;
-            this._pgGameModel = options.pgGameModel;
-
-            // Initialize all the models.
-            this._handModels = [];
-            for (var hmi = 0; hmi < 3; hmi++) {
-                var handModel = new PGHandModel();
-                this._handModels.push(handModel);
-            }
+            this._dealModel = options.dealModel;
+            this._deckModel = options.deckModel;
 
             // Listen to the models for changes.
             this._addModelListeners();
@@ -50,8 +43,8 @@ define([
                 this._handViews = [];
                 for (var hvi = 0; hvi < 3; hvi++) {
                     this._handViews.push(new PGHandView({
-                        $el: $game,
-                        handModel: this._handModels[hvi],
+                        $el: $deal,
+                        handModel: this._dealModel.get('handModels')[hvi],
                         index: hvi
                     }));
                 }

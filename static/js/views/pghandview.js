@@ -63,7 +63,6 @@ define(['backbone'], function(Backbone) {
                                     '</div>');
                     $handTiles.append($tile);
                 }
-                this._tilesChanged();
             }
         },
 
