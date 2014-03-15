@@ -23,8 +23,6 @@ define([
 
         // Startup
         initialize: function(options) {
-            this._$el = options.$el;
-
             this._playerModel = options.pgPlayerModel;
             this._deckModel = options.pgDeckModel;
             this._gameModel = options.pgGameModel;
@@ -58,16 +56,16 @@ define([
             if (!this.renderedTemplate) {
                 this.renderedTemplate = true;
                 var $game = $('<div class="pggame"></div>');
-                this._$el.append($game);
+                this.$el.append($game);
 
                 this._dealViews = [
                     new PGDealView({
-                        $el: $game,
+                        el: $game[0],
                         dealModel: this._playerDealModel,
                         deckModel: this._deckModel
                     }),
                     new PGDealView({
-                        $el: $game,
+                        el: $game[0],
                         dealModel: this._computerDealModel,
                         deckModel: this._deckModel
                     })
@@ -84,12 +82,12 @@ define([
         _showOrHide: function() {
             if ((this._playerModel.get('state') === 'static') && (this._playerModel.get('username') !== "unknown")) {
             } else {
-                this._$el.finish().fadeOut(500);
+                this.$el.finish().fadeOut(500);
             }
         },
 
         _newGame: function() {
-            this._$el.finish().fadeOut(500);
+            this.$el.finish().fadeOut(500);
             this.render();
 
             var $game = $(".pggame");
@@ -103,7 +101,7 @@ define([
             $game.prepend(score);
 
             this._deckModel.washTiles();
-            this._$el.finish().fadeIn(500);
+            this.$el.finish().fadeIn(500);
         },
 
     });

@@ -19,7 +19,6 @@ define([
         initialize: function(options) {
             // View-based stuff.
             this._options = options;
-            this._$el = options.$el;
 
             this._index = options.index;
 
@@ -28,6 +27,10 @@ define([
 
             // Listen for changes in the models.
             this._addModelListeners();
+        },
+
+        events: {
+            'click .pgrearrange-btn': "_rearrange"
         },
 
         // Show our view when asked.
@@ -40,7 +43,7 @@ define([
                                     '<div class="pghand-tiles">' +
                                     '</div>' +
                                 '</div>');
-                this._$el.append(this._$hand);
+                this.$el.append(this._$hand);
 
                 var $handTiles = this._$hand.children(".pghand-tiles");
                 $handTiles.append('<span class="pgtexticon pgrearrange-btn">&#128257;</span>');
@@ -79,6 +82,7 @@ define([
                     if (di === 0)
                         $handTiles.append('<div class="pgtile-spacer"></div>');
                 }
+                this.delegateEvents();
             }
         },
 
@@ -106,6 +110,10 @@ define([
             var lowHand = new PGHand(tiles[2], tiles[3]);
             $($labels[0]).text(highHand.name());
             $($labels[1]).text(lowHand.name());
+        },
+
+        _rearrange: function(e) {
+            var button = e.target;
         }
 
     });

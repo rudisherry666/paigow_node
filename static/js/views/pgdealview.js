@@ -23,8 +23,6 @@ define([
 
         // Startup
         initialize: function(options) {
-            this._$el = options.$el;
-
             this._dealModel = options.dealModel;
             this._deckModel = options.deckModel;
 
@@ -37,13 +35,13 @@ define([
             if (!this.renderedTemplate) {
                 this.renderedTemplate = true;
                 var $deal = $('<div class="pgdeal"></div>');
-                this._$el.append($deal);
+                this.$el.append($deal);
 
                 // There are three hands, each with a model.
                 this._handViews = [];
                 for (var hvi = 0; hvi < 3; hvi++) {
                     this._handViews.push(new PGHandView({
-                        $el: $deal,
+                        el: $deal[0],
                         handModel: this._dealModel.get('handModels')[hvi],
                         index: hvi
                     }));

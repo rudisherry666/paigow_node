@@ -43,7 +43,7 @@ define([
 
             // The container where the game is played
             var pgGameView = new PGGameView({
-                $el: $("#pg-game"),
+                el: $('.pg-game'),
                 pgPlayerModel: pgPlayerModel,
                 pgDeckModel: pgDeckModel,
                 pgGameModel: pgGameModel
@@ -58,7 +58,7 @@ define([
 
             // The sign-in view
             var signinView = new PGSigninView({
-                el: $(".form-signin"),
+                el: $(".form-signin")[0],
                 pgPlayerModel: pgPlayerModel
             });
             signinView.render();
