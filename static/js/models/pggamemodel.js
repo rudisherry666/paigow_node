@@ -31,9 +31,9 @@ function(
                 []
             ],
             'nextTileIndex': 0,
-            'player_score': 0,
-            'opponent_score': 0,
-            'opponent_name': "computer"
+            'playerScore': 0,
+            'opponentScore': 0,
+            'opponentName': "computer"
         },
 
         urlRoot: '/game',

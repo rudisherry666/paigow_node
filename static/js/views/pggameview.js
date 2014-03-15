@@ -87,11 +87,11 @@ define([
 
             var $game = $(".pggame");
             $game.find('.pgscore').remove();
-            var score = _.template('<h2 class="pgscore"><%=player_name%>: <%=player_score%> <%=opponent_name%>: <%=opponent_score%></h2>', {
-                player_name: this._playerModel.get('username'),
-                opponent_name: this._gameModel.get('opponent_name'),
-                player_score: this._gameModel.get('player_score'),
-                opponent_score: this._gameModel.get('opponent_score')
+            var score = _.template('<h2 class="pgscore"><%=playerName%>: <%=playerScore%> <%=opponentName%>: <%=opponentScore%></h2>', {
+                playerName: this._playerModel.get('username'),
+                opponentName: this._gameModel.get('opponentName'),
+                playerScore: this._gameModel.get('playerScore'),
+                opponentScore: this._gameModel.get('opponentScore')
             });
             $game.prepend(score);
 
