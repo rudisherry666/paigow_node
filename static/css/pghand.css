@@ -2,11 +2,12 @@
     /*margin-right: 20px;*/
     padding: 10px 10px 3px 10px;
     text-align: center;
-    display: inline-block;
+    display: block;
 }
 
 .pghand .pghand-tiles {
     width: auto;
+    display: inline-block;
 }
 
 .pghand .pghand-name {

@@ -29,7 +29,7 @@ define(['backbone'], function(Backbone) {
         // Listen for changes
         _addModelListeners: function() {
             this._options.pgPlayerModel.on("change:username", _.bind(function() {
-                console.log("PGPlayerView: name changed!");
+                console.log("PGPlayerView: name changed to " + this._options.pgPlayerModel.get('username'));
                 if (this._nameSpan)
                     this._nameSpan.html(this._options.pgPlayerModel.get('username'));
             }, this));

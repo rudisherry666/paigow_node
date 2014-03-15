@@ -1,6 +1,6 @@
 /*
 *
-* @class PGHandModel
+* @class PGGameModel
 *
 * This file defines the pgplayer js class on the client
 *
@@ -9,23 +9,24 @@
 
 define(['backbone'], function(Backbone) {
     
-    var PGHandModel = Backbone.Model.extend({
+    var PGGameModel = Backbone.Model.extend({
 
         // Startup
         initialize: function() {
             this.set(this.defaults);
         },
 
-        // A hand is specific to a player in a game, and is
-        // some round in the game.
+        // A game is specific to a player.
         defaults: {
-            'tiles': [],
-            'points': 0
+            'hands': [],
+            'player_score': 0,
+            'opponent_score': 0,
+            'opponent_name': "computer"
         },
 
-        urlRoot: '/hand'
+        urlRoot: '/game'
 
     });
 
-    return PGHandModel;
+    return PGGameModel;
 });

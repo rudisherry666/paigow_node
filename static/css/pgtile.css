@@ -123,12 +123,12 @@
     display: block;
 }
 
-/* ----------- HIGH-FOUR ----------- */
+/* ----------- LOW-FOUR ----------- */
 
-.pgtile-high-four .pgdot-1,
-.pgtile-high-four .pgdot-3,
-.pgtile-high-four .pgdot-18,
-.pgtile-high-four .pgdot-20
+.pgtile-low-four .pgdot-1,
+.pgtile-low-four .pgdot-3,
+.pgtile-low-four .pgdot-18,
+.pgtile-low-four .pgdot-20
 {
     background: White;
     display: block;

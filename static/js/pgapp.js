@@ -8,11 +8,15 @@
 define([
     'models/pgplayermodel',
     'views/pgplayernameview',
-    'views/pgsigninview'
+    'views/pgsigninview',
+    'models/pggamemodel',
+    'views/pggameview'
 ], function(
     PGPlayerModel,
     PGPlayerNameView,
-    PGSigninView) {
+    PGSigninView,
+    PGGameModel,
+    PGGameView) {
 
     function PGApp() {
         var defer = $.Deferred();
@@ -25,19 +29,31 @@ define([
             error:   function() { console.log('error');   defer.reject();  }
         });
 
+        // Create a game model.  For now we don't fetch it.
+        var pgGameModel = new PGGameModel();
+
         // Create the views that show the player's name or other attributes in
         // various parts of the UI.
         defer.promise().done(function() {
-            console.log('done');
+
+            // The container where the game is played
+            var pgGameView = new PGGameView({
+                $el: $("#pg-game"),
+                pgPlayerModel: pgPlayerModel,
+                pgGameModel: pgGameModel
+            });
+
+            // The part of the nav bar where the name is shown
             var navPGPlayerNameView = new PGPlayerNameView({
                 pgPlayerModel: pgPlayerModel,
                 $el: $("#pglayer-name-nav")
             });
             navPGPlayerNameView.render();
 
+            // The sign-in view
             var signinView = new PGSigninView({
                 el: $(".form-signin"),
-                pgPlayerModel: pgPlayerModel,
+                pgPlayerModel: pgPlayerModel
             });
             signinView.render();
         });
