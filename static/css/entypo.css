@@ -6,10 +6,10 @@
   font-style: normal;
 }
 
-.pgicon {
+.pgtexticon {
   font-family: "entypo";
-  color: DodgerBlue;
-  font-size: 80px;
+  color: #000;
+  font-size: 40px;
   vertical-align: middle;
   margin-top: -5px;
   width: 1em;

@@ -43,6 +43,7 @@ define([
                 this._$el.append(this._$hand);
 
                 var $handTiles = this._$hand.children(".pghand-tiles");
+                $handTiles.append('<span class="pgtexticon pgrearrange-btn">&#128257;</span>');
                 var tiles = this._handModel.get('tiles');
                 for (var di = 0; di < 2; di++) {
                     var $2tile = $('<div class="pg2tile"></div>');
