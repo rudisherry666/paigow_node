@@ -40,8 +40,10 @@ define([
                 // There are three hands, each with a model.
                 this._handViews = [];
                 for (var hvi = 0; hvi < 3; hvi++) {
+                    var $handEl = $('<div id="pghand-' + hvi + '" class="pghand">');
+                    $deal.append($handEl);
                     this._handViews.push(new PGHandView({
-                        el: $deal[0],
+                        el: $handEl[0],
                         handModel: this._dealModel.get('handModels')[hvi],
                         index: hvi
                     }));

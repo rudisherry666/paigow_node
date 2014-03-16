@@ -38,16 +38,17 @@ define([
             if (!this.renderedTemplate) {
                 this.renderedTemplate = true;
 
-                // Create a div for the hand, remembering the index so it's individually addressable.
-                this._$hand = $(  '<div id="pghand-' + this._index + '" class="pghand">' +
-                                    '<div class="pghand-tiles">' +
-                                    '</div>' +
-                                '</div>');
-                this.$el.append(this._$hand);
+                // We're given the hand div.
+                this._$hand = this.$el;
 
-                var $handTiles = this._$hand.children(".pghand-tiles");
+                var $handTiles = $('<div class="pghand-tiles"></div>');
+                this._$hand.append($handTiles);
+
+                // Add the rearrange button.
                 $handTiles.append('<span class="pgtexticon pgrearrange-btn">&#128257;</span>');
-                var tiles = this._handModel.get('tiles');
+
+                // Add the tiles divs.  All dots are defined; the CSS will show only the
+                // apprpropriate ones given the pgtile class, which comse from the tile it is.
                 for (var di = 0; di < 2; di++) {
                     var $2tile = $('<div class="pg2tile"></div>');
                     $handTiles.append($2tile);
@@ -113,7 +114,11 @@ define([
         },
 
         _rearrange: function(e) {
-            var button = e.target;
+            // Switch around our hand's tiles: third tile goes second,
+            // fourth goes third, second goes fourth.
+            var tiles = this._handModel.get('tiles');
+            this._handModel.set('tiles', [ tiles[0], tiles[2], tiles[3], tiles[1] ]);
+            this._tilesChanged();
         }
 
     });
