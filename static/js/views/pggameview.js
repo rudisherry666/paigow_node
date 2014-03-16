@@ -58,20 +58,18 @@ define([
                 var $game = this.$el;
                 this.$el.append($game);
 
-                var $deals = $('<div class="pgdeal"></div><div class="pgdeal"></div>');
+                var $deals = $(this._dealsTemplate);
                 $game.append($deals);
                 this._dealViews = [
                     new PGDealView({
                         el: $deals[0],
                         dealModel: this._playerDealModel,
-                        deckModel: this._deckModel,
-                        dealClass: 'pg-player-deal'
+                        deckModel: this._deckModel
                     }),
                     new PGDealView({
                         el: $deals[1],
                         dealModel: this._computerDealModel,
                         deckModel: this._deckModel,
-                        dealClass: 'pg-opponent-deal pg-hidden-hand'
                     })
                 ];
             }
@@ -107,6 +105,10 @@ define([
             this._deckModel.washTiles();
             this.$el.finish().fadeIn(500);
         },
+
+        _dealsTemplate:
+                '</div><div class="pgdeal pg-player-deal"></div>' +
+                '</div><div class="pgdeal pg-opponent-deal pg-hidden-hand"></div>'
 
     });
 

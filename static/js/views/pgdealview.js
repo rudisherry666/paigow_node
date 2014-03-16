@@ -42,9 +42,6 @@ define([
                 this.renderedTemplate = true;
                 var $deal = this.$el;
 
-                // Add the classes we're told/
-                $deal.addClass(this._options.dealClass);
-
                 // Get the contents of the deal from the template.
                 var $hands = $(this._dealTemplate);
                 $deal.append($hands);
