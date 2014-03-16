@@ -30,6 +30,10 @@ define([
             this._addModelListeners();
         },
 
+        events: {
+            'click .pgswitchhands-btn': "_switchHands"
+        },
+
         // If there is no signin, then show the view.
         render: function() {
             if (!this.renderedTemplate) {
@@ -47,8 +51,12 @@ define([
                         index: hvi
                     }));
                     if (hvi < 2)
-                        $deal.append('<span class="pgtexticon pgswitchhands-btn pgswitchhands-' + hvi + '-btn">&#59215;</span>');
+                        $deal.append('<span data-handindex="' + hvi + '" class="pgtexticon pgswitchhands-btn pgswitchhands-' + hvi + '-btn">&#59215;</span>');
                 }
+
+                // The 'events' was parsed before we created our view; this call
+                // reparse it to get the views we just created.
+                this.delegateEvents();
             }
             _.each(this._handViews, function(handView) { handView.render(); });
         },
@@ -56,6 +64,17 @@ define([
         // Listen for changes
         _addModelListeners: function() {
         },
+
+        _switchHands: function(e) {
+            var whichHand = parseInt($(e.target).attr('data-handindex'), 10);
+            var handModels = this._dealModel.get('handModels');
+            var modelOne = handModels[whichHand];
+            var modelTwo = handModels[whichHand+1];
+            var tilesOne = modelOne.get('tileindexes');
+            var tilesTwo = modelTwo.get('tileindexes');
+            modelOne.set('tileindexes', tilesTwo);
+            modelTwo.set('tileindexes', tilesOne);
+        }
 
     });
 
