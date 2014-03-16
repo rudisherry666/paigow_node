@@ -10,13 +10,13 @@
 
 .pgswitchhands-btn {
     position: absolute;
-    margin-left: -25px;
-    left: 9%;
+    margin-left: -20px;
+    left: 50%;
     margin-top: -10px;
     font-size: 50px;
     cursor: pointer;
 }
-.pgswitchhands-0-btn { top: 31%; }
+.pgswitchhands-0-btn { top: 32%; }
 .pgswitchhands-1-btn { top: 64%; }
 
 .pg-hidden-hand .pgswitchhands-btn {
