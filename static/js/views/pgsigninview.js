@@ -44,7 +44,7 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
                 this._hideError();
                 this._isShowing = (this._options.pgPlayerModel.get('username') === "unknown");
                 if (this._isShowing) {
-                    $(".form-signin").fadeIn(500);
+                    $(".form-signin").fadeIn(500, function() { $("#pgsignin-signin-name").focus(); });
                 } else
                     $(".form-signin").fadeOut(500);
             } else {
