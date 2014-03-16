@@ -83,6 +83,9 @@ define([
                     if (di === 0)
                         $handTiles.append('<div class="pgtile-spacer"></div>');
                 }
+
+                // The 'events' was parsed before we created our view; this call
+                // reparse it to get the views we just created.
                 this.delegateEvents();
             }
         },
@@ -116,8 +119,8 @@ define([
         _rotateTiles: function(e) {
             // Switch around our hand's tiles: third tile goes second,
             // fourth goes third, second goes fourth.
-            var tiles = this._handModel.get('tiles');
-            this._handModel.set('tiles', [ tiles[0], tiles[2], tiles[3], tiles[1] ]);
+            var tileIndexes = this._handModel.get('tileindexes');
+            this._handModel.set('tileindexes', [ tileIndexes[0], tileIndexes[2], tileIndexes[3], tileIndexes[1] ]);
             this._tilesChanged();
         }
 

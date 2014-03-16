@@ -19,6 +19,7 @@ function(
         // Startup
         initialize: function() {
             this.set(this.defaults);
+            this.washTiles({silent: true});
         },
 
         defaults: {
@@ -26,7 +27,7 @@ function(
         },
 
         // Shuffle an array.
-        washTiles: function() {
+        washTiles: function(options) {
             var obj = PGTile.prototype.deck();
             var washed = [], rand;
             for (var index = 0; index < obj.length; index++) {
@@ -44,7 +45,8 @@ function(
 
             // Manual trigger because of array-comparison; setting to new
             // deck doesn't auto-trigger 'changed:deck'.
-            this.trigger('changed:deck');
+            if (!options || !options.silent)
+                this.trigger('changed:deck');
         },
 
         nextTileIndex: function() {

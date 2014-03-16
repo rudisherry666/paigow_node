@@ -20,9 +20,13 @@ define(['backbone'], function(Backbone) {
 
             // Get all the tile indexes.  These don't change, but when the
             // deck is shuffled we re-get the tile at that index.
-            this._tileIndexes = [];
+            var tileIndexes = [];
             for (var ti = 0; ti < 4; ti++)
-                this._tileIndexes.push(this._deckModel.nextTileIndex());
+                tileIndexes.push(this._deckModel.nextTileIndex());
+
+            // Set the indexes but during initialization we don't want
+            // to trigger anything: that happens when the deck is washed.
+            this.set('tileindexes', tileIndexes, {silent: true});
         },
 
         // A hand is specific to a player in a game, and is
@@ -37,16 +41,23 @@ define(['backbone'], function(Backbone) {
         _addModelListeners: function() {
             // If the deck is changed, our tiles should be re-initialized.
             this._deckModel.on('change:deck',
-                _.bind(function() {
-                    var tiles = [
-                        this._deckModel.tileOf(this._tileIndexes[0]),
-                        this._deckModel.tileOf(this._tileIndexes[1]),
-                        this._deckModel.tileOf(this._tileIndexes[2]),
-                        this._deckModel.tileOf(this._tileIndexes[3])
-                    ];
-                    this.set('tiles', tiles);
-                    this.trigger('change:tiles');
-                }, this));
+                _.bind(function() { this._resetTiles(); }, this));
+
+            // If tile indexes are changed, reset the tieles
+            this.on('change:tileindexes',
+                _.bind(function() { this._resetTiles(); }, this));
+        },
+
+        _resetTiles: function() {
+            var tileIndexes = this.get('tileindexes');
+            var tiles = [
+                this._deckModel.tileOf(tileIndexes[0]),
+                this._deckModel.tileOf(tileIndexes[1]),
+                this._deckModel.tileOf(tileIndexes[2]),
+                this._deckModel.tileOf(tileIndexes[3])
+            ];
+            this.set('tiles', tiles);
+            this.trigger('change:tiles');
         }
 
     });
