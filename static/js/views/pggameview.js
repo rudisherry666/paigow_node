@@ -56,18 +56,17 @@ define([
             if (!this.renderedTemplate) {
                 this.renderedTemplate = true;
                 var $game = this.$el;
-                this.$el.append($game);
 
-                var $deals = $(this._dealsTemplate);
-                $game.append($deals);
+                var $gameContents = $(this._gameTemplate);
+                $game.append($gameContents);
                 this._dealViews = [
                     new PGDealView({
-                        el: $deals[0],
+                        el: $gameContents.find('.pgdeal')[0],
                         dealModel: this._playerDealModel,
                         deckModel: this._deckModel
                     }),
                     new PGDealView({
-                        el: $deals[1],
+                        el: $gameContents.find('.pgdeal')[1],
                         dealModel: this._computerDealModel,
                         deckModel: this._deckModel,
                     })
@@ -106,9 +105,11 @@ define([
             this.$el.finish().fadeIn(500);
         },
 
-        _dealsTemplate:
-                '</div><div class="pgdeal pg-player-deal"></div>' +
-                '</div><div class="pgdeal pg-opponent-deal pg-hidden-hand"></div>'
+        _gameTemplate:
+                '<div>' +
+                    '<div class="pgdeal pg-player-deal"></div>' +
+                    '<div class="pgdeal pg-opponent-deal pg-hidden-hand"></div>' +
+                '</div>'
 
     });
 
