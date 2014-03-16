@@ -45,7 +45,7 @@ define([
                 this._$hand.append($handTiles);
 
                 // Add the rearrange button.
-                $handTiles.append('<span class="pgtexticon rotatetiles-btn">&#128257;</span>');
+                $handTiles.append('<span class="pgtexticon rotatetiles-btn">&#10226;</span>');
 
                 // Add the tiles divs.  All dots are defined; the CSS will show only the
                 // apprpropriate ones given the pgtile class, which comse from the tile it is.
