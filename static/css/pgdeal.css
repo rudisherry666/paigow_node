@@ -8,6 +8,25 @@
     margin: 20px;
 }
 
+.pg-deal-hands {
+    position: relative;
+    padding-top: 30px;
+}
+
+.pg-deal-buttons button {
+    display: inline-block;
+    margin-left: 13px;
+    margin-right: 13px;
+    margin-bottom: 10px;
+    height: 30px;
+}
+
+.pg-deal-buttons .pg-deal-preview-hands { float: left; }
+.pg-deal-buttons .pg-deal-tiles-are-set { float: right; }
+.pg-hidden-hand .pg-deal-buttons {
+    visibility: hidden;
+}
+
 .pgswitchhands-btn {
     position: absolute;
     margin-left: -20px;
@@ -16,12 +35,8 @@
     font-size: 50px;
     cursor: pointer;
 }
-.pgswitchhands-0-btn { top: 32%; }
-.pgswitchhands-1-btn { top: 64%; }
-
-.pg-hidden-hand .pgswitchhands-btn {
-    display: none;
-}
+.pgswitchhands-0-btn { top: 198px; }
+.pgswitchhands-1-btn { top: 382px; }
 
 .pg-handpoints {
     position: absolute;
@@ -33,11 +48,11 @@
     color: gray;
     left: 50%;
 }
-.pg-handpoints-3 { top:  3%; }
-.pg-handpoints-2 { top: 36%; }
-.pg-handpoints-1 { top: 69%; }
+.pg-handpoints-3 { top:  61px; }
+.pg-handpoints-2 { top: 244px; }
+.pg-handpoints-1 { top: 426px; }
 
-.pg-hidden-hand .pg-handpoints {
+.pg-hidden-hand .pg-handpoints, .pg-hidden-hand .pgswitchhands-btn {
     display: none;
 }
 
