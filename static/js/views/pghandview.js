@@ -30,7 +30,7 @@ define([
         },
 
         events: {
-            'click .pgswitchtiles-btn': "_rearrange"
+            'click .rotatetiles-btn': "_rotateTiles"
         },
 
         // Show our view when asked.
@@ -45,7 +45,7 @@ define([
                 this._$hand.append($handTiles);
 
                 // Add the rearrange button.
-                $handTiles.append('<span class="pgtexticon pgswitchtiles-btn">&#128257;</span>');
+                $handTiles.append('<span class="pgtexticon rotatetiles-btn">&#128257;</span>');
 
                 // Add the tiles divs.  All dots are defined; the CSS will show only the
                 // apprpropriate ones given the pgtile class, which comse from the tile it is.
@@ -113,7 +113,7 @@ define([
             $($labels[1]).text(lowHand.name());
         },
 
-        _rearrange: function(e) {
+        _rotateTiles: function(e) {
             // Switch around our hand's tiles: third tile goes second,
             // fourth goes third, second goes fourth.
             var tiles = this._handModel.get('tiles');
