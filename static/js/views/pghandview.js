@@ -30,7 +30,7 @@ define([
         },
 
         events: {
-            'click .pgrearrange-btn': "_rearrange"
+            'click .pgswitchtiles-btn': "_rearrange"
         },
 
         // Show our view when asked.
@@ -45,7 +45,7 @@ define([
                 this._$hand.append($handTiles);
 
                 // Add the rearrange button.
-                $handTiles.append('<span class="pgtexticon pgrearrange-btn">&#128257;</span>');
+                $handTiles.append('<span class="pgtexticon pgswitchtiles-btn">&#128257;</span>');
 
                 // Add the tiles divs.  All dots are defined; the CSS will show only the
                 // apprpropriate ones given the pgtile class, which comse from the tile it is.
