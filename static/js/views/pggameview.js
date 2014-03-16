@@ -64,12 +64,14 @@ define([
                     new PGDealView({
                         el: $deals[0],
                         dealModel: this._playerDealModel,
-                        deckModel: this._deckModel
+                        deckModel: this._deckModel,
+                        dealClass: 'pg-player-deal'
                     }),
                     new PGDealView({
                         el: $deals[1],
                         dealModel: this._computerDealModel,
-                        deckModel: this._deckModel
+                        deckModel: this._deckModel,
+                        dealClass: 'pg-opponent-deal pg-hidden-hand'
                     })
                 ];
             }

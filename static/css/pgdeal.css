@@ -19,6 +19,10 @@
 .pgswitchhands-0-btn { top: 31%; }
 .pgswitchhands-1-btn { top: 64%; }
 
+.pg-hidden-hand .pgswitchhands-btn {
+    display: none;
+}
+
 .pg-handpoints {
     position: absolute;
     display: inline-block;
@@ -32,3 +36,8 @@
 .pg-handpoints-3 { top:  3%; }
 .pg-handpoints-2 { top: 36%; }
 .pg-handpoints-1 { top: 69%; }
+
+.pg-hidden-hand .pg-handpoints {
+    display: none;
+}
+

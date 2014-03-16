@@ -23,6 +23,7 @@ define([
 
         // Startup
         initialize: function(options) {
+            this._options = options;
             this._dealModel = options.dealModel;
             this._deckModel = options.deckModel;
 
@@ -40,6 +41,9 @@ define([
             if (!this.renderedTemplate) {
                 this.renderedTemplate = true;
                 var $deal = this.$el;
+
+                // Add the classes we're told/
+                $deal.addClass(this._options.dealClass);
 
                 // Get the contents of the deal from the template.
                 var $hands = $(this._dealTemplate);
