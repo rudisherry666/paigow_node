@@ -34,6 +34,7 @@ define([
             'click .pgswitchhands-btn': "_switchHands"
         },
 
+
         // If there is no signin, then show the view.
         render: function() {
             if (!this.renderedTemplate) {
@@ -43,6 +44,8 @@ define([
                 // There are three hands, each with a model.
                 this._handViews = [];
                 for (var hvi = 0; hvi < 3; hvi++) {
+                    var $pointsEl = $('<span class="pg-handpoints pg-handpoints-' + (3-hvi) + '">' + (3-hvi) + '</span>');
+                    $deal.append($pointsEl);
                     var $handEl = $('<div id="pghand-' + hvi + '" class="pghand">');
                     $deal.append($handEl);
                     this._handViews.push(new PGHandView({
@@ -74,7 +77,7 @@ define([
             var tilesTwo = modelTwo.get('tileindexes');
             modelOne.set('tileindexes', tilesTwo);
             modelTwo.set('tileindexes', tilesOne);
-        }
+        },
 
     });
 

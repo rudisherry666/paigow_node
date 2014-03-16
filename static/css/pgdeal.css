@@ -16,11 +16,19 @@
     font-size: 50px;
     cursor: pointer;
 }
+.pgswitchhands-0-btn { top: 31%; }
+.pgswitchhands-1-btn { top: 64%; }
 
-.pgswitchhands-0-btn {
-    top: 31%;
+.pg-handpoints {
+    position: absolute;
+    display: inline-block;
+    font-size: 24px;
+    font-weight: 100;
+    margin-left: -6px;
+    pointer-events: none;
+    color: gray;
+    left: 50%;
 }
-
-.pgswitchhands-1-btn {
-    top: 64%;
-}
+.pg-handpoints-3 { top:  3%; }
+.pg-handpoints-2 { top: 36%; }
+.pg-handpoints-1 { top: 69%; }

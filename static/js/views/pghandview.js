@@ -55,28 +55,7 @@ define([
                     var $tileBlock = $('<div></div>');
                     $2tile.append($tileBlock);
                     for (var ti = 0; ti < 2; ti++) {
-                        var $tile = $(  '<div class="pgtile">' +
-                                            '<div class="pgdot pgdot-1"></div>' +
-                                            '<div class="pgdot pgdot-2"></div>' +
-                                            '<div class="pgdot pgdot-3"></div>' +
-                                            '<div class="pgdot pgdot-4"></div>' +
-                                            '<div class="pgdot pgdot-5"></div>' +
-                                            '<div class="pgdot pgdot-6"></div>' +
-                                            '<div class="pgdot pgdot-7"></div>' +
-                                            '<div class="pgdot pgdot-8"></div>' +
-                                            '<div class="pgdot pgdot-9"></div>' +
-                                            '<div class="pgdot pgdot-10"></div>' +
-                                            '<div class="pgdot pgdot-11"></div>' +
-                                            '<div class="pgdot pgdot-12"></div>' +
-                                            '<div class="pgdot pgdot-13"></div>' +
-                                            '<div class="pgdot pgdot-14"></div>' +
-                                            '<div class="pgdot pgdot-15"></div>' +
-                                            '<div class="pgdot pgdot-16"></div>' +
-                                            '<div class="pgdot pgdot-17"></div>' +
-                                            '<div class="pgdot pgdot-18"></div>' +
-                                            '<div class="pgdot pgdot-19"></div>' +
-                                            '<div class="pgdot pgdot-20"></div>' +
-                                        '</div>');
+                        var $tile = $(this._tileTemplate);
                         $tileBlock.append($tile);
                     }
                     $2tile.append('<span class="pg2tile-label"></span>');
@@ -122,7 +101,41 @@ define([
             var tileIndexes = this._handModel.get('tileindexes');
             this._handModel.set('tileindexes', [ tileIndexes[0], tileIndexes[2], tileIndexes[3], tileIndexes[1] ]);
             this._tilesChanged();
-        }
+        },
+
+        _tileTemplate:
+            '<div class="pgtile">' +
+                '<div class="pgdot pgdot-1"></div>' +
+                '<div class="pgdot pgdot-2"></div>' +
+                '<div class="pgdot pgdot-3"></div>' +
+                '<div class="pgdot pgdot-4"></div>' +
+                '<div class="pgdot pgdot-5"></div>' +
+                '<div class="pgdot pgdot-6"></div>' +
+                '<div class="pgdot pgdot-7"></div>' +
+                '<div class="pgdot pgdot-8"></div>' +
+                '<div class="pgdot pgdot-9"></div>' +
+                '<div class="pgdot pgdot-10"></div>' +
+                '<div class="pgdot pgdot-11"></div>' +
+                '<div class="pgdot pgdot-12"></div>' +
+                '<div class="pgdot pgdot-13"></div>' +
+                '<div class="pgdot pgdot-14"></div>' +
+                '<div class="pgdot pgdot-15"></div>' +
+                '<div class="pgdot pgdot-16"></div>' +
+                '<div class="pgdot pgdot-17"></div>' +
+                '<div class="pgdot pgdot-18"></div>' +
+                '<div class="pgdot pgdot-19"></div>' +
+                '<div class="pgdot pgdot-20"></div>' +
+            '</div>',
+
+        _handTemplate:
+            '<div class="pghand-tiles">' +
+                '<span class="pgtexticon rotatetiles-btn">⟲</span>' +
+                '<div class="pg2tile"><div></div>' +
+                '<span class="pg2tile-label"></span></div>' +
+                '<div class="pgtile-spacer"></div>' +
+                '<div class="pg2tile"></div>' +
+                '<span class="pg2tile-label">0</span>' +
+            '</div>'
 
     });
 
