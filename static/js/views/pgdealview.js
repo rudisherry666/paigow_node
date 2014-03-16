@@ -46,6 +46,8 @@ define([
                         handModel: this._dealModel.get('handModels')[hvi],
                         index: hvi
                     }));
+                    if (hvi < 2)
+                        $deal.append('<span class="pgtexticon pgswitchhands-btn pgswitchhands-' + hvi + '-btn">&#59215;</span>');
                 }
             }
             _.each(this._handViews, function(handView) { handView.render(); });

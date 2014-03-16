@@ -1,9 +1,26 @@
 .pgdeal {
+    position: relative;
+    display: inline-block;
     padding-top: 10px;
     background-color: LimeGreen;
     border-radius: 5px;
     text-align: center;
-    display: inline-block;
     margin: 20px;
 }
 
+.pgswitchhands-btn {
+    position: absolute;
+    margin-left: -25px;
+    left: 9%;
+    margin-top: -10px;
+    font-size: 50px;
+    cursor: pointer;
+}
+
+.pgswitchhands-0-btn {
+    top: 31%;
+}
+
+.pgswitchhands-1-btn {
+    top: 64%;
+}
