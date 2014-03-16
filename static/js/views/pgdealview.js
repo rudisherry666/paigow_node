@@ -41,20 +41,18 @@ define([
                 this.renderedTemplate = true;
                 var $deal = this.$el;
 
+                // Get the contents of the deal from the template.
+                var $hands = $(this._dealTemplate);
+                $deal.append($hands);
+
                 // There are three hands, each with a model.
                 this._handViews = [];
                 for (var hvi = 0; hvi < 3; hvi++) {
-                    var $pointsEl = $('<span class="pg-handpoints pg-handpoints-' + (3-hvi) + '">' + (3-hvi) + '</span>');
-                    $deal.append($pointsEl);
-                    var $handEl = $('<div id="pghand-' + hvi + '" class="pghand">');
-                    $deal.append($handEl);
                     this._handViews.push(new PGHandView({
-                        el: $handEl[0],
+                        el: $deal.find('.pghand')[hvi],
                         handModel: this._dealModel.get('handModels')[hvi],
                         index: hvi
                     }));
-                    if (hvi < 2)
-                        $deal.append('<span data-handindex="' + hvi + '" class="pgtexticon pgswitchhands-btn pgswitchhands-' + hvi + '-btn">&#59215;</span>');
                 }
 
                 // The 'events' was parsed before we created our view; this call
@@ -78,6 +76,17 @@ define([
             modelOne.set('tileindexes', tilesTwo);
             modelTwo.set('tileindexes', tilesOne);
         },
+
+        _dealTemplate:
+            '<span class="pg-handpoints pg-handpoints-3">3</span>' +
+            '<div id="pghand-0" class="pghand"></div>' +
+            '<span data-handindex="0" class="pgtexticon pgswitchhands-btn pgswitchhands-0-btn">&#59215;</span>' +
+            '<span class="pg-handpoints pg-handpoints-2">2</span>' +
+            '<div id="pghand-1" class="pghand"></div>' +
+            '<span data-handindex="0" class="pgtexticon pgswitchhands-btn pgswitchhands-1-btn">&#59215;</span>' +
+            '<span class="pg-handpoints pg-handpoints-1">1</span>' +
+            '<div id="pghand-2" class="pghand"></div>'
+
 
     });
 
