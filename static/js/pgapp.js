@@ -42,8 +42,11 @@ define([
         defer.promise().done(function() {
 
             // The container where the game is played
+            var $gameView = $('<div class="pggame"></div>');
+            var $gameParent = $('.pg-game');
+            $gameParent.append($gameView);
             var pgGameView = new PGGameView({
-                el: $('.pg-game'),
+                el: $gameView[0],
                 pgPlayerModel: pgPlayerModel,
                 pgDeckModel: pgDeckModel,
                 pgGameModel: pgGameModel

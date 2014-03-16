@@ -55,7 +55,7 @@ define([
         render: function() {
             if (!this.renderedTemplate) {
                 this.renderedTemplate = true;
-                var $game = $('<div class="pggame"></div>');
+                var $game = this.$el;
                 this.$el.append($game);
 
                 this._dealViews = [
