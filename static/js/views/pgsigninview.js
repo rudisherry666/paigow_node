@@ -16,9 +16,10 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         },
 
         events: {
-            'click #pgsignin-signin': "_onSignin",
+            'click #pgsignin-signin'  : "_onSignin",
             'click #pgsignin-register': "_onRegister",
-            'click .nav-tabs li a': function(e) { this._hideError(); }
+            'keyup'                   : "_onKeyUp",
+            'click .nav-tabs li a'    : "_hideError"
         },
 
         // If there is no signin, then show the view.
@@ -48,6 +49,30 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
                     $(".form-signin").fadeOut(500);
             } else {
                 this._onError((this._options.pgPlayerModel.get('state') === 'signing-in') ? "Signing in..." : "Registering...");
+            }
+        },
+
+        // Implementation of 'esc' and 'return' for submitting form, need to do
+        // it manually because it's not really a form.
+        _onKeyUp: function(e) {
+            // Regardless of key, we don't do anything if it's working
+            // om a signin or register.
+            if (this._options.pgPlayerModel.get('state') === 'working')
+                return;
+
+            switch (e.keyCode) {
+                case 13: // return: confirm the form: figure out which tab
+                    var $tab = $('.nav-tabs li.active a');
+                    var href = $tab.attr('href');
+                    switch(href) {
+                        case "#login"   : this._onSignin(e); break;
+                        case "#register": this._onRegister(e); break;
+                    }
+                break;
+
+                case 27: // esc: empty the form
+                    $('.pgsignin-input').val("");
+                break;
             }
         },
 
