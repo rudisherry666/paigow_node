@@ -34,8 +34,7 @@ define([
         render: function() {
             if (!this.renderedTemplate) {
                 this.renderedTemplate = true;
-                var $deal = $('<div class="pgdeal"></div>');
-                this.$el.append($deal);
+                var $deal = this.$el;
 
                 // There are three hands, each with a model.
                 this._handViews = [];

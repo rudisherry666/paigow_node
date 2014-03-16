@@ -58,14 +58,16 @@ define([
                 var $game = this.$el;
                 this.$el.append($game);
 
+                var $deals = $('<div class="pgdeal"></div><div class="pgdeal"></div>');
+                $game.append($deals);
                 this._dealViews = [
                     new PGDealView({
-                        el: $game[0],
+                        el: $deals[0],
                         dealModel: this._playerDealModel,
                         deckModel: this._deckModel
                     }),
                     new PGDealView({
-                        el: $game[0],
+                        el: $deals[1],
                         dealModel: this._computerDealModel,
                         deckModel: this._deckModel
                     })
