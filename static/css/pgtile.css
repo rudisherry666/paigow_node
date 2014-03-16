@@ -30,6 +30,10 @@
     display: none;
 }
 
+.pg-hidden-hand .pgdot {
+    display: none;
+}
+
 /* ----------- TEEN ----------- */
 
 .pgtile-teen .pgdot-1,
