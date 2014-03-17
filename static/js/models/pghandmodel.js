@@ -7,7 +7,13 @@
 * A single player corresponds to a person playing the game.
 */
 
-define(['backbone'], function(Backbone) {
+define([
+    'backbone',
+    'classes/pghand'
+], function(
+    Backbone,
+    PGHand
+) {
     
     var PGHandModel = Backbone.Model.extend({
 
@@ -43,7 +49,7 @@ define(['backbone'], function(Backbone) {
             this._deckModel.on('change:deck',
                 _.bind(function() { this._resetTiles(); }, this));
 
-            // If tile indexes are changed, reset the tieles
+            // If tile indexes are changed, reset the tiles
             this.on('change:tileindexes',
                 _.bind(function() { this._resetTiles(); }, this));
         },
@@ -58,6 +64,32 @@ define(['backbone'], function(Backbone) {
             ];
             this.set('tiles', tiles);
             this.trigger('change:tiles');
+        },
+
+        orderTiles: function(options) {
+            var tiles = this.get('tiles');
+            var tileIndexes = this.get('tileindexes').slice(0);
+
+            // Put the higher hand on the left
+            var highHand = new PGHand(tiles[0], tiles[1]);
+            var lowHand = new PGHand(tiles[2], tiles[3]);
+            if (highHand.compare(lowHand) < 0) {
+                tileIndexes = [ tileIndexes[2], tileIndexes[3], tileIndexes[0], tileIndexes[1] ];
+            }
+
+            // Make sure each hand has the higher tiles.
+            var deckModel = this._deckModel;
+            function compareAndSwitchIfNecessary(a, b) {
+                if (deckModel.tileOf(tileIndexes[a]).compare(deckModel.tileOf(tileIndexes[b])) < 0) {
+                    var tempIndex = tileIndexes[a];
+                    tileIndexes[a] = tileIndexes[b];
+                    tileIndexes[b] = tempIndex;
+                }
+            }
+            compareAndSwitchIfNecessary(0, 1);
+            compareAndSwitchIfNecessary(2, 3);
+
+            this.set('tileindexes', tileIndexes);
         }
 
     });

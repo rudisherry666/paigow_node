@@ -20,16 +20,25 @@ function(
         initialize: function(options) {
             this.set(this.defaults);
             this._deckModel = options.deckModel;
+
+            // Create the three handmodels underlying this dealModel.
             var handOptions = { deckModel: options.deckModel };
-            this.set('handModels', [
+            this.set('handmodels', [
                 new PGHandModel(handOptions),
                 new PGHandModel(handOptions),
                 new PGHandModel(handOptions)
             ]);
+
+            this._addModelListeners();
         },
 
         defaults: {
-            'username': "unknown"
+            'username': "unknown",
+            'state': "thinking"
+        },
+
+
+        _addModelListeners: function() {
         },
 
         urlRoot: '/deal',
