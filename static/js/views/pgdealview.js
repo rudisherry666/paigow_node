@@ -82,6 +82,7 @@ define([
                         break;
                         case "finished":
                             this.$el.find('.pg-deal-buttons button').attr('disabled', true);
+                            this.$el.addClass('pg-no-manipulate');
                         break;
                     }
                 }, this)
@@ -125,10 +126,10 @@ define([
                 '<div id="pghand-0" class="pghand"></div>' +
                 '<span class="pg-handpoints pg-handpoints-2">2</span>' +
                 '<div id="pghand-1" class="pghand"></div>' +
-                '<span data-handindex="0" class="pgtexticon pgswitchhands-btn pgswitchhands-0-btn">&#59215;</span>' +
+                '<span data-handindex="0" class="pg-tile-manipulate-control pgtexticon pgswitchhands-btn pgswitchhands-0-btn">&#59215;</span>' +
                 '<span class="pg-handpoints pg-handpoints-1">1</span>' +
                 '<div id="pghand-2" class="pghand"></div>' +
-                '<span data-handindex="1" class="pgtexticon pgswitchhands-btn pgswitchhands-1-btn">&#59215;</span>' +
+                '<span data-handindex="1" class="pg-tile-manipulate-control pgtexticon pgswitchhands-btn pgswitchhands-1-btn">&#59215;</span>' +
             '</div>',
 
         _previewHands: function(e) {

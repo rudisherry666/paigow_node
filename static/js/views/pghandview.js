@@ -87,7 +87,7 @@ define([
 
         _handTemplate:
             '<div class="pghand-tiles">' +
-                '<span class="pgtexticon rotatetiles-btn">&#10226;</span>' +
+                '<span class="pg-tile-manipulate-control pgtexticon rotatetiles-btn">&#10226;</span>' +
                 '<div class="pg2tile">' +
                     '<div>' +
                         '<div class="pgtile">' +

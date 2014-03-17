@@ -58,3 +58,6 @@
     display: none;
 }
 
+.pg-no-manipulate .pg-tile-manipulate-control {
+    visibility: hidden;
+}
