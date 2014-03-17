@@ -10,7 +10,10 @@
 
 .pg-deal-hands {
     position: relative;
-    padding-top: 30px;
+}
+
+.pg-deal-buttons {
+    height: 30px;
 }
 
 .pg-deal-buttons button {
@@ -18,7 +21,6 @@
     margin-left: 13px;
     margin-right: 13px;
     margin-bottom: 10px;
-    height: 30px;
 }
 
 .pg-deal-buttons .pg-deal-preview-hands { float: left; }
