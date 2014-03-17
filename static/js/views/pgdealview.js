@@ -73,15 +73,15 @@ define([
                 _.bind(function() {
                     switch (this._dealModel.get('state')) {
                         case "thinking":
-                            $('.pg-deal-preview-hands').removeAttr('disabled');
-                            $('.pg-deal-tiles-are-set').attr('disabled', "disabled");
+                            this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
+                            this.$el.find('.pg-deal-tiles-are-set').attr('disabled', true);
                         break;
                         case "previewing":
-                            $('.pg-deal-preview-hands').attr('disabled', "disabled");
-                            $('.pg-deal-tiles-are-set').removeAttr('disabled');
+                            this.$el.find('.pg-deal-preview-hands').attr('disabled', true);
+                            this.$el.find('.pg-deal-tiles-are-set').removeAttr('disabled');
                         break;
                         case "finished":
-                            $('.pg-deal-buttons button').attr('disabled', "disabled");
+                            this.$el.find('.pg-deal-buttons button').attr('disabled', true);
                         break;
                     }
                 }, this)
@@ -149,8 +149,11 @@ define([
 
         _tilesAreSet: function(e) {
 
-        }
+        },
 
+        _tilesAreSet: function(e) {
+             this._dealModel.set('state', "finished");
+       }
 
     });
 
