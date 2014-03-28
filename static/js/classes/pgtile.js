@@ -161,12 +161,55 @@ var tiles = [
 /*
 * @constructor
 *
-* @param index index into the set of possible tiles
+* @param index {string or number} if number, index into the set of possible tiles. If string, name of tile plus optional "-#" where # is 1 or 2
 * @color color of the dot: 'red' or 'white'
 *
 */
-function PGTile(index) {
-    if (index < PGTile.prototype.TILE_INDEX.TEEN_1 || index > PGTile.prototype.TILE_INDEX.GEE_JOON_2) throw "PGTile: bad constructor param " + index;
+function PGTile(tileSelector) {
+    var index;
+
+    var prefix = "PGTile constructor ";
+    function pgTileSelectorFatal(str) {
+        // console.log(prefix + str);
+        throw new Error(prefix + str);
+    }
+
+    if (typeof tileSelector === "number") {
+        index = tileSelector;
+    } else if (typeof tileSelector === "string") {
+        // The string is '<name>[-(0|1)]{0-1}'
+        index = -1;
+        var name;
+        var which;
+
+        // Find out if there are hyphens
+        var s = tileSelector.split("-");
+        if (s.length === 2) {
+            // Yes, there's a hyphen.  Get the name and which (1st or 2nd)
+            name = s[0];
+            which = parseInt(s[1], 10);
+            if (which !== 1 && which !== 2) pgTileSelectorFatal("bad which in string");
+        } else if (s.length === 1) {
+            // No hyphen: assume the first.
+            name = s[0];
+            which = 1;
+        } else {
+            // Too many hyphens!
+            pgTileSelectorFatal("too many hyphens in string");
+        }
+
+        // We have the name, search the list.
+        for (var ti = 0; ti < tiles.length; ti++) {
+            if (tiles[ti].tileName === name) {
+                index = ti + (which-1);
+                break;                
+            }
+        }
+
+    } else
+        throw new Error("PGTile constructor given bad param type");
+
+    if (index < PGTile.prototype.TILE_INDEX.TEEN_1 || index > PGTile.prototype.TILE_INDEX.GEE_JOON_2) pgTileSelectorFatal("bad numeric constructor param " + index);
     this._index = index;
     this._obj = tiles[index];
 }

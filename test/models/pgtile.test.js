@@ -9,6 +9,25 @@ describe('PGTile', function() {
         var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.GEE_JOON_1);
         assert.notEqual(pgTile, null);
     });
+    it('should return a PGTile object from names', function() {
+        var pgTile = new PGTile("low four");
+        assert.notEqual(pgTile, null);
+        pgTile = new PGTile("low four-1");
+        assert.notEqual(pgTile, null);
+        assert.equal(pgTile.name(), (new PGTile(PGTile.prototype.TILE_INDEX.LOW_FOUR_1)).name());
+    });
+    it('should throw on bad names', function() {
+        var pgTile;
+        assert.throws(function() {
+            pgTile = new PGTile("no tile at all");
+        });
+        assert.throws(function() {
+            pgTile = new PGTile("low four-3");
+        });
+        assert.throws(function() {
+            pgTile = new PGTile("low four-1-2");
+        });
+    });
     it('should throw on bad constructor params', function() {
         var pgTile;
         assert.throws(function() {
@@ -19,7 +38,7 @@ describe('PGTile', function() {
         });
     });
     it('should throw on bad sequence getter', function() {
-        var pgTile = new PGTile(PGTile.prototype.ELEVEN);
+        var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1);
         assert.throws(function() {
             var sequence = pgTile.dotSequenceOf('blue', 'top');
         });
