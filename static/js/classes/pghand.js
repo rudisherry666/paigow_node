@@ -8,6 +8,12 @@
 * against each other; the order of the tiles do not matter.
 */
 
+// Sneaky way to make this either a require module or a Node module
+var PGTile;
+if (typeof module !== "undefined") {
+    PGTile = require("./pgtile");
+}
+
 /*
 * @attribute HANDS
 *
@@ -163,25 +169,39 @@ var HANDS = {
 * The constructor for PGHand, takes the two chars.
 *
 */
-function PGHand(tile1, tile2) {
-    if (tile1 instanceof Array) {
-        if (tile1.length !== 2) throw "PGHand constructor given array of length " + tile1.length;
-        tile2 = tile1[1];
-        tile1 = tile1[0];
+function PGHand(args) {
+    var prefix = "PGHand constructor ";
+
+    function pgHandFatal(err) {
+        console.log(prefix + err);
+        throw new Error(prefix + err);
     }
-    if (!tile1 || !tile2) throw "PGHand constructor not given two tiles";
+
+    // If we're passed an array, use it; otherwise make an array of our arguments.
+    var tiles;
+    if (args instanceof Array) {
+        tiles = args;
+    } else {
+        tiles = [];
+        for (var arg in arguments)
+            tiles.push(arguments[arg]);
+    }
+    if (tiles.length !== 2) pgHandFatal("wrong number of params");
+    for (var ti = 0; ti < tiles.length; ti++) {
+        if (!(tiles[ti] instanceof PGTile)) pgHandFatal("argument not a PGTile");
+    }
 
     // Make it so tile1 is the higher tile
-    switch (tile1.compare(tile2)) {
+    switch (tiles[0].compare(tiles[1])) {
         case 1:
         case 0:
-            this._tile1 = tile1;
-            this._tile2 = tile2;
+            this._tile1 = tiles[0];
+            this._tile2 = tiles[1];
         break;
 
         default:
-            this._tile2 = tile1;
-            this._tile1 = tile2;
+            this._tile2 = tiles[0];
+            this._tile1 = tiles[1];
         break;
     }
 
@@ -264,7 +284,8 @@ PGHand.prototype.compare = function(hand) {
 
 // Sneaky way to make this either a require module or a Node module
 if (typeof module === "undefined") {
-    define([], function() {
+    define(["./pgtile"], function(tile) {
+        PGTile = tile;
         return PGHand;
     });
 } else
