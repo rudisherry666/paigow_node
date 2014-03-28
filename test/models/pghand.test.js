@@ -15,6 +15,8 @@ describe('PGHand', function() {
         assert.notEqual(pgHand, null);
         pgHand = new PGHand([tileEleven, tileEight]);
         assert.notEqual(pgHand, null);
+        pgHand = new PGHand("eleven", "mixed eight-1");
+        assert.notEqual(pgHand, null);
     });
     it('should throw on bad constructor params', function() {
         var pgHand;

@@ -188,7 +188,15 @@ function PGHand(args) {
     }
     if (tiles.length !== 2) pgHandFatal("wrong number of params");
     for (var ti = 0; ti < tiles.length; ti++) {
-        if (!(tiles[ti] instanceof PGTile)) pgHandFatal("argument not a PGTile");
+        var tile;
+        var tileArg = tiles[ti];
+        if (typeof tileArg === "string") {
+            tile = new PGTile(tileArg);
+        } else {
+            tile = tileArg;
+        }
+        if (!(tile instanceof PGTile)) pgHandFatal("argument not a PGTile");
+        tiles[ti] = tile;
     }
 
     // Make it so tile1 is the higher tile
