@@ -10,8 +10,10 @@ requirejs.config({
         'underscore': "lib/underscore-1.6.0.min",
         'backbone': "lib/backbone-1.1.2.min",
         // 'backbone': "lib/backbone",
-        'bootstrap': "//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min",
-        'jquery': "//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min",
+        'bootstrap': "lib/bootstrap-3.1.1.min",
+        // 'bootstrap': "lib/bootstrap",
+        'jquery': "lib/jquery-1.11.0.min",
+        // 'jquery': "//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min",
         'jquery-ui': "lib/jquery-ui-1.10.4.custom.min"
     },
     shim: {
