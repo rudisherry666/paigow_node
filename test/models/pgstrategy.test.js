@@ -9,6 +9,7 @@ var before = require('../before.test'),
 console.log("test: PGStrategy");
 
 describe('PGStrategy', function() {
+
     var tileEleven = new PGTile(PGTile.prototype.TILE_INDEX.ELEVEN_1),
         tileEight = new PGTile(PGTile.prototype.TILE_INDEX.MIXED_EIGHT_1),
         tileDay = new PGTile(PGTile.prototype.TILE_INDEX.DAY_2),
@@ -25,22 +26,24 @@ describe('PGStrategy', function() {
 
     it('should throw on bad constructor params', function() {
         var pgStrategy;
-        assert.throws(function() {
-            pgStrategy = new PGStrategy(tileDay);
-        });
-        assert.throws(function() {
-            pgStrategy = new PGStrategy('Hello world');
-        });
-        assert.throws(function() {
-            pgStrategy = new PGStrategy([tileEleven]);
-        });
-        assert.throws(function() {
-            pgStrategy = new PGStrategy([tileFour, { _index: 1}]);
-        });
+        assert.throws(function() { pgStrategy = new PGStrategy(tileDay); });
+        assert.throws(function() { pgStrategy = new PGStrategy('eleven'); });
+        assert.throws(function() { pgStrategy = new PGStrategy([tileEleven]); });
+        assert.throws(function() { pgStrategy = new PGStrategy([tileFour, { _index: 1}]); });
     });
 
-    it('should sort various hands correctly', function() {
-        var pgStrategy = new PGStrategy("day", "ten-1", "mixed five-2", "eleven");
+    it('should sort only-way correctly', function() {
+        pgStrategy = new PGStrategy("eleven", "low four", "high eight", "mixed five");  // should be 9-9
+        var pgSet = pgStrategy.bestSet();
+        assert(pgSet instanceof PGSet, "best set not a set");
+        var hands = pgSet.hands();
+        assert(hands instanceof Array, "best set hands not an array");
+        assert(hands[0] instanceof PGHand, "first hand not a hand");
+        assert.equal(hands[0].tiles()[0].name(), "high eight");
+        assert.equal(hands[0].tiles()[1].name(), "eleven");
+        assert.equal(hands[1].tiles()[0].name(), "low four");
+        assert.equal(hands[1].tiles()[1].name(), "mixed five");
+
 //         set = PGSet.createWithTileNames(("day", "low ten", "mixed five", "eleven"));
 //         self.assertEqual(autoSetNumerical(set), 2);
 //         set = PGSet.createWithTileNames(("low four", "low ten", "eleven", "low six"));

@@ -72,9 +72,15 @@ function chooseOrdering(sum1, diff1, sum2, diff2) {
 
 // routines to check if one set has something and the other does not;
 function whichSetHasIt(set1, set2, tst) {
-    if (tst(set1) && !tst(set2)) {
+    function hasIt(what) {
+        return what[tst].call(what);
+    }
+    var set1HasIt = hasIt(set1.hands()[0]) || hasIt(set1.hands()[1]);
+    var set2HasIt = hasIt(set2.hands()[0]) || hasIt(set2.hands()[1]);
+
+    if (set1HasIt && !set2HasIt) {
         return 1;
-    } else if (tst(set2) && !tst(set1)) {
+    } else if (set2HasIt && !set1HasIt) {
         return 2;
     } else {
         return undefined;
@@ -89,19 +95,19 @@ function lastTwoTilesAreIn(set, values) {
 
 // take care of special hands;
 function orderingForSpecialHands(set) {
-    pgStrategyLog("\norder for set " + str(set));
+    pgStrategyLog("\norder for set " + set);
 
     // we'll be moving tiles around; create a temp set.;
     locSet = PGSet.create(set.tiles);
 
     // always use two pairs;
     var ordering = locSet.orderingWithTwoPair();
-    pgStrategyLog("   order for two pairs " + str(ordering));
+    pgStrategyLog("   order for two pairs " + ordering);
     if (ordering) return ordering;
 
     // if we have a pair, there are exceptions;
     ordering = locSet.orderingWithPair();
-    pgStrategyLog("   order for one pairs " + str(ordering));
+    pgStrategyLog("   order for one pairs " + ordering);
     if (ordering) {
         switchIt = false;
 
@@ -168,30 +174,30 @@ function orderingForSpecialHands(set) {
 // we have already tested and there isn't an only-way.;
 function whichHasSpecialHands(set1, set2) {
     pgStrategyLog("testing for pairs...");
-    ordering = whichSetHasIt(set1, set2, PGSet.hasPair);
+    ordering = whichSetHasIt(set1, set2, 'isPair');
     if (ordering) {
-        pgStrategyLog("one pair has it: set" + str(ordering));
+        pgStrategyLog("one pair has it: set" + ordering);
         return ordering;
     }
 
     pgStrategyLog("testing for wong...");
-    ordering = whichSetHasIt(set1, set2, PGSet.hasWong);
+    ordering = whichSetHasIt(set1, set2, 'isWong');
     if (ordering) {
-        pgStrategyLog("one pair has it: set" + str(ordering));
+        pgStrategyLog("one pair has it: set" + ordering);
         return ordering;
     }
 
     pgStrategyLog("testing for gong...");
-    ordering = whichSetHasIt(set1, set2, PGSet.hasGong);
+    ordering = whichSetHasIt(set1, set2, 'isGong');
     if (ordering) {
-        pgStrategyLog("one pair has it: set" + str(ordering));
+        pgStrategyLog("one pair has it: set" + ordering);
         return ordering;
     }
 
     pgStrategyLog("testing for high nine...");
-    ordering = whichSetHasIt(set1, set2, PGSet.hasHighNine);
+    ordering = whichSetHasIt(set1, set2, 'isHighNine');
     if (ordering) {
-        pgStrategyLog("one pair has it: set" + str(ordering));
+        pgStrategyLog("one pair has it: set" + ordering);
         return ordering;
     }
 
@@ -202,13 +208,13 @@ function whichHasSpecialHands(set1, set2) {
 function firstSetIsBetter(set1, set2) {
 
     // check for only way between these two sets;
-    pgStrategyLog("\nTesting set " + str(set1) + " against ");
-    pgStrategyLog("        set " + str(set2));
+    pgStrategyLog("\nTesting set " + set1 + " against ");
+    pgStrategyLog("        set " + set2);
 
-    if (set1 > set2) {
+    if (set1.compare(set2) > 0) {
         pgStrategyLog(" ... set1 is only way");
         return true;
-    } else if (set2 > set1) {
+    } else if (set2.compare(set1) > 0) {
         pgStrategyLog(" ... set2 is only way");
         return false;
     }
@@ -217,7 +223,7 @@ function firstSetIsBetter(set1, set2) {
 
     ordering = whichHasSpecialHands(set1, set2);
     if (ordering) {
-        pgStrategyLog("one pair has it: set" + str(ordering));
+        pgStrategyLog("one pair has it: set" + ordering);
         return ordering == 1;
     }
 
@@ -227,9 +233,9 @@ function firstSetIsBetter(set1, set2) {
     pgStrategyLog(" ...sum and diff2: " + sd2.sum + "  " + sd2.diff );
 
     // no only way: check for diffs;
-    //return set1.isMoreEvenThan(set2);
+    //return set1.sumAndDiff().diff < set2.sumAndDiff().diff;
     // no only way: check for sums;
-    return set1.hasHigherSumThan(set2);
+    return set1.sumAndDiff().sum > set2.sumAndDiff().sum;
 }
 
 function autoSetHeuristic(set) {
@@ -287,11 +293,14 @@ function PGStrategy(args) {
         if (!(tiles[ti] instanceof PGTile)) pgStrategyFatal("argument not a PGTile");
     }
 
-    // Create the three possible variations of the hand
+    // Create the three possible variations of the hand.  Each PGSet contructor
+    // will reorder the hands to be high then low, and each hand constructor will
+    // reorder the tiles to be high then low.
     this._sets = [
+        null,   // dummy so we can be 1-based to match scoring numbers.
         new PGSet(new PGHand(tiles[0], tiles[1]), new PGHand(tiles[2], tiles[3])),
         new PGSet(new PGHand(tiles[0], tiles[2]), new PGHand(tiles[3], tiles[1])),
-        new PGSet(new PGHand(tiles[0], tiles[3]), new PGHand(tiles[2], tiles[2]))
+        new PGSet(new PGHand(tiles[0], tiles[3]), new PGHand(tiles[1], tiles[2]))
     ];
 }
 
@@ -302,40 +311,37 @@ if (!isInBrowser) {
     PGStrategy.prototype.constructor = PGStrategy;
 }
 
-PGStrategy.prototype.autoSet = function() {
-    // for set in sets {
-    //     if (sUseNumericalAutoSet) {
-    //         autoSetNumerical(set);
-    //     } else {
-    //         autoSetHeuristic(set);
-    //     }
+// PGStrategy.prototype.autoSet321 = function() {
 
-    // order the sets;
-    ordering = this._pickedOrderingForSets();
-    if (ordering == 1) {
-        // first set is the best, find the next-best;
-        if (firstSetIsBetter(sets[1], sets[2])) {
-            sets = sets;
-        } else {
-            sets = [ sets[0], sets[2], sets[1] ];
-        }
-    } else if (ordering == 2) {
-        // second set is the best, find the next-best;
-        if (firstSetIsBetter(sets[0], sets[2])) {
-            sets = [ sets[1], sets[0], sets[2] ];
-        } else {
-            sets = [ sets[1], sets[2], sets[0] ];
-        }
-    } else {
-        // third set is the best, find the next-best;
-        if (firstSetIsBetter(sets[0], sets[1])) {
-            sets = [ sets[2], sets[0], sets[1] ];
-        } else {
-            sets = [ sets[2], sets[1], sets[0] ];
-        }
-    }
+//     ordering = this._pickedOrderingForSets();
+//     if (ordering == 1) {
+//         // first set is the best, find the next-best;
+//         if (firstSetIsBetter(sets[1], sets[2])) {
+//             sets = sets;
+//         } else {
+//             sets = [ sets[0], sets[2], sets[1] ];
+//         }
+//     } else if (ordering == 2) {
+//         // second set is the best, find the next-best;
+//         if (firstSetIsBetter(sets[0], sets[2])) {
+//             sets = [ sets[1], sets[0], sets[2] ];
+//         } else {
+//             sets = [ sets[1], sets[2], sets[0] ];
+//         }
+//     } else {
+//         // third set is the best, find the next-best;
+//         if (firstSetIsBetter(sets[0], sets[1])) {
+//             sets = [ sets[2], sets[0], sets[1] ];
+//         } else {
+//             sets = [ sets[2], sets[1], sets[0] ];
+//         }
+//     }
 
-    return sets;
+//     return sets;
+// };
+
+PGStrategy.prototype.bestSet = function() {
+    return this._sets[this._pickedOrderingForSets()];
 };
 
 PGStrategy.prototype._pickedOrderingForSets = function() {
@@ -343,22 +349,15 @@ PGStrategy.prototype._pickedOrderingForSets = function() {
 
     pickedOrdering = undefined;
 
+    var sets = this._sets;
+
     // convenience vars to test various combinations;
-    if (true) {
-        s1beats2 = firstSetIsBetter(sets[1], sets[2]);
-        s2beats1 = firstSetIsBetter(sets[2], sets[1]);
-        s1beats3 = firstSetIsBetter(sets[1], sets[3]);
-        s3beats1 = firstSetIsBetter(sets[3], sets[1]);
-        s2beats3 = firstSetIsBetter(sets[2], sets[3]);
+    var s1beats2 = firstSetIsBetter(sets[1], sets[2]),
+        s2beats1 = firstSetIsBetter(sets[2], sets[1]),
+        s1beats3 = firstSetIsBetter(sets[1], sets[3]),
+        s3beats1 = firstSetIsBetter(sets[3], sets[1]),
+        s2beats3 = firstSetIsBetter(sets[2], sets[3]),
         s3beats2 = firstSetIsBetter(sets[3], sets[2]);
-    } else {
-        s1beats2 = sets[1] > sets[2];
-        s2beats1 = sets[2] > sets[1];
-        s1beats3 = sets[1] > sets[3];
-        s3beats1 = sets[3] > sets[1];
-        s2beats3 = sets[2] > sets[3];
-        s3beats2 = sets[3] > sets[2];
-    }
 
     // see if there is an only-way in there;
     if (s1beats2 && s1beats3) {
@@ -375,9 +374,9 @@ PGStrategy.prototype._pickedOrderingForSets = function() {
         ignore2 = s1beats2 || s3beats2;
         ignore3 = s2beats3 || s1beats3;
 
-        pgStrategyLog("    ignore1: " + str(ignore1));
-        pgStrategyLog("    ignore2: " + str(ignore2));
-        pgStrategyLog("    ignore3: " + str(ignore3));
+        pgStrategyLog("    ignore1: " + ignore1);
+        pgStrategyLog("    ignore2: " + ignore2);
+        pgStrategyLog("    ignore3: " + ignore3);
 
         if (ignore1) {
             if (firstSetIsBetter(sets[2], sets[3])) {
@@ -429,9 +428,9 @@ PGStrategy.prototype._pickedOrderingForSets = function() {
         }
     }
 
-    pgStrategyLog("pickedOrderingForSets END returns " + str(pickedOrdering) + "\n");
+    pgStrategyLog("pickedOrderingForSets END returns " + pickedOrdering + "\n");
     return pickedOrdering;
-}
+};
 
 
 // // ----------------------------------------------------;
