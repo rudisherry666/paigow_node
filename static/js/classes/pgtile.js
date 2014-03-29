@@ -230,6 +230,16 @@ var tiles = [
 ];
 
 /*
+* @method toString
+*
+* better way of showing it
+*
+*/
+PGTile.prototype.toString = function() {
+    return this.name();
+};
+
+/*
 * @method json
 *
 * return the json object representing this, suitable for sending to the client.
