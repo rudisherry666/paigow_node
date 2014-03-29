@@ -75,4 +75,13 @@ describe('PGSet', function() {
         assert.equal(pgSet1.compare(pgSet3),  0);
         assert.equal(pgSet2.compare(pgSet3), -1);
     });
+
+    it('should have sum and diff correct', function() {
+        var hand1 = new PGHand("eleven", "low four");
+        var hand2 = new PGHand("gee joon-1", "gee joon-2");
+        var pgSet = new PGSet(hand1, hand2);
+        var sad = pgSet.sumAndDiff();
+        assert.equal(sad.sum, (hand1.rank() + hand2.rank()));
+        assert.equal(sad.diff, (hand2.rank() - hand1.rank()));
+    });
 });

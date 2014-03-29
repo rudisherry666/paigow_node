@@ -110,6 +110,21 @@ PGSet.prototype.hands = function() {
 };
 
 /*
+* @method sumAndDiff
+*
+* Return an object of the sum and diff of the two hands
+*
+*/
+PGSet.prototype.sumAndDiff = function() {
+    var hand1Rank = this._hand1.rank(),
+        hand2Rank = this._hand2.rank();
+    return {
+        sum:  hand1Rank + hand2Rank,
+        diff: hand1Rank - hand2Rank
+    };
+};
+
+/*
 * @method compare
 *
 * Returns the canonical comparison: -1 if it's loses to the param, 0 if push, 1 if it wins agains the param.
