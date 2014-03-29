@@ -169,7 +169,7 @@ var HANDS = {
 * The constructor for PGHand, takes the two chars.
 *
 */
-function PGHand(args) {
+function PGHand(arg) {
     var prefix = "PGHand constructor ";
 
     function pgHandFatal(err) {
@@ -177,14 +177,19 @@ function PGHand(args) {
         throw new Error(prefix + err);
     }
 
+    // If we're pased a hand, return it.
+    if (arg instanceof PGHand) {
+        return arg;
+    }
+
     // If we're passed an array, use it; otherwise make an array of our arguments.
     var tiles;
-    if (args instanceof Array) {
-        tiles = args;
+    if (arg instanceof Array) {
+        tiles = arg;
     } else {
         tiles = [];
-        for (var arg in arguments)
-            tiles.push(arguments[arg]);
+        for (var arg1 in arguments)
+            tiles.push(arguments[arg1]);
     }
     if (tiles.length !== 2) pgHandFatal("wrong number of params");
 

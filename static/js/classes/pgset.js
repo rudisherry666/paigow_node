@@ -29,6 +29,11 @@ function PGSet(arg) {
         throw new Error(prefix + err);
     }
 
+    // If we're given a set, return it.
+    if (arg instanceof PGSet) {
+        return arg;
+    }
+
     var hand1, hand2;
     var inputs;
     if (arg instanceof Array) {
