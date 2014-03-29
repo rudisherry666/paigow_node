@@ -9,7 +9,10 @@
 */
 
 // Sneaky way to make this either a require module or a Node module
+var isInBrowser = (typeof module === "undefined");
+
 var PGTile;
+
 if (typeof module !== "undefined") {
     PGTile = require("./pgtile");
 }
@@ -219,6 +222,12 @@ function PGHand(arg) {
         throw "PGHand constructor got bad chars " + this._chars;
 }
 
+// Sneaky way to make this either a require module or a Node module
+if (!isInBrowser) {
+    PGHand.prototype = {};
+    PGHand.prototype.constructor = PGHand;
+}
+
 PGHand.prototype._obj = function() {
     var chars = this._tile1.handChar() + this._tile2.handChar();
     return HANDS[chars];
@@ -292,7 +301,7 @@ PGHand.prototype.compare = function(hand) {
 };
 
 // Sneaky way to make this either a require module or a Node module
-if (typeof module === "undefined") {
+if (isInBrowser) {
     define(["./pgtile"], function(tile) {
         PGTile = tile;
         return PGHand;

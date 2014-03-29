@@ -8,9 +8,12 @@
 */
 
 // Sneaky way to make this either a require module or a Node module
+var isInBrowser = (typeof module === "undefined");
+
 var PGTile,
     PGHand;
-if (typeof module !== "undefined") {
+
+if (!isInBrowser) {
     PGTile = require("./pgtile");
     PGHand = require("./pghand");
 }
@@ -75,6 +78,12 @@ function PGSet(arg) {
     }
 }
 
+// Sneaky way to make this either a require module or a Node module
+if (!isInBrowser) {
+    PGSet.prototype = {};
+    PGSet.prototype.constructor = PGSet;
+}
+
 PGSet.prototype._obj = function() {
     var chars = this._tile1.handChar() + this._tile2.handChar();
     return HANDS[chars];
@@ -122,7 +131,7 @@ PGSet.prototype.compare = function(set) {
 };
 
 // Sneaky way to make this either a require module or a Node module
-if (typeof module === "undefined") {
+if (isInBrowser) {
     define(["./pghand", "./pgtile"], function(hand, tile) {
         PGHand = hand;
         PGTile = tile;
