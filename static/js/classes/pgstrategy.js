@@ -8,10 +8,13 @@
 */
 
 // Sneaky way to make this either a require module or a Node module
+var isInBrowser = (typeof module === "undefined");
+
 var PGTile,
     PGHand,
     PGSet;
-if (typeof module !== "undefined") {
+
+if (!isInBrowser) {
     PGTile = require("./pgtile");
     PGHand = require("./pghand");
     PGSet = require("./pgset");
@@ -248,7 +251,7 @@ function autoSetNumerical(set) {
     tiles2 = [ tiles[0], tiles[2], tiles[1], tiles[3] ];
     tiles3 = [ tiles[0], tiles[3], tiles[1], tiles[2] ];
     sets = (undefined, PGSet.create(tiles1), PGSet.create(tiles2), PGSet.create(tiles3));
-    ordering = pickedOrderingForSets(sets);
+    ordering = _pickedOrderingForSets(sets);
 
     // we founds something, re-order the tiles for it.;
     if (ordering > 0) {
@@ -260,11 +263,83 @@ function autoSetNumerical(set) {
     return ordering;
 }
 
-function pickedOrderingForSets(sets) {
+
+function PGStrategy(args) {
+    if (isInBrowser) Object.call(this);
+
+    var prefix = "PGStrategy constructor ";
+
+    function pgStrategyFatal(err) {
+        console.log(prefix + err);
+        throw new Error(prefix + err);
+    }
+
+    var tiles;
+    if (args instanceof Array) {
+        tiles = args;
+    } else {
+        tiles = [];
+        for (var arg in arguments)
+            tiles.push(new PGTile(arguments[arg]));
+    }
+    if (tiles.length !== 4) pgStrategyFatal("wrong number of params");
+    for (var ti = 0; ti < tiles.length; ti++) {
+        if (!(tiles[ti] instanceof PGTile)) pgStrategyFatal("argument not a PGTile");
+    }
+
+    // Create the three possible variations of the hand
+    this._sets = [
+        new PGSet(new PGHand(tiles[0], tiles[1]), new PGHand(tiles[2], tiles[3])),
+        new PGSet(new PGHand(tiles[0], tiles[2]), new PGHand(tiles[3], tiles[1])),
+        new PGSet(new PGHand(tiles[0], tiles[3]), new PGHand(tiles[2], tiles[2]))
+    ];
+}
+
+
+// Sneaky way to make this either a require module or a Node module
+if (!isInBrowser) {
+    PGStrategy.prototype = {};
+    PGStrategy.prototype.constructor = PGStrategy;
+}
+
+PGStrategy.prototype.autoSet = function() {
+    // for set in sets {
+    //     if (sUseNumericalAutoSet) {
+    //         autoSetNumerical(set);
+    //     } else {
+    //         autoSetHeuristic(set);
+    //     }
+
+    // order the sets;
+    ordering = this._pickedOrderingForSets();
+    if (ordering == 1) {
+        // first set is the best, find the next-best;
+        if (firstSetIsBetter(sets[1], sets[2])) {
+            sets = sets;
+        } else {
+            sets = [ sets[0], sets[2], sets[1] ];
+        }
+    } else if (ordering == 2) {
+        // second set is the best, find the next-best;
+        if (firstSetIsBetter(sets[0], sets[2])) {
+            sets = [ sets[1], sets[0], sets[2] ];
+        } else {
+            sets = [ sets[1], sets[2], sets[0] ];
+        }
+    } else {
+        // third set is the best, find the next-best;
+        if (firstSetIsBetter(sets[0], sets[1])) {
+            sets = [ sets[2], sets[0], sets[1] ];
+        } else {
+            sets = [ sets[2], sets[1], sets[0] ];
+        }
+    }
+
+    return sets;
+};
+
+PGStrategy.prototype._pickedOrderingForSets = function() {
     pgStrategyLog("\npickedOrderingForSets BEGIN...");
-    pgStrategyLog("set 1: " + str(sets[1]));
-    pgStrategyLog("set 2: " + str(sets[2]));
-    pgStrategyLog("set 3: " + str(sets[3]));
 
     pickedOrdering = undefined;
 
@@ -358,72 +433,6 @@ function pickedOrderingForSets(sets) {
     return pickedOrdering;
 }
 
-function PGStrategy(args) {
-    var prefix = "PGStrategy constructor ";
-
-    function pgStrategyFatal(err) {
-        console.log(prefix + err);
-        throw new Error(prefix + err);
-    }
-
-    var tiles;
-    if (args instanceof Array) {
-        tiles = args;
-    } else {
-        tiles = [];
-        for (var arg in arguments)
-            tiles.push(new PGTile(arguments[arg]));
-    }
-    if (tiles.length !== 4) pgStrategyFatal("wrong number of params");
-    for (var ti = 0; ti < tiles.length; ti++) {
-        if (!(tiles[ti] instanceof PGTile)) pgStrategyFatal("argument not a PGTile");
-    }
-
-    // Create the three possible variations of the hand
-    this._sets = [
-        new PGSet(new PGHand(tiles[0], tiles[1]), new PGHand(tiles[2], tiles[3])),
-        new PGSet(new PGHand(tiles[0], tiles[2]), new PGHand(tiles[3], tiles[1])),
-        new PGSet(new PGHand(tiles[0], tiles[3]), new PGHand(tiles[2], tiles[2]))
-    ];
-}
-
-PGStrategy.prototype.autoSet = function() {
-    // for set in sets {
-    //     if (sUseNumericalAutoSet) {
-    //         autoSetNumerical(set);
-    //     } else {
-    //         autoSetHeuristic(set);
-    //     }
-
-    // order the sets;
-    orderingSets = [ undefined ];
-    orderingSets.extend(sets);
-    ordering = pickedOrderingForSets(orderingSets);
-    if (ordering == 1) {
-        // first set is the best, find the next-best;
-        if (firstSetIsBetter(sets[1], sets[2])) {
-            sets = sets;
-        } else {
-            sets = [ sets[0], sets[2], sets[1] ];
-        }
-    } else if (ordering == 2) {
-        // second set is the best, find the next-best;
-        if (firstSetIsBetter(sets[0], sets[2])) {
-            sets = [ sets[1], sets[0], sets[2] ];
-        } else {
-            sets = [ sets[1], sets[2], sets[0] ];
-        }
-    } else {
-        // third set is the best, find the next-best;
-        if (firstSetIsBetter(sets[0], sets[1])) {
-            sets = [ sets[2], sets[0], sets[1] ];
-        } else {
-            sets = [ sets[2], sets[1], sets[0] ];
-        }
-    }
-
-    return sets;
-};
 
 // // ----------------------------------------------------;
 // // Test PGStrategy class;
@@ -509,7 +518,7 @@ PGStrategy.prototype.autoSet = function() {
 
 
 // Sneaky way to make this either a require module or a Node module
-if (typeof module === "undefined") {
+if (isInBrowser) {
     define(["./pgtile", "./pghand", "./pgset"], function(tile, hand, set) {
         PGTile = tile;
         PGHand = hand;

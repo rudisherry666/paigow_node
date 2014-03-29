@@ -55,40 +55,60 @@ describe('PGStrategy', function() {
 //         self.assertEqual(autoSetNumerical(set), 3);
     });
 
-    // it('should return a hands array', function() {
-    //     var pgSet = new PGStrategy(hand1, hand2);
-    //     var hands = pgSet.hands();
-    //     assert(hands instanceof Array);
-    //     assert(hands.length === 2);
-    //     assert.equal(hands[0], hand1);
-    //     assert.equal(hands[1], hand2);
-    // });
-    // it('should return switch the hands to get the right order', function() {
-    //     var pgSet = new PGStrategy(hand2, hand1);
-    //     var hands = pgSet.hands();
-    //     assert(hands instanceof Array);
-    //     assert(hands.length === 2);
-    //     assert.equal(hands[0], hand1);
-    //     assert.equal(hands[1], hand2);
-    // });
-    // it('should return ranks', function() {
-    //     var pgSet = new PGStrategy(hand2, hand1);
-    //     var ranks = pgSet.ranks();
-    //     assert(ranks instanceof Array);
-    //     assert(ranks.length === 2);
-    //     assert.equal(ranks[0], hand1.rank());
-    //     assert.equal(ranks[1], hand2.rank());
-    // });
-    // it('should compare correctly', function() {
-    //     var hand3 = new PGHand(tileEleven, tileDay),
-    //         hand4 = new PGHand(tileEight, tileFour),
-    //         hand5 = new PGHand(tileEleven, tileFour),
-    //         hand6 = new PGHand(tileEight, tileDay);
-    //     var pgSet1 = new PGStrategy(hand1, hand2),
-    //         pgSet2 = new PGStrategy(hand3, hand4),
-    //         pgSet3 = new PGStrategy(hand5, hand6);
-    //     assert.equal(pgSet1.compare(pgSet2),  1);
-    //     assert.equal(pgSet1.compare(pgSet3),  0);
-    //     assert.equal(pgSet2.compare(pgSet3), -1);
-    // });
+//     function testX321SetOrdering(self) {
+//         set1 = PGSet.createWithTileNames(("low ten", "mixed nine", "harmony four", "low four"));
+//         set2 = PGSet.createWithTileNames(("low six", "low six", "low ten", "high seven"));
+//         self.assertFalse(firstSetIsBetter(set1, set2));
+
+//         set1 = PGSet.createWithTileNames(("eleven", "mixed five", "high eight", "high seven"));
+//         set2 = PGSet.createWithTileNames(("low ten", "mixed nine", "high ten", "mixed five"));
+//         self.assertFalse(firstSetIsBetter(set1, set2));
+
+//     function specialOrderingForHighPair(self, teenOrDay) {
+//         // test reordering to get pair;
+//         set = PGSet.createWithTileNames((teenOrDay, "eleven", "high eight", teenOrDay));
+//         self.assertEqual(orderingForSpecialHands(set), 1);
+
+//         // test no reordering to get pair;
+//         set = PGSet.createWithTileNames(("eleven", teenOrDay, "high eight", teenOrDay));
+//         self.assertEqual(orderingForSpecialHands(set), 1);
+
+//         // test no reorder to split pair;
+//         set = PGSet.createWithTileNames(("mixed nine", teenOrDay, "high eight", teenOrDay));
+//         self.assertEqual(orderingForSpecialHands(set), 1);
+
+//         // test reorder to split pair;
+//         set = PGSet.createWithTileNames(("mixed nine", "high eight", teenOrDay, teenOrDay));
+//         self.assertEqual(orderingForSpecialHands(set), 2);
+
+//     function specialOrderingForHighPair(self) {
+//         self.specialOrderingForTeenPair("teen");
+//         self.specialOrderingForTeenPair("day");
+
+//     function testSpecialOrderingForOtherPairs(self) {
+//         // test reorder sevens to split pair;
+//         set = PGSet.createWithTileNames(("mixed seven", "mixed seven", "teen", "day"));
+//         self.assertEqual(orderingForSpecialHands(set), 2);
+
+//         // test no reorder sevens to split pair;
+//         set = PGSet.createWithTileNames(("mixed seven", "teen", "mixed seven", "day"));
+//         self.assertEqual(orderingForSpecialHands(set), 1);
+
+//         // test reorder eights to make pair;
+//         set = PGSet.createWithTileNames(("mixed eight", "low ten", "mixed eight", "day"));
+//         self.assertEqual(orderingForSpecialHands(set), 2);
+
+//         // test no reorder eights to make pair;
+//         set = PGSet.createWithTileNames(("low ten", "day", "mixed eight", "mixed eight"));
+//         self.assertEqual(orderingForSpecialHands(set), 1);
+
+//         // test reorder nines to make pair;
+//         set = PGSet.createWithTileNames(("low ten", "day", "mixed nine", "mixed nine"));
+//         self.assertEqual(orderingForSpecialHands(set), 2);
+
+//         // test geen joon splitting and not;
+//         set = PGSet.createWithTileNames(("gee joon", "gee joon", "long six", "low six"));
+//         self.assertEqual(orderingForSpecialHands(set), 2);
+//         set = PGSet.createWithTileNames(("gee joon", "gee joon", "long six", "mixed seven"));
+//         self.assertEqual(orderingForSpecialHands(set), 1);
 });
