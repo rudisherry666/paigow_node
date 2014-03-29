@@ -207,7 +207,7 @@ function PGTile(tileSelector) {
         for (var ti = 0; ti < tiles.length; ti++) {
             if (tiles[ti].tileName === name) {
                 index = ti + (which-1);
-                break;                
+                break;
             }
         }
 
