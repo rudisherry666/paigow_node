@@ -194,6 +194,9 @@ PGTile.prototype.TILE_NAME = {
     GEE_JOON:     'gee joon'
 };
 
+
+// The tile objects.
+// TODO: const names for the ranks.
 var tiles = [
     { tileName: PGTile.prototype.TILE_NAME.TEEN,            handChar: PGTile.prototype.HAND_CHAR.TEEN,            divClass: 'pgtile-teen',            tileRank:15, pairRank:14 },
     { tileName: PGTile.prototype.TILE_NAME.TEEN,            handChar: PGTile.prototype.HAND_CHAR.TEEN,            divClass: 'pgtile-teen',            tileRank:15, pairRank:14 },
@@ -326,6 +329,15 @@ PGTile.prototype.tileRank = function() {
 */
 PGTile.prototype.pairRank = function() {
     return tiles[this._index].pairRank;
+};
+
+/*
+* @method isTeenOrDay
+*
+* Convenience functions
+*/
+PGTile.prototype.isTeenOrDay = function() {
+    return (this.tileRank() === 15 || this.tileRank() === 14);
 };
 
 // Sneaky way to make this either a require module or a Node module
