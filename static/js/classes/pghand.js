@@ -187,14 +187,10 @@ function PGHand(args) {
             tiles.push(arguments[arg]);
     }
     if (tiles.length !== 2) pgHandFatal("wrong number of params");
+
+    // Make sure the array is PGTiles.
     for (var ti = 0; ti < tiles.length; ti++) {
-        var tile;
-        var tileArg = tiles[ti];
-        if (typeof tileArg === "string") {
-            tile = new PGTile(tileArg);
-        } else {
-            tile = tileArg;
-        }
+        var tile = new PGTile(tiles[ti]);
         if (!(tile instanceof PGTile)) pgHandFatal("argument not a PGTile");
         tiles[ti] = tile;
     }

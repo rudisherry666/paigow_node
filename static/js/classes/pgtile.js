@@ -174,6 +174,11 @@ function PGTile(tileSelector) {
         throw new Error(prefix + str);
     }
 
+    // If it's a PGTile, we return it.
+    if (tileSelector instanceof PGTile) {
+        return tileSelector;
+    }
+
     if (typeof tileSelector === "number") {
         index = tileSelector;
     } else if (typeof tileSelector === "string") {

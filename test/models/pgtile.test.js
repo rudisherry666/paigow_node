@@ -8,6 +8,8 @@ describe('PGTile', function() {
     it('should return a PGTile object', function() {
         var pgTile = new PGTile(PGTile.prototype.TILE_INDEX.GEE_JOON_1);
         assert.notEqual(pgTile, null);
+        var pgTile2 = new PGTile(pgTile);
+        assert.equal(pgTile, pgTile2);
     });
     it('should return a PGTile object from names', function() {
         var pgTile = new PGTile("low four");
