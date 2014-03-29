@@ -21,7 +21,7 @@ describe('PGSet', function() {
         assert.notEqual(pgSet, null);
     });
 
-    it('should take tils as params', function() {
+    it('should take tiles as params', function() {
         var pgSet = new PGSet(tileEleven, tileEight, tileDay, tileFour);
         assert.notEqual(pgSet, null);
         pgSet = new PGSet("eleven", "high eight", "day", "low four");
