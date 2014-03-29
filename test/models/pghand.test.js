@@ -25,18 +25,10 @@ describe('PGHand', function() {
 
     it('should throw on bad constructor params', function() {
         var pgHand;
-        assert.throws(function() {
-            pgHand = new PGHand(tileDay);
-        });
-        assert.throws(function() {
-            pgHand = new PGHand('Hello world');
-        });
-        assert.throws(function() {
-            pgHand = new PGHand([tileEleven]);
-        });
-        assert.throws(function() {
-            pgHand = new PGHand(TileFour, { _index: 1});
-        });
+        assert.throws(function() { pgHand = new PGHand(tileDay);       });
+        assert.throws(function() { pgHand = new PGHand('Hello world'); });
+        assert.throws(function() { pgHand = new PGHand([tileEleven]);  });
+        assert.throws(function() { pgHand = new PGHand(TileFour, { _index: 1}); });
     });
 
     it('should return a tiles array', function() {
@@ -56,5 +48,23 @@ describe('PGHand', function() {
         pgHand = new PGHand(tileEight, tileDay);
         assert(pgHand.rank() >= 0);
         assert.equal(pgHand.name(), "gong");
+    });
+
+    it('should have good convenience functions', function() {
+        var pgHand = new PGHand(tileFour, tileEight);
+        assert(!pgHand.isPair(), "eight-four is pair!");
+        assert(!pgHand.isWong(), "eight-four is wong!");
+        assert(!pgHand.isGong(), "eight-four is gong!");
+        assert(!pgHand.isHighNine(), "eight-four is high nine!");
+        pgHand = new PGHand("day", "mixed eight");
+        assert(!pgHand.isPair(), "gong is pair!");
+        assert(!pgHand.isWong(), "gong is wong!");
+        assert(pgHand.isGong(), "gong is not gong!");
+        assert(!pgHand.isHighNine(), "gong is high nine!");
+        pgHand = new PGHand("day", "mixed five");
+        assert(!pgHand.isPair(), "seven is pair!");
+        assert(!pgHand.isWong(), "seven is wong!");
+        assert(!pgHand.isGong(), "seven is gong!");
+        assert(!pgHand.isHighNine(), "seven is high nine!");
     });
 });

@@ -277,6 +277,19 @@ PGHand.prototype.tiles = function() {
 };
 
 /*
+* @method isPair
+* @method isWong
+* @method isGong
+* @method isHighNine
+*
+* Convenience methods
+*/
+PGHand.prototype.isPair = function() { return this._tile1.tileRank() === this._tile2.tileRank(); };
+PGHand.prototype.isWong = function() { return this._tile1.isTeenOrDay() && (this._tile2.numericVal() === 9); };
+PGHand.prototype.isGong = function() { return this._tile1.isTeenOrDay() && (this._tile2.numericVal() === 8); };
+PGHand.prototype.isHighNine = function() { return this._tile1.isTeenOrDay() && (this._tile2.numericVal() === 7); };
+
+/*
 * @method compare
 *
 * Returns the canonical comparison: -1 if it's less than the param, 0 if equal, 1 if greater.
