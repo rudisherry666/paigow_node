@@ -14,27 +14,28 @@ describe('PGSet', function() {
         tileFour = new PGTile(PGTile.prototype.TILE_INDEX.HARMONY_FOUR_1),
         hand2 = new PGHand(tileDay, tileFour);
 
-    it('should return a PGSet object', function() {
+    it('should take hands as params', function() {
         var pgSet = new PGSet(hand1, hand2);
         assert.notEqual(pgSet, null);
         pgSet = new PGSet([hand1, hand2]);
         assert.notEqual(pgSet, null);
     });
+
+    it('should take tils as params', function() {
+        var pgSet = new PGSet(tileEleven, tileEight, tileDay, tileFour);
+        assert.notEqual(pgSet, null);
+        pgSet = new PGSet("eleven", "high eight", "day", "low four");
+        assert.notEqual(pgSet, null);
+    });
+
     it('should throw on bad constructor params', function() {
         var pgSet;
-        assert.throws(function() {
-            pgSet = new PGSet(tileDay);
-        });
-        assert.throws(function() {
-            pgSet = new PGSet('Hello world');
-        });
-        assert.throws(function() {
-            pgSet = new PGSet([tileEleven]);
-        });
-        assert.throws(function() {
-            pgSet = new PGSet(TileFour, { _index: 1});
-        });
+        assert.throws(function() { pgSet = new PGSet(tileDay);       });
+        assert.throws(function() { pgSet = new PGSet('Hello world'); });
+        assert.throws(function() { pgSet = new PGSet([tileEleven]);  });
+        assert.throws(function() { pgSet = new PGSet(tileFour, { _index: 1}); });
     });
+
     it('should return a hands array', function() {
         var pgSet = new PGSet(hand1, hand2);
         var hands = pgSet.hands();
@@ -43,6 +44,7 @@ describe('PGSet', function() {
         assert.equal(hands[0], hand1);
         assert.equal(hands[1], hand2);
     });
+
     it('should return switch the hands to get the right order', function() {
         var pgSet = new PGSet(hand2, hand1);
         var hands = pgSet.hands();
@@ -51,6 +53,7 @@ describe('PGSet', function() {
         assert.equal(hands[0], hand1);
         assert.equal(hands[1], hand2);
     });
+
     it('should return ranks', function() {
         var pgSet = new PGSet(hand2, hand1);
         var ranks = pgSet.ranks();
@@ -59,6 +62,7 @@ describe('PGSet', function() {
         assert.equal(ranks[0], hand1.rank());
         assert.equal(ranks[1], hand2.rank());
     });
+
     it('should compare correctly', function() {
         var hand3 = new PGHand(tileEleven, tileDay),
             hand4 = new PGHand(tileEight, tileFour),

@@ -11,7 +11,6 @@
 var PGTile,
     PGHand;
 if (typeof module !== "undefined") {
-    console.log("required!");
     PGTile = require("./pgtile");
     PGHand = require("./pghand");
 }
@@ -19,15 +18,40 @@ if (typeof module !== "undefined") {
 /*
 * @constructor PGSet
 *
-* The constructor for PGSet, takes the two chars.
+* The constructor for PGSet, takes the two hands, or four tiles, or four tile names.
 *
 */
-function PGSet(hand1, hand2) {
-    if (hand1 instanceof Array) {
-        if (hand1.length !== 2) throw "PGSet constructor given array of length " + hand1.length;
-        hand2 = hand1[1];
-        hand1 = hand1[0];
+function PGSet(arg) {
+    var prefix = "PGSet constructor ";
+
+    function pgSetFatal(err) {
+        console.log(prefix + err);
+        throw new Error(prefix + err);
     }
+
+    var hand1, hand2;
+    var inputs;
+    if (arg instanceof Array) {
+        inputs = arg;
+    } else {
+        inputs = arguments;
+    }
+    switch (inputs.length) {
+        case 2:
+            hand1 = inputs[0];
+            hand2 = inputs[1];
+        break;
+
+        case 4:
+            hand1 = new PGHand(inputs[0], inputs[1]);
+            hand2 = new PGHand(inputs[2], inputs[3]);
+        break;
+
+        default:
+            pgSetFatal("wrong number of params");
+        break;
+    }
+
     if (!hand1 || !hand2) throw "PGSet constructor not given both hands";
     if (!(hand1 instanceof PGHand) || !(hand2 instanceof PGHand)) throw "PGSet constructor given param that's not a hand";
 
