@@ -19,6 +19,7 @@ describe('PGTile', function() {
         pgTile = new PGTile("low four-1");
         assert.notEqual(pgTile, null);
         assert.equal(pgTile.name(), (new PGTile(PGTile.prototype.TILE_INDEX.LOW_FOUR_1)).name());
+        assert.equal(pgTile.numericVal(), 4);
     });
 
     it('should throw on bad names', function() {

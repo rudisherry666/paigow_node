@@ -198,38 +198,38 @@ PGTile.prototype.TILE_NAME = {
 // The tile objects.
 // TODO: const names for the ranks.
 var tiles = [
-    { tileName: PGTile.prototype.TILE_NAME.TEEN,            handChar: PGTile.prototype.HAND_CHAR.TEEN,            divClass: 'pgtile-teen',            tileRank:15, pairRank:14 },
-    { tileName: PGTile.prototype.TILE_NAME.TEEN,            handChar: PGTile.prototype.HAND_CHAR.TEEN,            divClass: 'pgtile-teen',            tileRank:15, pairRank:14 },
-    { tileName: PGTile.prototype.TILE_NAME.DAY,             handChar: PGTile.prototype.HAND_CHAR.DAY,             divClass: 'pgtile-day',             tileRank:14, pairRank:13 },
-    { tileName: PGTile.prototype.TILE_NAME.DAY,             handChar: PGTile.prototype.HAND_CHAR.DAY,             divClass: 'pgtile-day',             tileRank:14, pairRank:13 },
-    { tileName: PGTile.prototype.TILE_NAME.HIGH_EIGHT,      handChar: PGTile.prototype.HAND_CHAR.HIGH_EIGHT,      divClass: 'pgtile-high-eight',      tileRank:13, pairRank:12 },
-    { tileName: PGTile.prototype.TILE_NAME.HIGH_EIGHT,      handChar: PGTile.prototype.HAND_CHAR.HIGH_EIGHT,      divClass: 'pgtile-high-eight',      tileRank:13, pairRank:12 },
-    { tileName: PGTile.prototype.TILE_NAME.HARMONY_FOUR,    handChar: PGTile.prototype.HAND_CHAR.HARMONY_FOUR,    divClass: 'pgtile-harmony-four',    tileRank:12, pairRank:11 },
-    { tileName: PGTile.prototype.TILE_NAME.HARMONY_FOUR,    handChar: PGTile.prototype.HAND_CHAR.HARMONY_FOUR,    divClass: 'pgtile-harmony-four',    tileRank:12, pairRank:11 },
-    { tileName: PGTile.prototype.TILE_NAME.HIGH_TEN,        handChar: PGTile.prototype.HAND_CHAR.HIGH_TEN,        divClass: 'pgtile-high-ten',        tileRank:11, pairRank:10 },
-    { tileName: PGTile.prototype.TILE_NAME.HIGH_TEN,        handChar: PGTile.prototype.HAND_CHAR.HIGH_TEN,        divClass: 'pgtile-high-ten',        tileRank:11, pairRank:10 },
-    { tileName: PGTile.prototype.TILE_NAME.LONG_SIX,        handChar: PGTile.prototype.HAND_CHAR.LONG_SIX,        divClass: 'pgtile-long-six',        tileRank:10, pairRank: 9 },
-    { tileName: PGTile.prototype.TILE_NAME.LONG_SIX,        handChar: PGTile.prototype.HAND_CHAR.LONG_SIX,        divClass: 'pgtile-long-six',        tileRank:10, pairRank: 9 },
-    { tileName: PGTile.prototype.TILE_NAME.LOW_FOUR,        handChar: PGTile.prototype.HAND_CHAR.LOW_FOUR,        divClass: 'pgtile-low-four',        tileRank: 9, pairRank: 8 },
-    { tileName: PGTile.prototype.TILE_NAME.LOW_FOUR,        handChar: PGTile.prototype.HAND_CHAR.LOW_FOUR,        divClass: 'pgtile-low-four',        tileRank: 9, pairRank: 8 },
-    { tileName: PGTile.prototype.TILE_NAME.ELEVEN,          handChar: PGTile.prototype.HAND_CHAR.ELEVEN,          divClass: 'pgtile-eleven',          tileRank: 8, pairRank: 7 },
-    { tileName: PGTile.prototype.TILE_NAME.ELEVEN,          handChar: PGTile.prototype.HAND_CHAR.ELEVEN,          divClass: 'pgtile-eleven',          tileRank: 8, pairRank: 7 },
-    { tileName: PGTile.prototype.TILE_NAME.TEN,             handChar: PGTile.prototype.HAND_CHAR.TEN,             divClass: 'pgtile-ten',             tileRank: 7, pairRank: 6 },
-    { tileName: PGTile.prototype.TILE_NAME.TEN,             handChar: PGTile.prototype.HAND_CHAR.TEN,             divClass: 'pgtile-ten',             tileRank: 7, pairRank: 6 },
-    { tileName: PGTile.prototype.TILE_NAME.SEVEN,           handChar: PGTile.prototype.HAND_CHAR.SEVEN,           divClass: 'pgtile-seven',           tileRank: 6, pairRank: 5 },
-    { tileName: PGTile.prototype.TILE_NAME.SEVEN,           handChar: PGTile.prototype.HAND_CHAR.SEVEN,           divClass: 'pgtile-seven',           tileRank: 6, pairRank: 5 },
-    { tileName: PGTile.prototype.TILE_NAME.SIX,             handChar: PGTile.prototype.HAND_CHAR.SIX,             divClass: 'pgtile-six',             tileRank: 5, pairRank: 4 },
-    { tileName: PGTile.prototype.TILE_NAME.SIX,             handChar: PGTile.prototype.HAND_CHAR.SIX,             divClass: 'pgtile-six',             tileRank: 5, pairRank: 4 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_NINE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_NINE,      divClass: 'pgtile-mixed-nine-1',    tileRank: 4, pairRank: 3 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_NINE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_NINE,      divClass: 'pgtile-mixed-nine-2',    tileRank: 4, pairRank: 3 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_EIGHT,     handChar: PGTile.prototype.HAND_CHAR.MIXED_EIGHT,     divClass: 'pgtile-mixed-eight-1',   tileRank: 3, pairRank: 2 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_EIGHT,     handChar: PGTile.prototype.HAND_CHAR.MIXED_EIGHT,     divClass: 'pgtile-mixed-eight-2',   tileRank: 3, pairRank: 2 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_SEVEN,     handChar: PGTile.prototype.HAND_CHAR.MIXED_SEVEN,     divClass: 'pgtile-mixed-seven-1',   tileRank: 2, pairRank: 1 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_SEVEN,     handChar: PGTile.prototype.HAND_CHAR.MIXED_SEVEN,     divClass: 'pgtile-mixed-seven-2',   tileRank: 2, pairRank: 1 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_FIVE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_FIVE,      divClass: 'pgtile-mixed-five-1',    tileRank: 1, pairRank: 0 },
-    { tileName: PGTile.prototype.TILE_NAME.MIXED_FIVE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_FIVE,      divClass: 'pgtile-mixed-five-2',     tileRank: 1, pairRank: 0 },
-    { tileName: PGTile.prototype.TILE_NAME.GEE_JOON,        handChar: PGTile.prototype.HAND_CHAR.GEE_JOON,        divClass: 'pgtile-gee-joon-1',      tileRank: 0, pairRank:15 },
-    { tileName: PGTile.prototype.TILE_NAME.GEE_JOON,        handChar: PGTile.prototype.HAND_CHAR.GEE_JOON,        divClass: 'pgtile-gee-joon-2',      tileRank: 0, pairRank:15 }
+    { tileName: PGTile.prototype.TILE_NAME.TEEN,            handChar: PGTile.prototype.HAND_CHAR.TEEN,            divClass: 'pgtile-teen',            tileRank:15, pairRank:14, numericVal: 2 },
+    { tileName: PGTile.prototype.TILE_NAME.TEEN,            handChar: PGTile.prototype.HAND_CHAR.TEEN,            divClass: 'pgtile-teen',            tileRank:15, pairRank:14, numericVal: 2 },
+    { tileName: PGTile.prototype.TILE_NAME.DAY,             handChar: PGTile.prototype.HAND_CHAR.DAY,             divClass: 'pgtile-day',             tileRank:14, pairRank:13, numericVal: 2 },
+    { tileName: PGTile.prototype.TILE_NAME.DAY,             handChar: PGTile.prototype.HAND_CHAR.DAY,             divClass: 'pgtile-day',             tileRank:14, pairRank:13, numericVal: 2 },
+    { tileName: PGTile.prototype.TILE_NAME.HIGH_EIGHT,      handChar: PGTile.prototype.HAND_CHAR.HIGH_EIGHT,      divClass: 'pgtile-high-eight',      tileRank:13, pairRank:12, numericVal: 8 },
+    { tileName: PGTile.prototype.TILE_NAME.HIGH_EIGHT,      handChar: PGTile.prototype.HAND_CHAR.HIGH_EIGHT,      divClass: 'pgtile-high-eight',      tileRank:13, pairRank:12, numericVal: 8 },
+    { tileName: PGTile.prototype.TILE_NAME.HARMONY_FOUR,    handChar: PGTile.prototype.HAND_CHAR.HARMONY_FOUR,    divClass: 'pgtile-harmony-four',    tileRank:12, pairRank:11, numericVal: 4 },
+    { tileName: PGTile.prototype.TILE_NAME.HARMONY_FOUR,    handChar: PGTile.prototype.HAND_CHAR.HARMONY_FOUR,    divClass: 'pgtile-harmony-four',    tileRank:12, pairRank:11, numericVal: 4 },
+    { tileName: PGTile.prototype.TILE_NAME.HIGH_TEN,        handChar: PGTile.prototype.HAND_CHAR.HIGH_TEN,        divClass: 'pgtile-high-ten',        tileRank:11, pairRank:10, numericVal:10 },
+    { tileName: PGTile.prototype.TILE_NAME.HIGH_TEN,        handChar: PGTile.prototype.HAND_CHAR.HIGH_TEN,        divClass: 'pgtile-high-ten',        tileRank:11, pairRank:10, numericVal:10 },
+    { tileName: PGTile.prototype.TILE_NAME.LONG_SIX,        handChar: PGTile.prototype.HAND_CHAR.LONG_SIX,        divClass: 'pgtile-long-six',        tileRank:10, pairRank: 9, numericVal: 6 },
+    { tileName: PGTile.prototype.TILE_NAME.LONG_SIX,        handChar: PGTile.prototype.HAND_CHAR.LONG_SIX,        divClass: 'pgtile-long-six',        tileRank:10, pairRank: 9, numericVal: 6 },
+    { tileName: PGTile.prototype.TILE_NAME.LOW_FOUR,        handChar: PGTile.prototype.HAND_CHAR.LOW_FOUR,        divClass: 'pgtile-low-four',        tileRank: 9, pairRank: 8, numericVal: 4 },
+    { tileName: PGTile.prototype.TILE_NAME.LOW_FOUR,        handChar: PGTile.prototype.HAND_CHAR.LOW_FOUR,        divClass: 'pgtile-low-four',        tileRank: 9, pairRank: 8, numericVal: 4 },
+    { tileName: PGTile.prototype.TILE_NAME.ELEVEN,          handChar: PGTile.prototype.HAND_CHAR.ELEVEN,          divClass: 'pgtile-eleven',          tileRank: 8, pairRank: 7, numericVal:11 },
+    { tileName: PGTile.prototype.TILE_NAME.ELEVEN,          handChar: PGTile.prototype.HAND_CHAR.ELEVEN,          divClass: 'pgtile-eleven',          tileRank: 8, pairRank: 7, numericVal:11 },
+    { tileName: PGTile.prototype.TILE_NAME.TEN,             handChar: PGTile.prototype.HAND_CHAR.TEN,             divClass: 'pgtile-ten',             tileRank: 7, pairRank: 6, numericVal:10 },
+    { tileName: PGTile.prototype.TILE_NAME.TEN,             handChar: PGTile.prototype.HAND_CHAR.TEN,             divClass: 'pgtile-ten',             tileRank: 7, pairRank: 6, numericVal:10 },
+    { tileName: PGTile.prototype.TILE_NAME.SEVEN,           handChar: PGTile.prototype.HAND_CHAR.SEVEN,           divClass: 'pgtile-seven',           tileRank: 6, pairRank: 5, numericVal: 7 },
+    { tileName: PGTile.prototype.TILE_NAME.SEVEN,           handChar: PGTile.prototype.HAND_CHAR.SEVEN,           divClass: 'pgtile-seven',           tileRank: 6, pairRank: 5, numericVal: 7 },
+    { tileName: PGTile.prototype.TILE_NAME.SIX,             handChar: PGTile.prototype.HAND_CHAR.SIX,             divClass: 'pgtile-six',             tileRank: 5, pairRank: 4, numericVal: 6 },
+    { tileName: PGTile.prototype.TILE_NAME.SIX,             handChar: PGTile.prototype.HAND_CHAR.SIX,             divClass: 'pgtile-six',             tileRank: 5, pairRank: 4, numericVal: 6 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_NINE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_NINE,      divClass: 'pgtile-mixed-nine-1',    tileRank: 4, pairRank: 3, numericVal: 9 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_NINE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_NINE,      divClass: 'pgtile-mixed-nine-2',    tileRank: 4, pairRank: 3, numericVal: 9 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_EIGHT,     handChar: PGTile.prototype.HAND_CHAR.MIXED_EIGHT,     divClass: 'pgtile-mixed-eight-1',   tileRank: 3, pairRank: 2, numericVal: 8 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_EIGHT,     handChar: PGTile.prototype.HAND_CHAR.MIXED_EIGHT,     divClass: 'pgtile-mixed-eight-2',   tileRank: 3, pairRank: 2, numericVal: 8 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_SEVEN,     handChar: PGTile.prototype.HAND_CHAR.MIXED_SEVEN,     divClass: 'pgtile-mixed-seven-1',   tileRank: 2, pairRank: 1, numericVal: 7 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_SEVEN,     handChar: PGTile.prototype.HAND_CHAR.MIXED_SEVEN,     divClass: 'pgtile-mixed-seven-2',   tileRank: 2, pairRank: 1, numericVal: 7 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_FIVE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_FIVE,      divClass: 'pgtile-mixed-five-1',    tileRank: 1, pairRank: 0, numericVal: 5 },
+    { tileName: PGTile.prototype.TILE_NAME.MIXED_FIVE,      handChar: PGTile.prototype.HAND_CHAR.MIXED_FIVE,      divClass: 'pgtile-mixed-five-2',    tileRank: 1, pairRank: 0, numericVal: 5 },
+    { tileName: PGTile.prototype.TILE_NAME.GEE_JOON,        handChar: PGTile.prototype.HAND_CHAR.GEE_JOON,        divClass: 'pgtile-gee-joon-1',      tileRank: 0, pairRank:15, numericVal: 3 },
+    { tileName: PGTile.prototype.TILE_NAME.GEE_JOON,        handChar: PGTile.prototype.HAND_CHAR.GEE_JOON,        divClass: 'pgtile-gee-joon-2',      tileRank: 0, pairRank:15, numericVal: 3 },
 ];
 
 /*
@@ -329,6 +329,15 @@ PGTile.prototype.tileRank = function() {
 */
 PGTile.prototype.pairRank = function() {
     return tiles[this._index].pairRank;
+};
+
+/*
+* @method numericVal
+*
+* returns the numeric value of this tile
+*/
+PGTile.prototype.numericVal = function() {
+    return tiles[this._index].numericVal;
 };
 
 /*
