@@ -33,12 +33,13 @@ function(
             'next_tile_index': 0,
             'player_score': 0,
             'opponent_score': 0,
-            'opponent_name': "computer"
+            'opponent_name': "computer",
+            'state': undefined
         },
 
         _addModelListeners: function() {
-            this.on("change:player_score", function() { this.trigger("score:change"); });
-            this.on("change:opponent_score", function() { this.trigger("score:change"); });
+            this.on("change:player_score", function() { this.trigger("change:score"); });
+            this.on("change:opponent_score", function() { this.trigger("change:score"); });
         },
 
         urlRoot: '/game',

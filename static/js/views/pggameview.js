@@ -64,7 +64,8 @@ define([
                     new PGDealView({
                         el: $gameContents.find('.pgdeal')[0],
                         dealModel: this._playerDealModel,
-                        deckModel: this._deckModel
+                        deckModel: this._deckModel,
+                        gameModel: this._gameModel
                     }),
                     new PGDealView({
                         el: $gameContents.find('.pgdeal')[1],
@@ -80,7 +81,8 @@ define([
         _addModelListeners: function() {
             this._playerModel.on("change:state", _.bind(this._showOrHide, this));
             this._playerDealModel.on("change:state", _.bind(this._handleDealState, this));
-            this._gameModel.on("score:change", _.bind(this._updateScore, this));
+            this._gameModel.on("change:score", _.bind(this._updateScore, this));
+            this._gameModel.on("change:state", _.bind(this._handleGameState, this));
         },
 
         _showOrHide: function() {
@@ -101,10 +103,23 @@ define([
             // even if the new value is the same as the last value.
             this._gameModel.set('player_score', 0);
             this._gameModel.set('opponent_score', 0);
-            this._gameModel.trigger("score:change");
+            this._gameModel.trigger("change:score");
 
             this._deckModel.washTiles();
             this.$el.finish().fadeIn(500);
+
+            this._gameModel.set('state', "just_dealt");
+        },
+
+        _handleGameState: function() {
+            if (this._gameModel.get('state') === "new_deal_asked_for") {
+                // Signal from dealview to deal next tiles.
+
+                this._deckModel.washTiles();
+
+                // We deal the tiles, start over.
+                this._gameModel.set('state', "just_dealt");
+            }
         },
 
         _handleDealState: function() {
@@ -121,7 +136,10 @@ define([
 
                 // The player has set their tiles
                 case 'finished':
-                    // Oder the three hands (sets)
+
+                    this._gameModel.set('state', "scoring");
+
+                    // Order the three hands (sets)
                     this._dealViews[1].orderSets();
 
                     // Show the computer hands
@@ -164,7 +182,15 @@ define([
                                 this._gameModel.set('opponent_score', this._gameModel.get('opponent_score') + points);
                             break;
                         }
-                        
+                    }
+
+                    // Test for finished game.
+                    if (this._gameModel.get('player_score') >= 21 || this._gameModel.get('opponent_score') >= 21) {
+                        // Game is finished.  User will have to pick new game.
+                        this._gameModel.set('state', "finished");
+                    } else {
+                        // Still more to play.
+                        this._gameModel.set('state', "ready_for_next_deal");
                     }
                 break;
             }

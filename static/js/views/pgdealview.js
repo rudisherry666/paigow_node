@@ -26,6 +26,7 @@ define([
             this._options = options;
             this._dealModel = options.dealModel;
             this._deckModel = options.deckModel;
+            this._gameModel = options.gameModel;
 
             // Listen to the models for changes.
             this._addModelListeners();
@@ -82,10 +83,6 @@ define([
                             this.$el.find('.pg-deal-tiles-are-set').removeAttr('disabled');
                             this.$el.removeClass('pg-no-manipulate');
                         break;
-                        case "finished":
-                            this.$el.find('.pg-deal-buttons button').attr('disabled', true);
-                            this.$el.addClass('pg-no-manipulate');
-                        break;
                     }
                 }, this)
             );
@@ -101,10 +98,9 @@ define([
                 }, this)
             );
 
-            // If the state changes to "previewing", order the tiles
-            this.on('change:state',
-                _.bind(function() { this._checkPreview(this.previous('state')); }, this));
-
+            if (this._gameModel) {
+                this._gameModel.on("change:state", _.bind(function() { this._handleGameState(); }, this));
+            }
         },
 
 
@@ -150,8 +146,8 @@ define([
 
         _dealTemplate:
             '<div class="pg-deal-buttons">' +
-                '<div><button type="button" class="pg-deal-preview-hands btn btn-primary btn-sm">Preview hands</button></div>' +
-                '<div><button type="button" class="pg-deal-tiles-are-set btn btn-primary btn-sm">Tiles are set</button></div>' +
+                '<div><button type="button" class="pg-deal-preview-hands btn btn-primary btn-sm">Preview Hands</button></div>' +
+                '<div><button type="button" class="pg-deal-tiles-are-set btn btn-primary btn-sm">Tiles are Set</button></div>' +
             '</div>' +
             '<div class="pg-deal-hands">' +
                 '<span class="pg-handpoints pg-handpoints-3">3</span>' +
@@ -165,24 +161,53 @@ define([
             '</div>',
 
         _previewHands: function(e) {
-            var newState = this._dealModel.get('state');
-            switch(newState) {
-                case "thinking":
-                    newState = "previewing";
-                    this._dealModel.get('handmodels').forEach(function(handModel) {
-                        handModel.previewTiles();
-                    });
-                break;
-                case "previewing":
-                    newState = "thinking";
-                break;
+            // Double-duty: next-deal or preview-hands
+            var gameState = this._gameModel.get('state');
+            if (gameState === "ready_for_next_deal") {
+                this._gameModel.set('state', "new_deal_asked_for");
+            } else {
+                var newState = this._dealModel.get('state');
+                switch(newState) {
+                    case "thinking":
+                        newState = "previewing";
+                        this._dealModel.get('handmodels').forEach(function(handModel) {
+                            handModel.previewTiles();
+                        });
+                    break;
+                    case "previewing":
+                        newState = "thinking";
+                    break;
+                }
+                this._dealModel.set('state', newState);
             }
-            this._dealModel.set('state', newState);
         },
 
         _tilesAreSet: function(e) {
              this._dealModel.set('state', "finished");
         },
+
+        _handleGameState: function() {
+            switch (this._gameModel.get('state')) {
+                case "ready_for_next_deal":
+                    $(".pg-deal-preview-hands").text("Next Deal");
+                    this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
+                break;
+
+                case "just_dealt":
+                    $(".pg-deal-preview-hands").text("Preview Hands");
+                    this._dealModel.set('state', "thinking");
+                break;
+
+                case "scoring":
+                    this.$el.find('.pg-deal-buttons button').attr('disabled', true);
+                    this.$el.addClass('pg-no-manipulate');
+                break;
+
+                default:
+                    $(".pg-deal-preview-hands").text("Preview hands");
+                break;
+            }
+        }
 
     });
 

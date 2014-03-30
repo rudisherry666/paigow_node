@@ -6,10 +6,12 @@
 */
 
 define([
+    'underscore',
     'backbone',
     'models/pghandmodel'
 ],
 function(
+    _,
     Backbone,
     PGHandModel
 ) {
@@ -48,8 +50,6 @@ function(
 
         _addModelListeners: function() {
         },
-
-        urlRoot: '/deal',
 
     });
 
