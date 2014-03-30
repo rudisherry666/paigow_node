@@ -180,8 +180,8 @@ function whichHasSpecialHands(set1, set2) {
         return ordering;
     }
 
-    pgStrategyLog("testing for wong...");
-    ordering = whichSetHasIt(set1, set2, 'isWong');
+    pgStrategyLog("testing for high nine...");
+    ordering = whichSetHasIt(set1, set2, 'isHighNine');
     if (ordering) {
         pgStrategyLog("one pair has it: set" + ordering);
         return ordering;
@@ -194,8 +194,8 @@ function whichHasSpecialHands(set1, set2) {
         return ordering;
     }
 
-    pgStrategyLog("testing for high nine...");
-    ordering = whichSetHasIt(set1, set2, 'isHighNine');
+    pgStrategyLog("testing for wong...");
+    ordering = whichSetHasIt(set1, set2, 'isWong');
     if (ordering) {
         pgStrategyLog("one pair has it: set" + ordering);
         return ordering;
@@ -362,10 +362,13 @@ PGStrategy.prototype._pickedOrderingForSets = function() {
     // see if there is an only-way in there;
     if (s1beats2 && s1beats3) {
         pickedOrdering = 1;
+        console.log("" + sets[1] + " is only way for this set");
     } else if (s2beats1 && s2beats3) {
         pickedOrdering = 2;
+        console.log("" + sets[2] + " is only way for this set");
     } else if (s3beats1 && s3beats2) {
         pickedOrdering = 3;
+        console.log("" + sets[3] + " is only way for this set");
     } else {
 
         // nope, no only way.  See if there is any set we can remove;
