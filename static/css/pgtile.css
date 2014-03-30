@@ -12,7 +12,11 @@
     margin-right: 3px;
 }
 
-.pg-loser .pgtile, .pg-push .pgtile {
+.pg-loser .pgtile {
+    background-color: #666;
+}
+
+.pg-push .pgtile {
     background-color: #444;
 }
 
@@ -38,8 +42,8 @@
     display: none !important;
 }
 
-.pg-loser .pgdot {
-    opacity: 0.7;
+.pg-loser .pgdot, .pg-push .pgdot {
+    opacity: 0.5;
 }
 
 /* ----------- TEEN ----------- */
