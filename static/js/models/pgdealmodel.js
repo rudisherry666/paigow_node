@@ -30,11 +30,20 @@ function(
             ]);
 
             this._addModelListeners();
+
+            if (options.computer) {
+                _.each(this.get('handmodels'), function(model) {
+                    model.on('change:tiles', function() {
+                        model.orderTiles();
+                    });
+                });
+            }
         },
 
         defaults: {
             'username': "unknown",
-            'state': "thinking"
+            'state': "thinking",
+            'computer': false
         },
 
 

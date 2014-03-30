@@ -110,6 +110,16 @@ PGSet.prototype.hands = function() {
 };
 
 /*
+* @method tiles
+*
+* Return the array of hands of this set
+*
+*/
+PGSet.prototype.tiles = function() {
+    return this._hand1.tiles().concat(this._hand2.tiles());
+};
+
+/*
 * @method sumAndDiff
 *
 * Return an object of the sum and diff of the two hands
@@ -122,6 +132,19 @@ PGSet.prototype.sumAndDiff = function() {
         sum:  hand1Rank + hand2Rank,
         diff: hand1Rank - hand2Rank
     };
+};
+
+/*
+* @method toString
+*
+* Better for looking at things
+*
+*/
+PGSet.prototype.toString = function() {
+    return "[ " + this._hand1.tiles()[0].name() +
+            " " + this._hand1.tiles()[1].name() +
+            " " + this._hand2.tiles()[0].name() +
+            " " + this._hand2.tiles()[1].name() + " ]";
 };
 
 /*

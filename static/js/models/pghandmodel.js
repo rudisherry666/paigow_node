@@ -9,10 +9,12 @@
 
 define([
     'backbone',
-    'classes/pghand'
+    'classes/pghand',
+    'classes/pgstrategy'
 ], function(
     Backbone,
-    PGHand
+    PGHand,
+    PGStrategy
 ) {
     
     var PGHandModel = Backbone.Model.extend({
@@ -62,11 +64,16 @@ define([
                 this._deckModel.tileOf(tileIndexes[2]),
                 this._deckModel.tileOf(tileIndexes[3])
             ];
-            this.set('tiles', tiles);
+
+            // First time when we set the tiles it sends out a notification
+            // since it wasn't set at all; subsequently it doesn't because
+            // it doesn't recognize array differences.  Set it to silent and
+            // manually notify (below) so we do the same thing every time.
+            this.set('tiles', tiles, {silent:true});
             this.trigger('change:tiles');
         },
 
-        orderTiles: function(options) {
+        previewTiles: function(options) {
             var tiles = this.get('tiles');
             var tileIndexes = this.get('tileindexes').slice(0);
 
@@ -90,6 +97,34 @@ define([
             compareAndSwitchIfNecessary(2, 3);
 
             this.set('tileindexes', tileIndexes);
+        },
+
+        orderTiles: function(options) {
+            if (!this.inOrderTiles) {
+                var tiles = this.get('tiles');
+                var tileIndexes = this.get('tileindexes').slice(0);
+
+                // Use strategy.
+                var strategy = new PGStrategy(tiles);
+                var bestSet = strategy.bestSet();
+                var newTiles = bestSet.tiles();
+
+                console.log("" + bestSet + " is chosen as only way");
+
+                // Map the tiles as they are now to the tiles index; use
+                // equality of tiles.
+                var newTileIndexes = [];
+                _.each(newTiles, function(newTile) {
+                    for (var oti = 0; oti < tiles.length; oti++) {
+                        if (newTile === tiles[oti])
+                            newTileIndexes.push(tileIndexes[oti]);
+                    }
+                });
+
+                this.inOrderTiles = true;
+                this.set('tileindexes', newTileIndexes);
+                this.inOrderTiles = false;
+            }
         }
 
     });

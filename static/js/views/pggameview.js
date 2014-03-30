@@ -34,7 +34,8 @@ define([
             });
             this._computerDealModel = new PGDealModel({
                 username: this._playerModel.get('computer'),
-                deckModel: this._deckModel
+                deckModel: this._deckModel,
+                computer: true
             });
 
             // Listen to the models for changes.
@@ -108,7 +109,7 @@ define([
         _gameTemplate:
                 '<div>' +
                     '<div class="pgdeal pg-player-deal"></div>' +
-                    '<div class="pgdeal pg-opponent-deal pg-hidden-hand"></div>' +
+                    '<div class="pgdeal pg-opponent-deal xpg-hidden-hand"></div>' +
                 '</div>'
 
     });

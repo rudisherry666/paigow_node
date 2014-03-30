@@ -19,7 +19,7 @@ function(
         // Startup
         initialize: function() {
             this.set(this.defaults);
-            this.washTiles({silent: true});
+            // this.washTiles({silent: true});
         },
 
         defaults: {
@@ -40,13 +40,18 @@ function(
                     washed[rand] = value;
                 }
             }
-            this.set('deck', washed);
+
+            // First time when we set the deck it sends out a notification
+            // since it wasn't set at all; subsequently it doesn't because
+            // it doesn't recognize array differences.  Set it to silent and
+            // manually notify (below) so we do the same thing every time.
+            this.set('deck', washed, {silent:true});
             this.set('nextTileIndex', 0);
 
             // Manual trigger because of array-comparison; setting to new
             // deck doesn't auto-trigger 'changed:deck'.
             if (!options || !options.silent)
-                this.trigger('changed:deck');
+                this.trigger('change:deck');
         },
 
         nextTileIndex: function() {

@@ -45,11 +45,20 @@ describe('PGStrategy', function() {
         assert.equal(hands[1].tiles()[1].name(), "mixed five");
     });
 
-    it('should sort special hands correctly', function() {
+    it('should sort great hands correctly', function() {
         // Pair
-        pgStrategy = new PGStrategy("gee joon-1", "six", "gee joon-2", "low four");
+        pgStrategy = new PGStrategy("teen", "high eight", "teen", "high eight");
         var pgSet = pgStrategy.bestSet();
         var hands = pgSet.hands();
+        assert.equal(hands[0].tiles()[0].name(), "teen");
+        assert.equal(hands[0].tiles()[1].name(), "teen");
+        assert.equal(hands[1].tiles()[0].name(), "high eight");
+        assert.equal(hands[1].tiles()[1].name(), "high eight");
+
+        // Pair
+        pgStrategy = new PGStrategy("gee joon-1", "six", "gee joon-2", "low four");
+        pgSet = pgStrategy.bestSet();
+        hands = pgSet.hands();
         assert.equal(hands[0].tiles()[0].name(), "gee joon");
         assert.equal(hands[0].tiles()[1].name(), "gee joon");
         assert.equal(hands[1].tiles()[0].name(), "low four");
@@ -74,6 +83,33 @@ describe('PGStrategy', function() {
         assert.equal(hands[1].tiles()[1].name(), "eleven");
     });
 
+    it('should sort special hands correctly', function() {
+        var pgStrategy = new PGStrategy("harmony four", "mixed nine", "mixed five", "seven");
+        var pgSet = pgStrategy.bestSet();
+        var hands = pgSet.hands();
+        assert.equal(hands[0].tiles()[0].name(), "harmony four");
+        assert.equal(hands[0].tiles()[1].name(), "mixed five");
+        assert.equal(hands[1].tiles()[0].name(), "seven");
+        assert.equal(hands[1].tiles()[1].name(), "mixed nine");
+
+        pgStrategy = new PGStrategy("ten", "gee joon", "long six", "mixed nine");
+        pgSet = pgStrategy.bestSet();
+        hands = pgSet.hands();
+        assert.equal(hands[0].tiles()[0].name(), "long six");
+        assert.equal(hands[0].tiles()[1].name(), "gee joon");
+        assert.equal(hands[1].tiles()[0].name(), "ten");
+        assert.equal(hands[1].tiles()[1].name(), "mixed nine");
+
+        // High nine over gong
+        pgStrategy = new PGStrategy("day", "high eight", "low four", "seven");
+        pgSet = pgStrategy.bestSet();
+        hands = pgSet.hands();
+        assert.equal(hands[0].tiles()[0].name(), "day");
+        assert.equal(hands[0].tiles()[1].name(), "seven");
+        assert.equal(hands[1].tiles()[0].name(), "high eight");
+        assert.equal(hands[1].tiles()[1].name(), "low four");
+
+    });
 //     function testX321SetOrdering(self) {
 //         set1 = PGSet.createWithTileNames(("low ten", "mixed nine", "harmony four", "low four"));
 //         set2 = PGSet.createWithTileNames(("low six", "low six", "low ten", "high seven"));

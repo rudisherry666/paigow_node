@@ -138,7 +138,7 @@ define([
                 case "thinking":
                     newState = "previewing";
                     this._dealModel.get('handmodels').forEach(function(handModel) {
-                        handModel.orderTiles();
+                        handModel.previewTiles();
                     });
                 break;
                 case "previewing":
