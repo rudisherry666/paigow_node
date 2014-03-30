@@ -127,11 +127,16 @@ PGSet.prototype.tiles = function() {
 */
 PGSet.prototype.sumAndDiff = function() {
     var hand1Rank = this._hand1.rank(),
-        hand2Rank = this._hand2.rank();
-    return {
+        hand2Rank = this._hand2.rank(),
+        hand1Value = this._hand1.value(),
+        hand2Value = this._hand2.value();
+    var sad = {
         sum:  hand1Rank + hand2Rank,
-        diff: hand1Rank - hand2Rank
+        diff: hand1Rank - hand2Rank,
     };
+    if (hand1Value <= 9 && hand2Value <= 9)
+        sad.valDiff = hand1Value - hand2Value;
+    return sad;
 };
 
 /*

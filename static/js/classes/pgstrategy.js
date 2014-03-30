@@ -227,10 +227,16 @@ function firstSetIsBetter(set1, set2) {
         return ordering == 1;
     }
 
+    // Even it out numerically.
     sd1 = set1.sumAndDiff();
     sd2 = set2.sumAndDiff();
-    pgStrategyLog(" ...sum and diff1: " + sd1.sum + "  " + sd1.diff);
-    pgStrategyLog(" ...sum and diff2: " + sd2.sum + "  " + sd2.diff );
+    pgStrategyLog(" ...sum and diff1: " + sd1.sum + "  " + sd1.diff + " " + sd1.valueDiff);
+    pgStrategyLog(" ...sum and diff2: " + sd2.sum + "  " + sd2.diff + " " + sd2.valueDiff);
+
+    if ('valueDiff' in sd1 && 'valueDiff' in sd2 && sd1.valueDiff !== sd2.valueDiff) {
+        pgStrategyLog("... using value diffs of " + sd1.valueDiff + " and " + sd2.valueDiff);
+        return (sd1.valueDiff < sd2.valudDiff);
+    }
 
     // no only way: check for diffs;
     //return set1.sumAndDiff().diff < set2.sumAndDiff().diff;

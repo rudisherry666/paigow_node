@@ -110,6 +110,17 @@ describe('PGStrategy', function() {
         assert.equal(hands[1].tiles()[1].name(), "low four");
 
     });
+
+    it('should even numerical hands', function() {
+        var pgStrategy = new PGStrategy("day", "long six", "high ten", "mixed five");
+        var pgSet = pgStrategy.bestSet();
+        var hands = pgSet.hands();
+        console.log(pgSet.toString());
+        assert.equal(hands[0].tiles()[0].name(), "day");
+        assert.equal(hands[0].tiles()[1].name(), "mixed five");
+        assert.equal(hands[1].tiles()[0].name(), "high ten");
+        assert.equal(hands[1].tiles()[1].name(), "long six");
+    });
 //     function testX321SetOrdering(self) {
 //         set1 = PGSet.createWithTileNames(("low ten", "mixed nine", "harmony four", "low four"));
 //         set2 = PGSet.createWithTileNames(("low six", "low six", "low ten", "high seven"));
