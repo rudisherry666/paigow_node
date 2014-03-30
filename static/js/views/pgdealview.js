@@ -75,10 +75,12 @@ define([
                         case "thinking":
                             this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
                             this.$el.find('.pg-deal-tiles-are-set').attr('disabled', true);
+                            this.$el.removeClass('pg-no-manipulate');
                         break;
                         case "previewing":
                             this.$el.find('.pg-deal-preview-hands').attr('disabled', true);
                             this.$el.find('.pg-deal-tiles-are-set').removeAttr('disabled');
+                            this.$el.removeClass('pg-no-manipulate');
                         break;
                         case "finished":
                             this.$el.find('.pg-deal-buttons button').attr('disabled', true);
