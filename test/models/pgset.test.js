@@ -83,5 +83,12 @@ describe('PGSet', function() {
         var sad = pgSet.sumAndDiff();
         assert.equal(sad.sum, (hand1.rank() + hand2.rank()));
         assert.equal(sad.diff, (hand2.rank() - hand1.rank()));
+        assert.equal(sad.valDiff, undefined);
+
+        hand1 = new PGHand("eleven", "low four");
+        hand2 = new PGHand("ten", "high eight");
+        pgSet = new PGSet(hand1, hand2);
+        sad = pgSet.sumAndDiff();
+        assert.equal(sad.valDiff, 3);
     });
 });

@@ -230,12 +230,12 @@ function firstSetIsBetter(set1, set2) {
     // Even it out numerically.
     sd1 = set1.sumAndDiff();
     sd2 = set2.sumAndDiff();
-    pgStrategyLog(" ...sum and diff1: " + sd1.sum + "  " + sd1.diff + " " + sd1.valueDiff);
-    pgStrategyLog(" ...sum and diff2: " + sd2.sum + "  " + sd2.diff + " " + sd2.valueDiff);
+    pgStrategyLog(" ...sum and diff1: " + sd1.sum + "  " + sd1.diff + " " + sd1.valDiff);
+    pgStrategyLog(" ...sum and diff2: " + sd2.sum + "  " + sd2.diff + " " + sd2.valDiff);
 
-    if ('valueDiff' in sd1 && 'valueDiff' in sd2 && sd1.valueDiff !== sd2.valueDiff) {
-        pgStrategyLog("... using value diffs of " + sd1.valueDiff + " and " + sd2.valueDiff);
-        return (sd1.valueDiff < sd2.valudDiff);
+    if ('valDiff' in sd1 && 'valDiff' in sd2 && sd1.valDiff !== sd2.valDiff) {
+        pgStrategyLog("... using value diffs of " + sd1.valDiff + " and " + sd2.valDiff);
+        return (sd1.valDiff < sd2.valudDiff);
     }
 
     // no only way: check for diffs;
