@@ -80,8 +80,7 @@ define([
         _addModelListeners: function() {
             this._playerModel.on("change:state", _.bind(this._showOrHide, this));
             this._playerDealModel.on("change:state", _.bind(this._handleDealState, this));
-            this._gameModel.on("change:playerScore", _.bind(this._updateScore, this));
-            this._gameModel.on("change:opponentScore", _.bind(this._updateScore, this));
+            this._gameModel.on("score:change", _.bind(this._updateScore, this));
         },
 
         _showOrHide: function() {
@@ -97,8 +96,12 @@ define([
 
             var $game = $(".pggame");
 
-            this._gameModel.set('playerScore', 0);
-            this._gameModel.set('opponentScore', 0);
+            // Set the score.  Manually trigger a score change just in case the score
+            // was already 0-0.  Unfortunately is no backbone option to force a trigger
+            // even if the new value is the same as the last value.
+            this._gameModel.set('player_score', 0);
+            this._gameModel.set('opponent_score', 0);
+            this._gameModel.trigger("score:change");
 
             this._deckModel.washTiles();
             this.$el.finish().fadeIn(500);
@@ -143,7 +146,7 @@ define([
                                 $($hands[computerIndex]).addClass('pg-loser');
                                 $($scoreNums[playerIndex]).addClass('pg-winner');
                                 $($scoreNums[computerIndex]).addClass('pg-loser');
-                                this._gameModel.set('playerScore', this._gameModel.get('playerScore') + points);
+                                this._gameModel.set('player_score', this._gameModel.get('player_score') + points);
                             break;
 
                             case 0:   // push
@@ -158,7 +161,7 @@ define([
                                 $($hands[playerIndex]).addClass('pg-loser');
                                 $($scoreNums[computerIndex]).addClass('pg-winner');
                                 $($scoreNums[playerIndex]).addClass('pg-loser');
-                                this._gameModel.set('opponentScore', this._gameModel.get('opponentScore') + points);
+                                this._gameModel.set('opponent_score', this._gameModel.get('opponent_score') + points);
                             break;
                         }
                         
@@ -169,9 +172,9 @@ define([
 
         _updateScore: function() {
             this.$el.find('.pg-player-name').text(this._playerModel.get('username'));
-            this.$el.find('.pg-player-score').text(this._gameModel.get('playerScore'));
-            this.$el.find('.pg-opponent-name').text(this._gameModel.get('opponentName'));
-            this.$el.find('.pg-opponent-score').text(this._gameModel.get('opponentScore'));
+            this.$el.find('.pg-player-score').text(this._gameModel.get('player_score'));
+            this.$el.find('.pg-opponent-name').text(this._gameModel.get('opponent_name'));
+            this.$el.find('.pg-opponent-score').text(this._gameModel.get('opponent_score'));
         },
 
         _gameTemplate:

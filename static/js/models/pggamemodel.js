@@ -22,16 +22,23 @@ function(
         initialize: function(options) {
             this.set(this.defaults);
 
+            this._addModelListeners();
+
             // There are always two dealModels.
             var dealOptions = { deckModel: options.pgDeckModel };
         },
 
         // A game is specific to a player.
         defaults: {
-            'nextTileIndex': 0,
-            'playerScore': 0,
-            'opponentScore': 0,
-            'opponentName': "computer"
+            'next_tile_index': 0,
+            'player_score': 0,
+            'opponent_score': 0,
+            'opponent_name': "computer"
+        },
+
+        _addModelListeners: function() {
+            this.on("change:player_score", function() { this.trigger("score:change"); });
+            this.on("change:opponent_score", function() { this.trigger("score:change"); });
         },
 
         urlRoot: '/game',

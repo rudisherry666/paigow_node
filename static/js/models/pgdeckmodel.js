@@ -23,7 +23,7 @@ function(
         },
 
         defaults: {
-            'nextTileIndex': 0
+            'next_tile_index': 0
         },
 
         // Shuffle an array.
@@ -46,7 +46,7 @@ function(
             // it doesn't recognize array differences.  Set it to silent and
             // manually notify (below) so we do the same thing every time.
             this.set('deck', washed, {silent:true});
-            this.set('nextTileIndex', 0);
+            this.set('next_tile_index', 0);
 
             // Manual trigger because of array-comparison; setting to new
             // deck doesn't auto-trigger 'changed:deck'.
@@ -55,9 +55,9 @@ function(
         },
 
         nextTileIndex: function() {
-            var nextTileIndex = this.get('nextTileIndex');
+            var nextTileIndex = this.get('next_tile_index');
             if (nextTileIndex > 31) throw new Error("Too many tiles asked for");
-            this.set('nextTileIndex', nextTileIndex+1);
+            this.set('next_tile_index', nextTileIndex+1);
             return nextTileIndex;
         },
 
