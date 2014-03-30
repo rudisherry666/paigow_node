@@ -80,6 +80,8 @@ define([
         _addModelListeners: function() {
             this._playerModel.on("change:state", _.bind(this._showOrHide, this));
             this._playerDealModel.on("change:state", _.bind(this._handleDealState, this));
+            this._gameModel.on("change:playerScore", _.bind(this._updateScore, this));
+            this._gameModel.on("change:opponentScore", _.bind(this._updateScore, this));
         },
 
         _showOrHide: function() {
@@ -94,14 +96,9 @@ define([
             this.render();
 
             var $game = $(".pggame");
-            $game.find('.pgscore').remove();
-            var score = _.template('<p class="pgscore"><%=playerName%>: <%=playerScore%> <%=opponentName%>: <%=opponentScore%></p>', {
-                playerName: this._playerModel.get('username'),
-                opponentName: this._gameModel.get('opponentName'),
-                playerScore: this._gameModel.get('playerScore'),
-                opponentScore: this._gameModel.get('opponentScore')
-            });
-            $game.prepend(score);
+
+            this._gameModel.set('playerScore', 0);
+            this._gameModel.set('opponentScore', 0);
 
             this._deckModel.washTiles();
             this.$el.finish().fadeIn(500);
@@ -135,6 +132,7 @@ define([
                     var playerHands = this._playerDealModel.get('handmodels');
                     var computerHands = this._computerDealModel.get('handmodels');
                     for (var hi = 0; hi < 3; hi++) {
+                        var points = 3 - hi;
                         var playerIndex = hi;
                         var computerIndex = hi + 3;
                         var playerSet = playerHands[hi].pgSet();
@@ -145,6 +143,7 @@ define([
                                 $($hands[computerIndex]).addClass('pg-loser');
                                 $($scoreNums[playerIndex]).addClass('pg-winner');
                                 $($scoreNums[computerIndex]).addClass('pg-loser');
+                                this._gameModel.set('playerScore', this._gameModel.get('playerScore') + points);
                             break;
 
                             case 0:   // push
@@ -159,6 +158,7 @@ define([
                                 $($hands[playerIndex]).addClass('pg-loser');
                                 $($scoreNums[computerIndex]).addClass('pg-winner');
                                 $($scoreNums[playerIndex]).addClass('pg-loser');
+                                this._gameModel.set('opponentScore', this._gameModel.get('opponentScore') + points);
                             break;
                         }
                         
@@ -167,8 +167,16 @@ define([
             }
         },
 
+        _updateScore: function() {
+            this.$el.find('.pg-player-name').text(this._playerModel.get('username'));
+            this.$el.find('.pg-player-score').text(this._gameModel.get('playerScore'));
+            this.$el.find('.pg-opponent-name').text(this._gameModel.get('opponentName'));
+            this.$el.find('.pg-opponent-score').text(this._gameModel.get('opponentScore'));
+        },
+
         _gameTemplate:
                 '<div>' +
+                    '<p class="pgscore"><span class="pg-player-name"></span>: <span class="pg-player-score"></span> <span class="pg-opponent-name"></span>: <span class="pg-opponent-score"></span></p>' +
                     '<div class="pgdeal pg-player-deal"></div>' +
                     '<div class="pgdeal pg-opponent-deal pg-hidden-hand"></div>' +
                 '</div>'
