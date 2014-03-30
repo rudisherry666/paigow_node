@@ -114,7 +114,7 @@ define([
                     $(".pg-opponent-deal").addClass("pg-hidden-hand");
                 break;
                 case 'finished':
-                    this._computerDealModel.orderSets();
+                    this._dealViews[1].orderSets();
                     $(".pg-opponent-deal").removeClass("pg-hidden-hand");
                 break;
             }

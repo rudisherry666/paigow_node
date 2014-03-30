@@ -105,8 +105,38 @@ define([
 
         },
 
+
+        orderSets: function() {
+            var handModels = this._dealModel.get('handmodels');
+            var sets = [
+                handModels[0].pgSet(),
+                handModels[1].pgSet(),
+                handModels[2].pgSet()
+            ];
+            var sads = [
+                sets[0].sumAndDiff().sum,
+                sets[1].sumAndDiff().sum,
+                sets[2].sumAndDiff().sum
+            ];
+
+            var self = this;
+            function switchSad(i) {
+                var temp = sads[i];
+                sads[i] = sads[i+1];
+                sads[i+1] = temp;
+                self._switchHandsEx(i);
+            }
+            if (sads[0] < sads[1]) switchSad(0);
+            if (sads[1] < sads[2]) switchSad(1);
+            if (sads[0] < sads[1]) switchSad(0);
+        },
+
         _switchHands: function(e) {
             var whichHand = parseInt($(e.target).attr('data-handindex'), 10);
+            this._switchHandsEx(whichHand);
+        },
+
+        _switchHandsEx: function(whichHand) {
             var handModels = this._dealModel.get('handmodels');
             var modelOne = handModels[whichHand];
             var modelTwo = handModels[whichHand+1];
