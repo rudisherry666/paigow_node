@@ -12,6 +12,10 @@
     margin-right: 3px;
 }
 
+.pg-loser .pgtile, .pg-push .pgtile {
+    background-color: #444;
+}
+
 .red {
     background: Firebrick;
 }
@@ -32,6 +36,10 @@
 
 .pg-hidden-hand .pgdot {
     display: none !important;
+}
+
+.pg-loser .pgdot {
+    opacity: 0.7;
 }
 
 /* ----------- TEEN ----------- */

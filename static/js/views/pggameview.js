@@ -109,13 +109,60 @@ define([
 
         _handleDealState: function() {
             switch (this._playerDealModel.get('state')) {
+
                 case 'thinking':
                 case 'previewing':
+                    // Make sure the computer hand is hidden
                     $(".pg-opponent-deal").addClass("pg-hidden-hand");
+
+                    // All point-nums back to normal.
+                    this.$el.find('.pg-handpoints, .pghand').removeClass("pg-winner pg-loser pg-push");
                 break;
+
+                // The player has set their tiles
                 case 'finished':
+                    // Oder the three hands (sets)
                     this._dealViews[1].orderSets();
+
+                    // Show the computer hands
                     $(".pg-opponent-deal").removeClass("pg-hidden-hand");
+
+                    // Set the score.
+
+                    // All the handpoints: they go from player 321 to computer 321.
+                    var $scoreNums = this.$el.find('.pg-handpoints');
+                    var $hands = this.$el.find('.pghand');
+                    var playerHands = this._playerDealModel.get('handmodels');
+                    var computerHands = this._computerDealModel.get('handmodels');
+                    for (var hi = 0; hi < 3; hi++) {
+                        var playerIndex = hi;
+                        var computerIndex = hi + 3;
+                        var playerSet = playerHands[hi].pgSet();
+                        var computerSet = computerHands[hi].pgSet();
+                        switch (playerSet.compare(computerSet)) {
+                            case 1:   // player wins
+                                $($hands[playerIndex]).addClass('pg-winner');
+                                $($hands[computerIndex]).addClass('pg-loser');
+                                $($scoreNums[playerIndex]).addClass('pg-winner');
+                                $($scoreNums[computerIndex]).addClass('pg-loser');
+                            break;
+
+                            case 0:   // push
+                                $($hands[playerIndex]).addClass('pg-push');
+                                $($hands[computerIndex]).addClass('pg-push');
+                                $($scoreNums[playerIndex]).addClass('pg-push');
+                                $($scoreNums[computerIndex]).addClass('pg-push');
+                            break;
+
+                            case -1:  // computer wins
+                                $($hands[computerIndex]).addClass('pg-winner');
+                                $($hands[playerIndex]).addClass('pg-loser');
+                                $($scoreNums[computerIndex]).addClass('pg-winner');
+                                $($scoreNums[playerIndex]).addClass('pg-loser');
+                            break;
+                        }
+                        
+                    }
                 break;
             }
         },

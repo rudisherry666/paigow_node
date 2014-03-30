@@ -55,6 +55,15 @@
 .pg-handpoints-2 { top: 244px; }
 .pg-handpoints-1 { top: 426px; }
 
+.pg-handpoints.pg-winner {
+    font-weight: 700;
+    color: Firebrick;
+}
+
+.pg-handpoints.pg-loser {
+    color: LimeGreen;
+}
+
 .pg-hidden-hand .pgswitchhands-btn,
 .pg-opponenet-deal .pgswitchhands-btn
  {
