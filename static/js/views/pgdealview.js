@@ -142,10 +142,10 @@ define([
             var handModels = this._dealModel.get('handmodels');
             var modelOne = handModels[whichHand];
             var modelTwo = handModels[whichHand+1];
-            var tilesOne = modelOne.get('tileindexes');
-            var tilesTwo = modelTwo.get('tileindexes');
-            modelOne.set('tileindexes', tilesTwo);
-            modelTwo.set('tileindexes', tilesOne);
+            var tilesOne = modelOne.get('tile_indexes');
+            var tilesTwo = modelTwo.get('tile_indexes');
+            modelOne.set('tile_indexes', tilesTwo);
+            modelTwo.set('tile_indexes', tilesOne);
         },
 
         _dealTemplate:

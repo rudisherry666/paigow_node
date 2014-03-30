@@ -34,7 +34,7 @@ define([
 
             // Set the indexes but during initialization we don't want
             // to trigger anything: that happens when the deck is washed.
-            this.set('tileindexes', tileIndexes, {silent: true});
+            this.set('tile_indexes', tileIndexes, {silent: true});
         },
 
         // A hand is specific to a player in a game, and is
@@ -52,12 +52,12 @@ define([
                 _.bind(function() { this._resetTiles(); }, this));
 
             // If tile indexes are changed, reset the tiles
-            this.on('change:tileindexes',
+            this.on('change:tile_indexes',
                 _.bind(function() { this._resetTiles(); }, this));
         },
 
         _resetTiles: function() {
-            var tileIndexes = this.get('tileindexes');
+            var tileIndexes = this.get('tile_indexes');
             var tiles = [
                 this._deckModel.tileOf(tileIndexes[0]),
                 this._deckModel.tileOf(tileIndexes[1]),
@@ -75,7 +75,7 @@ define([
 
         previewTiles: function(options) {
             var tiles = this.get('tiles');
-            var tileIndexes = this.get('tileindexes').slice(0);
+            var tileIndexes = this.get('tile_indexes').slice(0);
 
             // Put the higher hand on the left
             var highHand = new PGHand(tiles[0], tiles[1]);
@@ -96,7 +96,7 @@ define([
             compareAndSwitchIfNecessary(0, 1);
             compareAndSwitchIfNecessary(2, 3);
 
-            this.set('tileindexes', tileIndexes);
+            this.set('tile_indexes', tileIndexes);
         },
 
         pgSet: function() {
@@ -107,7 +107,7 @@ define([
         orderTiles: function(options) {
             if (!this.inOrderTiles) {
                 var tiles = this.get('tiles');
-                var tileIndexes = this.get('tileindexes').slice(0);
+                var tileIndexes = this.get('tile_indexes').slice(0);
 
                 // Use strategy.
                 var strategy = new PGStrategy(tiles);
@@ -127,7 +127,7 @@ define([
                 });
 
                 this.inOrderTiles = true;
-                this.set('tileindexes', newTileIndexes);
+                this.set('tile_indexes', newTileIndexes);
                 this.inOrderTiles = false;
             }
         }

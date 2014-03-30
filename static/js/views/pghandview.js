@@ -80,8 +80,8 @@ define([
         _rotateTiles: function(e) {
             // Switch around our hand's tiles: third tile goes second,
             // fourth goes third, second goes fourth.
-            var tileIndexes = this._handModel.get('tileindexes');
-            this._handModel.set('tileindexes', [ tileIndexes[0], tileIndexes[2], tileIndexes[3], tileIndexes[1] ]);
+            var tileIndexes = this._handModel.get('tile_indexes');
+            this._handModel.set('tile_indexes', [ tileIndexes[0], tileIndexes[2], tileIndexes[3], tileIndexes[1] ]);
             this._tilesChanged();
         },
 
