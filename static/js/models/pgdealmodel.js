@@ -50,6 +50,23 @@ function(
         _addModelListeners: function() {
         },
 
+        orderSets: function() {
+            var handModels = this.get('handmodels');
+            var sets = [
+                handModels[0].pgSet(),
+                handModels[1].pgSet(),
+                handModels[2].pgSet()
+            ];
+            var sads = [
+                sets[0].sumAndDiff().sum,
+                sets[1].sumAndDiff().sum,
+                sets[2].sumAndDiff().sum
+            ];
+            if (sads[0] < sads[1]) {
+
+            }
+        },
+
         urlRoot: '/deal',
 
     });

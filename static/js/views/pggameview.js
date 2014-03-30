@@ -79,6 +79,7 @@ define([
         // Listen for changes
         _addModelListeners: function() {
             this._playerModel.on("change:state", _.bind(this._showOrHide, this));
+            this._playerDealModel.on("change:state", _.bind(this._handleDealState, this));
         },
 
         _showOrHide: function() {
@@ -106,10 +107,23 @@ define([
             this.$el.finish().fadeIn(500);
         },
 
+        _handleDealState: function() {
+            switch (this._playerDealModel.get('state')) {
+                case 'thinking':
+                case 'previewing':
+                    $(".pg-opponent-deal").addClass("pg-hidden-hand");
+                break;
+                case 'finished':
+                    this._computerDealModel.orderSets();
+                    $(".pg-opponent-deal").removeClass("pg-hidden-hand");
+                break;
+            }
+        },
+
         _gameTemplate:
                 '<div>' +
                     '<div class="pgdeal pg-player-deal"></div>' +
-                    '<div class="pgdeal pg-opponent-deal xpg-hidden-hand"></div>' +
+                    '<div class="pgdeal pg-opponent-deal pg-hidden-hand"></div>' +
                 '</div>'
 
     });

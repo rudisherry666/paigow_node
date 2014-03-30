@@ -149,12 +149,8 @@ define([
         },
 
         _tilesAreSet: function(e) {
-
-        },
-
-        _tilesAreSet: function(e) {
              this._dealModel.set('state', "finished");
-       }
+        },
 
     });
 

@@ -25,7 +25,8 @@
 
 .pg-deal-buttons .pg-deal-preview-hands { float: left; }
 .pg-deal-buttons .pg-deal-tiles-are-set { float: right; }
-.pg-hidden-hand .pg-deal-buttons {
+.pg-hidden-hand .pg-deal-buttons,
+.pg-opponent-deal .pg-deal-buttons {
     visibility: hidden;
 }
 
@@ -54,10 +55,14 @@
 .pg-handpoints-2 { top: 244px; }
 .pg-handpoints-1 { top: 426px; }
 
-.pg-hidden-hand .pg-handpoints, .pg-hidden-hand .pgswitchhands-btn {
+.pg-hidden-hand .pgswitchhands-btn,
+.pg-opponenet-deal .pgswitchhands-btn
+ {
     display: none;
 }
 
-.pg-no-manipulate .pg-tile-manipulate-control {
+.pg-no-manipulate .pg-tile-manipulate-control,
+.pg-opponent-deal .pg-tile-manipulate-control
+ {
     visibility: hidden;
 }

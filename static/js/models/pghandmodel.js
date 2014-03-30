@@ -99,6 +99,11 @@ define([
             this.set('tileindexes', tileIndexes);
         },
 
+        pgSet: function() {
+            var tiles = this.get('tiles');
+            return new PGSet(tiles[0], tiles[1], tiles[2], tiles[3]);
+        },
+
         orderTiles: function(options) {
             if (!this.inOrderTiles) {
                 var tiles = this.get('tiles');
