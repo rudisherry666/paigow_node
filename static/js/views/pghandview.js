@@ -7,10 +7,12 @@
 
 define([
     'backbone',
-    'classes/pghand'
+    'classes/pghand',
+    'utils/pgbrowserutils'
 ], function(
     Backbone,
-    PGHand
+    PGHand,
+    PGBrowserUtils
 ) {
     
     var PGHandView = Backbone.View.extend({
@@ -55,6 +57,10 @@ define([
         _addModelListeners: function() {
             this._handModel.on("change:tiles",
                 _.bind(function(e) { this._tilesChanged(); }, this));
+            this._handModel.on("hand:previewed",
+                _.bind(function(e) { this._previewHand(); }, this));
+            this._handModel.on("hand:unpreviewed",
+                _.bind(function(e) { this._unpreviewHand(); }, this));
         },
 
         _tilesChanged: function() {
@@ -83,6 +89,16 @@ define([
             var tileIndexes = this._handModel.get('tile_indexes');
             this._handModel.set('tile_indexes', [ tileIndexes[0], tileIndexes[2], tileIndexes[3], tileIndexes[1] ]);
             this._tilesChanged();
+        },
+
+        _previewHand: function() {
+            var twoTile = this._$hand.find('.pg2tile>div')[1];
+            PGBrowserUtils.animateRotate($(twoTile), 0, 90);
+        },
+
+        _unpreviewHand: function() {
+            var twoTile = this._$hand.find('.pg2tile>div')[1];
+            PGBrowserUtils.animateRotate($(twoTile), 90, 0);
         },
 
         _handTemplate:

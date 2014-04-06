@@ -105,21 +105,26 @@ define([
             this._gameModel.set('opponent_score', 0);
             this._gameModel.trigger("change:score");
 
-            this._deckModel.washTiles();
             this.$el.finish().fadeIn(500);
-
-            this._gameModel.set('state', "just_dealt");
+            this._newDeal();
         },
 
         _handleGameState: function() {
             if (this._gameModel.get('state') === "new_deal_asked_for") {
                 // Signal from dealview to deal next tiles.
-
-                this._deckModel.washTiles();
-
-                // We deal the tiles, start over.
-                this._gameModel.set('state', "just_dealt");
+                this._newDeal();
             }
+        },
+
+        _newDeal: function() {
+            this._deckModel.washTiles();
+
+            // We deal the tiles, start over.
+            this._gameModel.set('state', "just_dealt");
+
+            // Order the three hands (sets)
+            this._dealViews[1].orderSets();
+            this._computerDealModel.set('state', 'previewing');
         },
 
         _handleDealState: function() {
@@ -138,9 +143,6 @@ define([
                 case 'finished':
 
                     this._gameModel.set('state', "scoring");
-
-                    // Order the three hands (sets)
-                    this._dealViews[1].orderSets();
 
                     // Show the computer hands
                     $(".pg-opponent-deal").removeClass("pg-hidden-hand");

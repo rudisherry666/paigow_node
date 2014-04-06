@@ -74,14 +74,21 @@ define([
                 _.bind(function() {
                     switch (this._dealModel.get('state')) {
                         case "thinking":
+                            this._dealModel.get('handmodels').forEach(function(handModel) {
+                                handModel.unpreviewTiles();
+                            });
+                            this.$el.find(".pg-deal-preview-hands").text("Preview Hands");
                             this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
                             this.$el.find('.pg-deal-tiles-are-set').attr('disabled', true);
                             this.$el.removeClass('pg-no-manipulate');
                         break;
                         case "previewing":
-                            this.$el.find('.pg-deal-preview-hands').attr('disabled', true);
+                            this._dealModel.get('handmodels').forEach(function(handModel) {
+                                handModel.previewTiles();
+                            });
+                            this.$el.find(".pg-deal-preview-hands").text("Reconsider");
                             this.$el.find('.pg-deal-tiles-are-set').removeAttr('disabled');
-                            this.$el.removeClass('pg-no-manipulate');
+                            this.$el.addClass('pg-no-manipulate');
                         break;
                     }
                 }, this)
@@ -164,17 +171,17 @@ define([
             // Double-duty: next-deal or preview-hands
             var gameState = this._gameModel.get('state');
             if (gameState === "ready_for_next_deal") {
+                this._dealModel.get('handmodels').forEach(function(handModel) {
+                    handModel.unpreviewTiles();
+                });
                 this._gameModel.set('state', "new_deal_asked_for");
             } else {
                 var newState = this._dealModel.get('state');
                 switch(newState) {
-                    case "thinking":
+                    case "thinking":    // going to 'previewing'
                         newState = "previewing";
-                        this._dealModel.get('handmodels').forEach(function(handModel) {
-                            handModel.previewTiles();
-                        });
                     break;
-                    case "previewing":
+                    case "previewing":    // going to 'thinking'
                         newState = "thinking";
                     break;
                 }
@@ -195,6 +202,7 @@ define([
 
                 case "just_dealt":
                     $(".pg-deal-preview-hands").text("Preview Hands");
+                    $(".pg-deal-tiles-are-set").attr('disabled', true);
                     this._dealModel.set('state', "thinking");
                 break;
 

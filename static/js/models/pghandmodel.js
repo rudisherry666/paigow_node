@@ -97,6 +97,12 @@ define([
             compareAndSwitchIfNecessary(2, 3);
 
             this.set('tile_indexes', tileIndexes);
+
+            this.trigger('hand:previewed');
+        },
+
+        unpreviewTiles: function(options) {
+            this.trigger('hand:unpreviewed');
         },
 
         pgSet: function() {

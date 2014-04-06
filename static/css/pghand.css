@@ -24,7 +24,9 @@
 .pghand .pg2tile {
     display: inline-block;
     padding: 0;
-    overflow: hidden;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: visible;
     text-align: center;
 }
 
