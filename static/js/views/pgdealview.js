@@ -103,17 +103,6 @@ define([
                 }, this)
             );
 
-            // If any of the handmodel states change, make sure we're in "thinking".
-            this._dealModel.get('handmodels').forEach(
-                _.bind(function(handModel) {
-                    handModel.on('change:tiles',
-                        _.bind(function() {
-                            this._dealModel.set('state', "thinking");
-                        }, this)
-                    );
-                }, this)
-            );
-
             if (this._gameModel) {
                 this._gameModel.on("change:state", _.bind(function() { this._handleGameState(); }, this));
             }

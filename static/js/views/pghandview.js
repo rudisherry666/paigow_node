@@ -88,6 +88,7 @@ define([
         },
 
         previewHand: function() {
+            this._handModel.previewTiles();
             if (this._handModel.get('preview_state') !== 'previewed') {
                 this._handModel.set('preview_state', 'previewed');
                 var twoTile = this._$hand.find('.pg2tile>div')[1];
