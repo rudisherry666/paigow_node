@@ -111,8 +111,13 @@ define([
 
         _handleGameState: function() {
             if (this._gameModel.get('state') === "new_deal_asked_for") {
-                // Signal from dealview to deal next tiles.
-                this._newDeal();
+                // Signal from dealview to deal next tiles; makes sure the
+                // computer tiles are un-previewed.
+                this._dealViews[1].readyForNewDeal()
+                    .then(_.bind(function() {
+                        this._newDeal();
+                    }, this)
+                );
             }
         },
 

@@ -57,10 +57,6 @@ define([
         _addModelListeners: function() {
             this._handModel.on("change:tiles",
                 _.bind(function(e) { this._tilesChanged(); }, this));
-            this._handModel.on("hand:previewed",
-                _.bind(function(e) { this._previewHand(); }, this));
-            this._handModel.on("hand:unpreviewed",
-                _.bind(function(e) { this._unpreviewHand(); }, this));
         },
 
         _tilesChanged: function() {
@@ -91,14 +87,22 @@ define([
             this._tilesChanged();
         },
 
-        _previewHand: function() {
-            var twoTile = this._$hand.find('.pg2tile>div')[1];
-            PGBrowserUtils.animateRotate($(twoTile), 0, 90);
+        previewHand: function() {
+            if (this._handModel.get('preview_state') !== 'previewed') {
+                this._handModel.set('preview_state', 'previewed');
+                var twoTile = this._$hand.find('.pg2tile>div')[1];
+                return PGBrowserUtils.animateRotate($(twoTile), 0, 90);
+            } else
+                return PGBrowserUtils.resolvedDefer;
         },
 
-        _unpreviewHand: function() {
-            var twoTile = this._$hand.find('.pg2tile>div')[1];
-            PGBrowserUtils.animateRotate($(twoTile), 90, 0);
+        unpreviewHand: function() {
+            if (this._handModel.get('preview_state') === 'previewed') {
+                this._handModel.set('preview_state', 'unpreviewed');
+                var twoTile = this._$hand.find('.pg2tile>div')[1];
+                return PGBrowserUtils.animateRotate($(twoTile), 90, 0);
+            } else
+                return PGBrowserUtils.resolvedDefer;
         },
 
         _handTemplate:

@@ -72,23 +72,32 @@ define([
             // update the state of the buttons.
             this._dealModel.on('change:state',
                 _.bind(function() {
+                    var promises = [];
                     switch (this._dealModel.get('state')) {
                         case "thinking":
-                            this._dealModel.get('handmodels').forEach(function(handModel) {
-                                handModel.unpreviewTiles();
-                            });
-                            this.$el.find(".pg-deal-preview-hands").text("Preview Hands");
-                            this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
                             this.$el.find('.pg-deal-tiles-are-set').attr('disabled', true);
-                            this.$el.removeClass('pg-no-manipulate');
+                            this._handViews.forEach(function(handView) {
+                                promises.push(handView.unpreviewHand());
+                            });
+                            $.when.apply($, promises)
+                                .done(_.bind(function() {
+                                    this.$el.find(".pg-deal-preview-hands").text("Preview Hands");
+                                    this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
+                                    this.$el.removeClass('pg-no-manipulate');
+                                    }, this)
+                                );
                         break;
                         case "previewing":
-                            this._dealModel.get('handmodels').forEach(function(handModel) {
-                                handModel.previewTiles();
-                            });
-                            this.$el.find(".pg-deal-preview-hands").text("Reconsider");
-                            this.$el.find('.pg-deal-tiles-are-set').removeAttr('disabled');
                             this.$el.addClass('pg-no-manipulate');
+                            this._handViews.forEach(function(handView) {
+                                promises.push(handView.previewHand());
+                            });
+                            $.when.apply($, promises)
+                                .done(_.bind(function() {
+                                    this.$el.find(".pg-deal-preview-hands").text("Reconsider");
+                                    this.$el.find('.pg-deal-tiles-are-set').removeAttr('disabled');
+                                    }, this)
+                                );
                         break;
                     }
                 }, this)
@@ -136,6 +145,16 @@ define([
             if (sads[0] < sads[1]) switchSad(0);
         },
 
+        readyForNewDeal: function() {
+            var defer = $.Deferred();
+            var promises = [];
+            this._handViews.forEach(function(handView) {
+                promises.push(handView.unpreviewHand());
+            });
+            $.when.apply($,promises).done(function() { defer.resolve(); });
+            return defer.promise();
+        },
+
         _switchHands: function(e) {
             var whichHand = parseInt($(e.target).attr('data-handindex'), 10);
             this._switchHandsEx(whichHand);
@@ -171,10 +190,15 @@ define([
             // Double-duty: next-deal or preview-hands
             var gameState = this._gameModel.get('state');
             if (gameState === "ready_for_next_deal") {
-                this._dealModel.get('handmodels').forEach(function(handModel) {
-                    handModel.unpreviewTiles();
+                var promises = [];
+                this._handViews.forEach(function(handView) {
+                    promises.push(handView.unpreviewHand());
                 });
-                this._gameModel.set('state', "new_deal_asked_for");
+                $.when.apply($, promises)
+                    .done(_.bind(function() {
+                        this._gameModel.set('state', "new_deal_asked_for");
+                        }, this)
+                    );
             } else {
                 var newState = this._dealModel.get('state');
                 switch(newState) {
