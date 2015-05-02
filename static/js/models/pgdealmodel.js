@@ -2,7 +2,7 @@
 *
 * @class PGDealModel
 *
-* This file defines the deal that a single player (or oppoenent) gets
+* This file defines the deal that a single player (or opponent) gets
 */
 
 define([
