@@ -12,7 +12,7 @@ var Q = require('q'),
     PGRouteBase = require('./pgroutebase'),
     PGDBPlayer = require('../models/db/pgdbgame');
 
-var pgRouteGameLog = new PGLog("rteplayer", 'debug');
+var pgRouteGameLog = new PGLog("rtegame", 'debug');
 
 function PGRouteGame(expressApp, pgdbPlayer) {
     PGRouteBase.call(this, expressApp);
@@ -86,7 +86,7 @@ PGRouteGame.prototype._newGame = function(req, res) {
     }
 
     var sessionGame = new PGDBGame(sessionPlayer, PGDBPlayer.prototype.computer());
-    sessionGame.add()
+    sessionGame.add();
     PGSession.set('game', sessionGame);
 
 };
