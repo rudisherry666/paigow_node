@@ -18,6 +18,14 @@ function(
     
     var PGGameModel = Backbone.Model.extend({
 
+        state: {
+            READY_FOR_NEXT_DEAL : 'ready_for_next_deal',
+            NEW_DEAL_ASKED_FOR  : 'new_deal_asked_for',
+            JUST_DEALT          : 'just_dealt',
+            SCORING             : 'scoring',
+            GAME_OVER           : 'game_over',
+        },
+
         // Startup
         initialize: function(options) {
             this.set(this.defaults);

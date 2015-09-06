@@ -4,5 +4,60 @@ body {
 
 .pg-game {
   padding: 10px 5px;
-  text-align: center;
+}
+
+.container.pg {
+  margin: 0;
+  padding: 0;
+}
+
+.pggame {
+  margin: 0;
+  min-width: 768px;
+  transition: transform 1s;
+}
+
+@media (max-width: 680px) {
+  .pggame.pg-game-making-room,
+  .pggame.pg-game-comparing-hands,
+  .pggame.pg-game-ready-for-next-deal {
+    transform: scale(0.9);
+    transform-origin: top left;
+  }
+}
+
+@media (max-width: 620px) {
+  .pggame.pg-game-making-room,
+  .pggame.pg-game-comparing-hands,
+  .pggame.pg-game-ready-for-next-deal {
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
+}
+
+@media (max-width: 560px) {
+  .pggame.pg-game-making-room,
+  .pggame.pg-game-comparing-hands,
+  .pggame.pg-game-ready-for-next-deal {
+    transform: scale(0.7);
+    transform-origin: top left;
+  }
+}
+
+@media (max-width: 500px) {
+  .pggame.pg-game-making-room,
+  .pggame.pg-game-comparing-hands,
+  .pggame.pg-game-ready-for-next-deal {
+    transform: scale(0.6);
+    transform-origin: top left;
+  }
+}
+
+@media (max-width: 480px) {
+  .pggame.pg-game-making-room,
+  .pggame.pg-game-comparing-hands,
+  .pggame.pg-game-ready-for-next-deal {
+    transform: scale(0.5);
+    transform-origin: top left;
+  }
 }

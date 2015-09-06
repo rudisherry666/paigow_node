@@ -18,7 +18,7 @@ define([
     PGDealModel,
     PGDealView
 ) {
-    
+
     var PGGameView = Backbone.View.extend({
 
         // Startup
@@ -82,7 +82,7 @@ define([
             this._playerModel.on("change:state", _.bind(this._showOrHide, this));
             this._playerDealModel.on("change:state", _.bind(this._handleDealState, this));
             this._gameModel.on("change:score", _.bind(this._updateScore, this));
-            this._gameModel.on("change:state", _.bind(this._handleGameState, this));
+            this._gameModel.on("change:state", _.bind(this._onGameStateChange, this));
         },
 
         _showOrHide: function() {
@@ -109,10 +109,33 @@ define([
             this._newDeal();
         },
 
-        _handleGameState: function() {
-            if (this._gameModel.get('state') === "new_deal_asked_for") {
-                // Signal from dealview to deal next tiles.
-                this._newDeal();
+        _onGameStateChange: function(model, newState) {
+            // Convenience var for possible states
+            var states = this._gameModel.state;
+
+            // We're in "no" state now.
+            this.$el.removeClass('pg-game-making-room pg-game-ready-for-next-deal pg-game-comparing-hands pg-game-dealing-tiles pg-game-setting-tiles');
+
+            switch (newState) {
+                case states.READY_FOR_NEXT_DEAL:
+                    this.$el.addClass('pg-game-ready-for-next-deal');
+                break;
+
+                case states.JUST_DEALT:
+                    this.$el.addClass('pg-game-setting-tiles');
+                break;
+
+                case states.NEW_DEAL_ASKED_FOR:
+                    this.$el.addClass('pg-game-dealing-tiles');
+                    this._newDeal();
+                break;
+
+                case states.SCORING:
+                    this.$el.addClass('pg-game-making-room');
+                    _.delay(_.bind(function() {
+                        this.$el.addClass('pg-game-comparing-hands');
+                    }, this), 2000);
+                break;
             }
         },
 
@@ -140,8 +163,7 @@ define([
                 break;
 
                 // The player has set their tiles
-                case 'finished':
-
+                case 'finished_setting_tiles':
                     this._gameModel.set('state', "scoring");
 
                     // Show the computer hands
@@ -189,7 +211,7 @@ define([
                     // Test for finished game.
                     if (this._gameModel.get('player_score') >= 21 || this._gameModel.get('opponent_score') >= 21) {
                         // Game is finished.  User will have to pick new game.
-                        this._gameModel.set('state', "finished");
+                        this._gameModel.set('state', 'game_over');
                     } else {
                         // Still more to play.
                         this._gameModel.set('state', "ready_for_next_deal");

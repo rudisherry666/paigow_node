@@ -5,7 +5,7 @@
     background-color: LimeGreen;
     border-radius: 5px;
     text-align: center;
-    margin: 20px;
+    margin-left: 10px;
 }
 
 .pg-deal-hands {
@@ -64,8 +64,25 @@
     color: LimeGreen;
 }
 
+.pg-opponent-deal {
+    transition: opacity linear 2s;
+}
+
+.pg-opponent-deal {
+    opacity: 1;
+}
+
+.pg-game-making-room .pg-opponent-deal,
+.pg-game-setting-tiles .pg-opponent-deal,
+.pg-game-just-dealt .pg-opponent-deal {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
 .pg-hidden-hand .pgswitchhands-btn,
-.pg-opponenet-deal .pgswitchhands-btn
+.pg-opponent-deal .pgswitchhands-btn
  {
     display: none;
 }

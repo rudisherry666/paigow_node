@@ -190,18 +190,19 @@ define([
         },
 
         _tilesAreSet: function(e) {
-             this._dealModel.set('state', "finished");
+             this._dealModel.set('state', 'finished_setting_tiles');
         },
 
         _handleGameState: function() {
+          var $handsButton = $(".pg-deal-preview-hands");
             switch (this._gameModel.get('state')) {
                 case "ready_for_next_deal":
-                    $(".pg-deal-preview-hands").text("Next Deal");
+                    $handsButton.text("Next Deal");
                     this.$el.find('.pg-deal-preview-hands').removeAttr('disabled');
                 break;
 
                 case "just_dealt":
-                    $(".pg-deal-preview-hands").text("Preview Hands");
+                    $handsButton.text("Preview Hands");
                     $(".pg-deal-tiles-are-set").attr('disabled', true);
                     this._dealModel.set('state', "thinking");
                 break;
@@ -212,7 +213,7 @@ define([
                 break;
 
                 default:
-                    $(".pg-deal-preview-hands").text("Preview hands");
+                    $handsButton.text("Preview hands");
                 break;
             }
         }

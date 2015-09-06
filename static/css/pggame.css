@@ -1,14 +1,12 @@
-.pground {
-    padding-top: 10px;
-    padding-bottom: 23px;
-    background-color: LightGray;
-    border-radius: 5px;
-    text-align: center;
-    display: block;
+.pgscore {
+  font-size: 24px;
+  font-weight: 200;
+  margin-bottom: 3px;
+  margin-left: 40px;
 }
 
-.pgscore {
-    font-size: 24px;
-    margin-bottom: 3px;
-    font-weight: 200;
+.pg-game-comparing-hands .pgscore,
+.pg-game-ready-for-deal .pgscore {
+  margin-left: 0;
+  text-align: center;
 }
