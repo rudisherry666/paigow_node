@@ -92,3 +92,9 @@
  {
     visibility: hidden;
 }
+
+@media (max-width: 560px) {
+    .pgdeal {
+        margin-left: 1px;
+    }
+}

@@ -10,3 +10,9 @@
   margin-left: 0;
   text-align: center;
 }
+
+@media (max-width: 560px) {
+  .pgscore {
+    font-size: 16px;
+  }
+}
