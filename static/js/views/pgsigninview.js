@@ -77,8 +77,8 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
         },
 
         _onSignin: function(e) {
-            if (this._options.pgPlayerModel.get('state') === 'working')
-                return;
+            if (this._isSigningInOrRegistering()) return;
+            $('body').removeClass('pg-user-not-signed-in').addClass('pg-user-signing-in');
 
             this._hideError();
 
@@ -91,17 +91,12 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
                 return this._onError("Password is required!");
             }
 
-            this._options.pgPlayerModel.set({
-                state: 'signing-in',
-                username: username,
-                password: password
-            });
-            this._options.pgPlayerModel.save();
+            this._signInOrRegister('signing-in', username, password);
         },
 
         _onRegister: function(e) {
-            if (this._options.pgPlayerModel.get('state') === 'working')
-                return;
+            if (this._isSigningInOrRegistering()) return;
+            $('body').removeClass('pg-user-not-signed-in').addClass('pg-user-signing-in');
 
             this._hideError();
 
@@ -120,12 +115,8 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
             if (passwordVerify != password) {
                 return this._onError("Passwords don't match!");
             }
-            this._options.pgPlayerModel.set({
-                state: 'registering',
-                username: username,
-                password: password
-            });
-            this._options.pgPlayerModel.save();
+
+            this._signInOrRegister('registering', username, password);
         },
 
         _onError: function(err) {
@@ -135,6 +126,28 @@ define(['bootstrap', 'backbone', 'jquery-ui'], function(Bootstrap, Backbone) {
 
         _hideError: function() {
             $("#pgsignin-error-message").css('visibility', "hidden");
+        },
+
+        _isSigningInOrRegistering: function() {
+            var $body = $('body');
+            return $body.hasClass('signing-in');
+        },
+
+        _signInOrRegister: function(state, username, password) {
+            this._options.pgPlayerModel.set({
+                state: state,
+                username: username,
+                password: password
+            });
+            this._options.pgPlayerModel.save()
+                .then(_.bind(function() {
+                    this._options.pgPlayerModel.set('state', 'signed-in');
+                    $('body').removeClass('pg-user-signing-in').addClass('pg-user-signed-in');
+                }, this))
+                .fail(_.bind(function() {
+                    this._options.pgPlayerModel.set('state', 'not-signed-in');
+                    $('body').removeClass('pg-user-signing-in').addClass('pg-user-not-signed-in');
+                }, this));
         }
 
     });

@@ -28,3 +28,19 @@
     visibility: hidden;
     margin: 4px 0 8px;
 }
+
+.pg-user-signed-in .form-signing {
+  display: none;
+}
+
+.pg-user-signing-in .pg-user-signin-button,
+.pg-user-signed-in .pg-user-signin-button {
+  pointer-events: none;
+  cursor: default;
+}
+
+.pg-user-signing-in .pg-user-action-button,
+.pg-user-not-signed-in .pg-user-action-button {
+  pointer-events: none;
+  cursor: default;
+}

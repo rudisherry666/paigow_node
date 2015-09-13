@@ -40,16 +40,6 @@ define([
 
             // Listen to the models for changes.
             this._addModelListeners();
-
-            // This is not inside our view so we use the old-style
-            // jquery for that.
-            // TODO: have the button in the app or navbar and change
-            // the game model in some way.
-            $('#pg-new-game').click(
-                _.bind(function(e) {
-                    this._newGame();
-                }, this)
-            );
         },
 
         // If there is no signin, then show the view.
@@ -92,7 +82,7 @@ define([
             }
         },
 
-        _newGame: function() {
+        newGame: function() {
             this.$el.finish().fadeOut(500);
             this.render();
 

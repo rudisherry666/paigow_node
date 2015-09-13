@@ -42,6 +42,25 @@ body {
     transform: scale(0.7);
     transform-origin: top left;
   }
+  .navbar {
+    min-height: 30px;
+    margin-bottom: 10px;
+  }
+  .navbar-brand {
+    font-size: 12px;
+    padding: 6px;
+    padding-left: 9px;
+    height: 30px;
+  }
+  .navbar-toggle {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding: 3px 7px;
+  }
+  .navbar-nav>li>a {
+    padding: 6px;
+    line-height: 15px;
+  }
 }
 
 @media (max-width: 500px) {
@@ -60,4 +79,16 @@ body {
     transform: scale(0.5);
     transform-origin: top left;
   }
+}
+
+@media (max-width: 300px) {
+  .pggame.pg-game-making-room,
+  .pggame.pg-game-comparing-hands,
+  .pggame.pg-game-ready-for-next-deal {
+    transform: scale(0.4);
+    transform-origin: top left;
+  }
+}
+
+@media (max-height: 800) {
 }
